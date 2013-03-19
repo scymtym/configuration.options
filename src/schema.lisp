@@ -80,7 +80,13 @@
                  :documentation
                  "")
    (default      :initarg  :default
-                 :reader   option-default))
+                 :reader   option-default)
+   (description  :initarg  :description
+                 :type     (or null string)
+                 :reader   option-description
+                 :initform nil
+                 :documentation
+                 ""))
   (:default-initargs
    :type         (missing-required-initarg 'standard-schema-item 'type)
    :option-class 'standard-option)

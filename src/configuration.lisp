@@ -38,8 +38,14 @@ Is unbound when the option cell does not have a value."))
   (:documentation
    "TODO(jmoringe): document"))
 
-(defmethod option-type ((option option-cell))
-  (option-type (option-schema-item option)))
+(macrolet
+    ((define-delegation (name)
+       `(defmethod ,name ((option option-cell))
+          (,name (option-schema-item option)))))
+
+  (define-delegation option-type)
+  (define-delegation option-default)
+  (define-delegation option-description))
 
 (defmethod (setf option-value) :before ((new-value t)
                                         (option    option-cell))
@@ -70,6 +76,8 @@ Is unbound when the option cell does not have a value."))
 
   (define-delegation option-schema-item)
   (define-delegation option-type)
+  (define-delegation option-default)
+  (define-delegation option-description)
   (define-delegation option-value)
   #+no (define-delegation (setf option-value) (new-value)))
 
