@@ -1,0 +1,20 @@
+#+TITLE:       options README
+#+AUTHOR:      Jan Moringen
+#+EMAIL:       jmoringe@techfak.uni-bielefeld.de
+#+DESCRIPTION:
+#+KEYWORDS:    common lisp, options, configuration
+#+LANGUAGE:    en
+
+* STARTED Introduction
+  The =options= system provides data structures and functions for
+   configuration options, sources of option values and handling of
+   changes of option values.
+* TODO Tutorial
+** TODO Specifying a Schema
+** TODO Populating a Configuration
+** TODO Querying a Configuration
+** TODO Tracking Changes of Option Values
+* Settings                                                         :noexport:
+
+#+OPTIONS: H:2 num:nil toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS: TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
