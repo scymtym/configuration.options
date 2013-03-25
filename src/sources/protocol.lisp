@@ -6,22 +6,35 @@
 
 (cl:in-package #:options.sources)
 
-;;; Sink protocol
+;;; Source protocol
 
-(defgeneric notify (sink event name &optional value)
+(defgeneric initialize (source schema)
   (:documentation
-   "SINK is notified about some change regarding an option.
+   "Initialize SOURCE with SCHEMA. SOURCE can, for example, examine
+    the options in SCHEMA and create corresponding internal data
+    structures, or user-facing interfaces, help texts, etc."))
 
-EVENT can be, for example, :added, :removed, :changed.
+;; One-shot sources
 
-EVENT      NAME        VALUE
-:added     OPTION-NAME
-:removed   OPTION-NAME
-:new-value OPTION-NAME RAW-NEW-VALUE"))
-
-#+no (defgeneric raw-value (source option)
+(defgeneric process (source sink)
   (:documentation
-   "TODO(jmoringe): document"))
+   "Process the configuration information in SOURCE providing the
+    resulting configuration options to SINK."))
+
+;; Default behavior
+
+(define-condition-translating-method initialize ((source t) (schema t))
+  ((error initialization-error)
+   :source source
+   :schema schema))
+
+(defmethod initialize ((source t) (schema t))
+  (values))
+
+(define-condition-translating-method process ((source t) (sink t))
+  ((error processing-error)
+   :source source
+   :sink   sink))
 
 ;;; Source service and construction protocol
 

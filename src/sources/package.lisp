@@ -16,9 +16,26 @@
 
    #:options)
 
+  ;; Condition
   (:export
+   #:source-condition
+   #:source-condition-source
+
+   #:sink-condition
+   #:sink-condition-sink
+
+   #:initialization-error
+
+   #:processing-error)
+
+  ;; Source protocol and source creation
+  (:export
+   #:initialize
+   #:process
+
    #:make-source)
 
+  ;; Syntax protocol and syntax creation
   (:export
    #:make-syntax)
 
