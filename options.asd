@@ -74,7 +74,6 @@
                               (:file       "mixins")
 
                               ;; Syntax
-                              (:file       "ini")
 
                               ;; Sources
                               (:file       "source-environment-variables")
