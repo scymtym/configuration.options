@@ -13,7 +13,6 @@
    #:more-conditions
    #:print-items)
 
-  ;; Conditions
   ;; Types
   (:export
    #:wild-name-component
@@ -22,7 +21,11 @@
    #+maybe-later #:name
    #+maybe-later #:wild-name)
 
+  ;; Conditions
   (:export
+   #:name-parse-error
+   #:name-parse-error-text
+
    #:no-such-option
    #:no-such-option-name
    #:no-such-option-container
@@ -35,6 +38,9 @@
    #:name-equal
    #:name-matches
    #:name-<
+   #:merge-names
+
+   #:parse-name
 
    #:wildcard-name)
 

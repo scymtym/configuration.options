@@ -9,16 +9,17 @@
 ;;; `wildcard-name' class
 
 (defclass wildcard-name (standard-object
-                                sequence)
+                         sequence)
   ((components :initarg  :components
                :type     list
                :reader   name-components
                :documentation
-               ""))
+               "Stores the components of the name."))
   (:default-initargs
    :components (missing-required-initarg 'wildcard-name :components))
   (:documentation
-   "TODO(jmoringe): document"))
+   "Instances of this class represent names which contain at least one
+    wild component."))
 
 (defmethod shared-initialize :before ((instance   wildcard-name)
                                       (slot-names t)
@@ -105,16 +106,74 @@
 (defmethod merge-names ((left t) (right wildcard-name))
   (concatenate 'wildcard-name left right))
 
+;;; Name grammar and parsing
+
+#+later (esrap:defgrammar #:options.option-name
+            (:documentation
+             ""))
+#+later (esrap:in-grammar #:options.option-name)
+
+(esrap:defrule wild-inferiors
+    (and #\* #\*)
+  (:constant :wild-inferiors))
+
+(esrap:defrule wild
+    #\*
+  (:constant :wild))
+
+(esrap:defrule escaped/character
+    (and #\\ (or #\" #\\))
+  (:function second))
+
+;; TODO should we use \. instead?
+(esrap:defrule component/quoted
+    (and #\" (+ (or escaped/character (not (or #\\ #\")))) #\")
+  (:function second))
+
+(esrap:defrule component/stringish
+    (+ (or component/quoted (not #\.)))
+  (:text t))
+
+(esrap:defrule component
+    (or wild-inferiors wild component/stringish))
+
+(esrap:defrule dot-and-component
+    (and #\. component)
+  (:function second))
+
+(esrap:defrule name
+    (and component (* dot-and-component))
+  (:destructure (first rest)
+    (let ((components (cons first rest)))
+      (if (every #'stringp components)
+          components
+          (make-instance 'wildcard-name :components components)))))
+
+(defun parse-name (string &key (start 0) end junk-allowed)
+  (with-condition-translation
+      (((esrap:esrap-error name-parse-error
+                           :var           condition
+                           :cause-initarg nil)
+        :text (esrap:esrap-error-text condition)))
+    (esrap:parse 'name string
+                 :start        start
+                 :end          end
+                 :junk-allowed junk-allowed)))
+
 ;;; Utility functions
 
-(defun print-name (stream name &optional colon? at?)
-  "TODO(jmoringe): document"
+(defun print-name (stream name &optional colon? at? width)
+  "Print dot-separated components of NAME onto STREAM. If WIDTH is
+   supplied pad output to WIDTH."
   (declare (ignore colon? at?))
 
-  (format stream "~{~A~^.~}"
-          (map 'list (lambda (component)
-                       (case component
-                         (:wild           "*")
-                         (:wild-inferiors "**")
-                         (t               component)))
-               name)))
+  (check-type width (or null positive-integer))
+  (let ((components (map 'list (lambda (component)
+                                 (case component
+                                   (:wild           "*")
+                                   (:wild-inferiors "**")
+                                   (t               component)))
+                         name)))
+    (if width
+        (format stream "~V@<~{~A~^.~}~>" width components)
+        (format stream "~{~A~^.~}" components))))

@@ -57,7 +57,6 @@
                               (:file       "conditions")
                               (:file       "protocol")
                               (:file       "mixins")
-                              (:file       "name-grammar")
                               (:file       "name")
                               (:file       "schema")
                               (:file       "configuration")

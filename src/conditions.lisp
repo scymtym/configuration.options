@@ -6,7 +6,24 @@
 
 (cl:in-package #:options)
 
-;;;
+;;; Name-related conditions
+
+(define-condition name-parse-error (parse-error)
+  ((text :initarg  :text
+         :type     string
+         :reader   name-parse-error-text
+         :documentation
+         "Stores the string which could not be parsed as an option
+          name."))
+  (:report
+   (lambda (condition stream)
+     (format stream "~@<Failed to parse name ~S.~@:>"
+             (name-parse-error-text condition))))
+  (:documentation
+   "This error is signaled when a given string cannot be parsed as an
+    option name."))
+
+;;; Option locating conditions
 
 (define-condition no-such-option (error)
   ((name      :initarg  :name
