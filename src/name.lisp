@@ -25,7 +25,7 @@
                                       &key
                                       (components nil components-supplied?))
   (when components-supplied?
-    (check-type components (cons t t))))
+    (check-type components wild-name)))
 
 (defmethod print-object ((object wildcard-name) stream)
   (print-unreadable-object (object stream :type t :identity t)

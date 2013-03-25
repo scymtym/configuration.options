@@ -14,6 +14,14 @@
    #:print-items)
 
   ;; Conditions
+  ;; Types
+  (:export
+   #:wild-name-component
+   #:name-component
+
+   #+maybe-later #:name
+   #+maybe-later #:wild-name)
+
   (:export
    #:no-such-option
    #:no-such-option-name
