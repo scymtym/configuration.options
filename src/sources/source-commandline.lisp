@@ -1,4 +1,4 @@
-;;;; commandline.lisp ---
+;;;; source-commandline.lisp --- Source for commandline  options.
 ;;;;
 ;;;; Copyright (C) 2011, 2012, 2013 Jan Moringen
 ;;;;

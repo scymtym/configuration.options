@@ -34,7 +34,8 @@
 
                 ;; TODO(jmoringe, 2013-03-12): wild-name?
                 ((and (consp (first rest)) (typep name 'wildcard-name))
-                 `((setf (options::find-child ,(merge-names prefix name) ,schema)
+                 `((setf (find-child ,(merge-names prefix name) ,schema
+                                     :if-exists #'error)
                          (define-schema () ,@rest))))
 
                 ((consp (first rest))
@@ -43,6 +44,6 @@
 
                 (t
                  (error "~@<Syntax error: ~S ~S.~@:>" name rest)))))))
-    `(let ((,schema (make-instance 'options::standard-schema)))
+    `(let ((,schema (make-instance 'standard-schema)))
        ,@(mapcan #'process-spec specs)
        ,schema)))

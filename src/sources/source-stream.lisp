@@ -1,4 +1,4 @@
-;;;; stream.lisp ---
+;;;; source-stream.lisp --- Source for options from streams.
 ;;;;
 ;;;; Copyright (C) 2012, 2013 Jan Moringen
 ;;;;
@@ -14,12 +14,13 @@
   (:default-initargs
    :syntax (missing-required-initarg 'stream-source :syntax))
   (:documentation
-   "TODO(jmoringe): document"))
+   "Instances of this class are options sources which read and parse
+    stream containing configuration options in order to provide
+    options to sinks."))
 
 (service-provider::register-provider/class 'source 'stream :class 'stream-source)
 
 (defmethod print-items append ((object stream-source))
-  "TODO(jmoringe): document"
   `((:syntax ,(class-name (class-of (source-syntax object))) " ~A")))
 
 (defmethod process ((foo    stream-source)

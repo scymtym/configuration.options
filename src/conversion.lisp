@@ -1,4 +1,4 @@
-;;;; conversion.lisp ---
+;;;; conversion.lisp --- Conversion between strings and parsed values.
 ;;;;
 ;;;; Copyright (C) 2013 Jan Moringen
 ;;;;
@@ -11,10 +11,7 @@
 (defmethod value->string-using-type ((schema-item type-based-conversion-mixin)
                                      (value       t)
                                      (type        (eql 'boolean))
-                                     &key
-                                     inner-type)
-  (declare (ignore inner-type))
-
+                                     &key &allow-other-keys)
   (ecase value
     ((t)   "true")
     ((nil) "false")))
@@ -22,10 +19,7 @@
 (defmethod string->value-using-type ((schema-item type-based-conversion-mixin)
                                      (value       string)
                                      (type        (eql 'boolean))
-                                     &key
-                                     inner-type)
-  (declare (ignore inner-type))
-
+                                     &key &allow-other-keys)
   (cond
     ((member value '("true" "1") :test #'string=)
      t)
@@ -40,39 +34,27 @@
 (defmethod value->string-using-type ((schema-item type-based-conversion-mixin)
                                      (value       integer)
                                      (type        (eql 'integer))
-                                     &key
-                                     inner-type)
-  (declare (ignore inner-type))
-
+                                     &key &allow-other-keys)
   (princ-to-string value))
 
 (defmethod string->value-using-type ((schema-item type-based-conversion-mixin)
                                      (value       string)
                                      (type        (eql 'integer))
-                                     &key
-                                     inner-type)
-  (declare (ignore inner-type))
-
-  (parse-integer value))
+                                     &key &allow-other-keys)
+  (values (parse-integer value)))
 
 ;;; type `string'
 
 (defmethod value->string-using-type ((schema-item type-based-conversion-mixin)
                                      (value       string)
                                      (type        (eql 'string))
-                                     &key
-                                     inner-type)
-  (declare (ignore inner-type))
-
+                                     &key &allow-other-keys)
   value)
 
 (defmethod string->value-using-type ((schema-item type-based-conversion-mixin)
                                      (value       string)
                                      (type        (eql 'string))
-                                     &key
-                                     inner-type)
-  (declare (ignore inner-type))
-
+                                     &key &allow-other-keys)
   value)
 
 ;;; type `member'
@@ -80,10 +62,7 @@
 (defmethod value->string-using-type ((schema-item type-based-conversion-mixin)
                                      (value       symbol)
                                      (type        (eql 'member))
-                                     &key
-                                     inner-type)
-  (declare (ignore inner-type))
-
+                                     &key &allow-other-keys)
   (princ-to-string value))
 
 (defmethod string->value-using-type ((schema-item type-based-conversion-mixin)
@@ -92,7 +71,7 @@
                                      &key
                                      inner-type)
   (if (member string inner-type :test #'string=)
-      (make-keyword string)
+      (values (make-keyword string))
       (error #+later 'invalid-option-value "The value string ~S is invalid for option ~A. One of ~{~A~^, ~} expected."
              string schema-item inner-type)))
 

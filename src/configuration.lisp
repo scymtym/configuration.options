@@ -1,4 +1,4 @@
-;;;; configuration.lisp ---
+;;;; configuration.lisp --- Option and configuration classes.
 ;;;;
 ;;;; Copyright (C) 2011, 2012, 2013 Jan Moringen
 ;;;;
@@ -11,13 +11,14 @@
 (defclass standard-configuration (list-container-mixin
                                   print-items-mixin)
   ((schema :initarg  :schema
-           :reader configuration-schema
+           :reader   configuration-schema
            :documentation
-           ""))
+           "Stores the schema object associated to the configuration
+            object."))
   (:default-initargs
    :schema (missing-required-initarg 'standard-configuration :schema))
   (:documentation
-   "TODO(jmoringe): document"))
+   "Instances of this class store collections of named options."))
 
 ;;; `option-cell' class
 
@@ -29,9 +30,10 @@
    (value       :initarg  :value
                 :accessor option-value
                 :documentation
-                "
+                "Stores the value of the option cell.
 
-Is unbound when the option cell does not have a value."))
+                 Is unbound when the option cell does not have a
+                 value."))
   (:default-initargs
    :schema-item (missing-required-initarg
                  'option-cell :schema-item))
@@ -49,7 +51,6 @@ Is unbound when the option cell does not have a value."))
 
 (defmethod (setf option-value) :before ((new-value t)
                                         (option    option-cell))
-  "TODO(jmoringe): document"
   (validate-value (option-schema-item option) new-value))
 
 (defmethod print-items append ((object option-cell))
@@ -63,11 +64,13 @@ Is unbound when the option cell does not have a value."))
   ((cell :initarg  :cell
          :reader   option-%cell
          :documentation
-         ""))
+         "Stores the cell which in turn stores the associated schema
+          item and can store the actual value of the option."))
   (:default-initargs
    :cell (missing-required-initarg 'standard-option :cell))
   (:documentation
-   "TODO(jmoringe): document"))
+   "Instances of this class associate an option name to an schema item
+    and potentially an option value."))
 
 (macrolet
     ((define-delegation (name)

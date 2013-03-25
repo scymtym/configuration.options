@@ -7,26 +7,36 @@
 (cl:in-package #:options)
 
 ;;; Name protocol
+;;;
+;;; Names are generally similar to pathnames: a sequence of name
+;;; components which are either strings or one of the symbols :wild
+;;; and :wild-inferiors.
 
 (defgeneric name-components (name)
   (:documentation
-   "TODO(jmoringe): document"))
+   "Return a sequence of the components of NAME."))
 
 (defgeneric name-equal (left right)
   (:documentation
-   "TODO(jmoringe): document"))
+   "Return non-nil when LEFT and RIGHT are equal."))
 
 (defgeneric name-matches (query name)
   (:documentation
-   "TODO(jmoringe): document"))
+   "Return non-nil when QUERY matches name. This can be the case
+    either when QUERY and NAME are equal or when QUERY contains :wild
+    or :wild-inferiors components matching components of NAME."))
 
 (defgeneric name-< (left right)
   (:documentation
-   "TODO(jmoringe): document"))
+   "Return non-nil when LEFT is BEFORE in the following ordering:
+    components induce a lexicographical ordering where :wild-inferiors
+    go before :wild which in turn goes before all other
+    components."))
 
 (defgeneric merge-names (left right)
   (:documentation
-   "TODO(jmoringe): document"))
+   "Construct and return a new name by concatenating the components of
+    LEFT and RIGHT."))
 
 ;; Default behavior
 
@@ -79,7 +89,6 @@
                   &key
                   (configuration     *configuration*)
                   (if-does-not-exist #'error))
-  "TODO(jmoringe): document"
   (let ((option-or-value
           (find-option option-or-name configuration
                        :if-does-not-exist if-does-not-exist)))
@@ -93,23 +102,39 @@
 
 (defgeneric options (container)
   (:documentation
-   "TODO(jmoringe): document"))
+   "Return a sequence of the options contained in CONTAINER."))
 
 (defgeneric find-options (query container)
   (:documentation
-   "TODO(jmoringe): document"))
+   "Find and return a sequence of options in CONTAINER matching QUERY
+    which can be a name with wildcard components."))
 
 (defgeneric find-option (name container
                          &key
-                         if-does-not-exist)
+                         if-does-not-exist
+                         if-exists)
   (:documentation
-   "TODO(jmoringe): document"))
+   "Find and return the option named NAME in CONTAINER.
+
+    IF-DOES-NOT-EXIST controls the behavior in case there is no option
+    named NAME. Acceptable values are functions accepting a condition
+    object and nil.
+
+    IF-EXISTS is accepted for parity with `(setf find-option)'."))
 
 (defgeneric (setf find-option) (new-value name container
                                 &key
+                                if-does-not-exist
                                 if-exists)
   (:documentation
-   "TODO(jmoringe): document"))
+   "Store the option NEW-VALUE under the name NAME in container.
+
+    IF-DOES-NOT-EXIST is accepted for parity with `find-option'.
+
+    IF-EXISTS controls the behavior in case an option named NAME is
+    already stored in CONTAINER. Acceptable values are :supersede
+    and :keep."))
+
 ;; when using (setf find-option) to add an option to a configuration,
 ;; consult the schema to check whether the option is valid:
 ;; * options are allowed in that particular subtree
@@ -120,7 +145,8 @@
 
 (defmethod find-option :around ((name list) (container t)
                                 &key
-                                (if-does-not-exist #'error))
+                                (if-does-not-exist #'error)
+                                &allow-other-keys)
   (labels
       ((recur ()
          (or (call-next-method)
@@ -213,27 +239,28 @@
 
 (defgeneric value->string-using-type (schema-item value type &key inner-type)
   (:documentation
-   "TODO(jmoringe): document"))
+   "Return the type of OPTION. The returned type is an expression
+    similar to a CL type."))
 
 (defgeneric string->value-using-type (schema-item string type &key inner-type)
   (:documentation
-   "TODO(jmoringe): document"))
+   "Return the name object naming OPTION."))
 
 ;;; Option protocol
 
 (defgeneric option-configuration (option)
   (:documentation
-   "TODO(jmoringe): document"))
+   "Return the name object naming OPTION."))
 
 (defgeneric option-schema-item (option)
   (:documentation
-   "TODO(jmoringe): document"))
+   "Return the name object naming OPTION."))
 
 (defgeneric option-value (option)
   (:documentation
-   "TODO(jmoringe): document"))
+   "Return the name object naming OPTION."))
 
 ;;; TODO(jmoringe, 2012-02-22): always supported?
 (defgeneric (setf option-value) (new-value option)
   (:documentation
-   "TODO(jmoringe): document"))
+   "Return the name object naming OPTION."))

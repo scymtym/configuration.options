@@ -1,4 +1,4 @@
-;;;; protocol.lisp ---
+;;;; protocol.lisp --- Protocol functions provided by the sources module.
 ;;;;
 ;;;; Copyright (C) 2012, 2013 Jan Moringen
 ;;;;
@@ -44,19 +44,22 @@ Providers implement the above source protocol."))
   "TODO(jmoringe): document"
   (apply #'service-provider:make-provider 'source spec args))
 
-(defmethod make-source ((spec list)
-                        &rest args &key)
-  "TODO(jmoringe): document"
-  (let ((children (mapcar (curry #'apply #'make-source) spec)))
-    (list 'apply 'make-instance 'sequence :children children args)))
+;;; Syntax protocol
+
+(defgeneric process-content (syntax source sink)
+  (:documentation
+   "Process content of SOURCE assuming syntax SYNTAX and provide
+    resulting options to SINK."))
 
 ;;; Syntax service and construction protocol
 
 (service-provider:define-service syntax
   (:documentation
-   "TODO
+   "Providers of this service interpret the content of textual sources
+    of configuration information according to particular syntactic
+    rules and provide the resulting options to sinks.
 
-Providers implement the above syntax protocol."))
+    Providers implement the above syntax protocol."))
 
 (defgeneric make-syntax (spec
                          &key &allow-other-keys)

@@ -1,4 +1,4 @@
-;;;; file.lisp ---
+;;;; source-file.lisp --- Source for options from configuration files.
 ;;;;
 ;;;; Copyright (C) 2011, 2012, 2013 Jan Moringen
 ;;;;
@@ -11,16 +11,19 @@
                       :reader   source-pathname
                       :accessor %source-pathname
                       :documentation
-                      "")
+                      "Stores the pathname of the file from which
+                       configuration options should be read.")
    (if-does-not-exist :initarg  :if-does-not-exist
                       :type     if-does-not-exist-policy
                       :reader   source-if-does-not-exist
                       :documentation
-                      ""))
+                      "Stores the behavior in case the specified file
+                       does not exist."))
   (:default-initargs
    :pathname (missing-required-initarg 'file-source :pathname))
   (:documentation
-   "TODO(jmoringe): document"))
+   "Instances of this class are option sources which read and parse
+    configuration files in order to provide options to sinks."))
 
 (service-provider::register-provider/class 'source 'file :class 'file-source)
 

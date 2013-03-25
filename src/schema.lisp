@@ -1,4 +1,4 @@
-;;;; schema.lisp ---
+;;;; schema.lisp --- Schema item and schema classes.
 ;;;;
 ;;;; Copyright (C) 2011, 2013 Jan Moringen
 ;;;;
@@ -15,22 +15,25 @@
              :accessor %children
              :initform nil
              :documentation
-             ""))
+             "Stores named child schemas. Elements are of the form
+
+                (NAME . CHILD-SCHEMA)
+
+              where NAME is a wild name."))
   (:documentation
-   "TODO(jmoringe): document"))
+   "Instances of this class store named schema items which describe
+    option names, option types and other properties. In addition,
+    schema instances can contain child schemas."))
 
 (defmethod print-items append ((object standard-schema))
-  "TODO(jmoringe): document"
   `((:child-count ,(length (schema-children object)) " (C ~D)"
                   ((:after :count)))))
 
 (defmethod find-option ((name      t)
                         (container standard-schema)
                         &key
-                        if-does-not-exist)
-  "TODO(jmoringe): document"
-  (declare (ignore if-does-not-exist))
-
+                        if-does-not-exist
+                        &allow-other-keys)
   (let+ ((option (find name (options container)
                        :key  #'option-name
                        :test (lambda (name query) (name-matches query name))))
@@ -73,7 +76,8 @@
   ((type         :initarg  :type
                  :reader   option-type
                  :documentation
-                 "")
+                 "Stores the type of the option as an expression
+                  similar to a CL type.")
    (option-class :initarg  :option-class
                  :type     symbol
                  :reader   option-class
@@ -128,10 +132,3 @@
                             (list (option-default schema-item)))
                     values)))
     (call-next-method schema-item values)))
-
-;;; `wildcard-schema-item' class
-
-(defclass wildcard-schema-item (standard-schema-item)
-  ()
-  (:documentation
-   "TODO(jmoringe): document"))

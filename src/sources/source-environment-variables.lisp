@@ -1,4 +1,4 @@
-;;;; source-environment-variables.lisp ---
+;;;; source-environment-variables.lisp --- Options from environment variables.
 ;;;;
 ;;;; Copyright (C) 2011, 2012, 2013 Jan Moringen
 ;;;;
@@ -12,9 +12,12 @@
            :accessor source-prefix
            :initform nil
            :documentation
-           ""))
+           "Stores an optional prefix which environment variable names
+            have to match in order to be considered for processing by
+            the source."))
   (:documentation
-   "TODO(jmoringe): document"))
+   "Instances of this class provide values of environment variables to
+    sinks."))
 
 (service-provider::register-provider/class 'source :environment-variables
                                            :class 'environment-variables-source)

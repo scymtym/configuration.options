@@ -1,4 +1,4 @@
-;;;; conditions.lisp --- Conditions used in the cl-options system.
+;;;; conditions.lisp --- Conditions used in the options system.
 ;;;;
 ;;;; Copyright (C) 2011, 2012, 2013 Jan Moringen
 ;;;;
@@ -29,18 +29,22 @@
   ((name      :initarg  :name
               :reader   no-such-option-name
               :documentation
-              "")
+              "Stores the name of the option which could not be
+               found.")
    (container :initarg  :container
               :reader   no-such-option-container
               :documentation
-              ""))
+              "Stores the container object in which the requested
+               option could not be found."))
   (:report
    (lambda (condition stream)
-     (format stream "~@<No option named ~/options::print-name/ in ~A.~@:>"
+     (format stream "~@<No option named ~/options::print-name/ in ~
+                     ~A.~@:>"
              (no-such-option-name      condition)
              (no-such-option-container condition))))
   (:documentation
-   "TODO(jmoringe): document"))
+   "This error is signaled when a requested option-like object cannot
+    be found."))
 
 ;;;
 

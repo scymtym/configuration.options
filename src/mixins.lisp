@@ -39,7 +39,7 @@
 
 (defmethod value->string-using-type ((schema-item type-based-conversion-mixin)
                                      (value       t)
-                                     (type        list)
+                                     (type        cons)
                                      &key
                                      inner-type)
   (value->string-using-type
@@ -47,8 +47,8 @@
    :inner-type (append (rest type) (ensure-list inner-type))))
 
 (defmethod string->value-using-type ((schema-item type-based-conversion-mixin)
-                                     (value  string)
-                                     (type   list)
+                                     (value       string)
+                                     (type        cons)
                                      &key
                                      inner-type)
   (string->value-using-type
@@ -78,9 +78,7 @@
 (defmethod merge-values-using-type ((schema-item type-based-merging-mixin)
                                     (values      sequence)
                                     (type        t)
-                                    &key
-                                    inner-type)
-  (declare (ignore inner-type))
+                                    &key &allow-other-keys)
   (elt values 0))
 
 ;;; `list-container-mixin' class
@@ -107,11 +105,8 @@
 
 (defmethod find-option ((name      t)
                         (container list-container-mixin)
-                        &key
-                        if-does-not-exist)
+                        &key &allow-other-keys)
   "TODO(jmoringe): document"
-  (declare (ignore if-does-not-exist))
-
   (find name (options container)
         :key  #'option-name
         :test #'name-equal))
@@ -119,19 +114,13 @@
 (defmethod (setf find-option) ((new-value t)
                                (name      t)
                                (container list-container-mixin)
-                               &key
-                               if-exists)
-  (declare (ignore if-exists))
-
+                               &key &allow-other-keys)
   (push new-value (%options container))
   new-value)
 
 (defmethod (setf find-option) :after ((new-value t)
                                       (name      t)
                                       (container list-container-mixin)
-                                      &key
-                                      if-exists)
-  (declare (ignore if-exists))
-
+                                      &key &allow-other-keys)
   (setf (%options container)
         (sort (options container) #'name-< :key #'option-name)))
