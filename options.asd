@@ -106,7 +106,8 @@
                  :depends-on ("test")
                  :serial     t
                  :components ((:file       "package")
-                              (:file       "protocol")))))
+                              (:file       "protocol")
+                              (:file       "source-environment-variables")))))
 
 (defmethod perform ((op     test-op)
                     (system (eql (find-system :options-test))))

@@ -19,23 +19,35 @@
    "Instances of this class provide values of environment variables to
     sinks."))
 
-(service-provider::register-provider/class 'source :environment-variables
-                                           :class 'environment-variables-source)
+(service-provider:register-provider/class
+ 'source :environment-variables :class 'environment-variables-source)
 
-(defmethod process ((syntax environment-variables-source) (source t))
+(defmethod process ((source environment-variables-source)
+                    (sink   t))
   "Obtain configuration options from environment variables."
-  (let+ (((&accessors-r/o (prefix source-prefix)) syntax)
+  (let+ (((&accessors-r/o (prefix source-prefix)) source)
          ((&flet name->option-name (name)
             (when (or (null prefix) (starts-with-subseq prefix name))
-              (split-sequence #\_ name :start (if prefix (length prefix) 0)))))
+              (split-sequence #\_ (string-downcase name)
+                              :start (if prefix (length prefix) 0)))))
          ((&flet variable->option (string)
             (let+ ((index (position #\= string))
-                   (name (name->option-name (subseq string 0 index)))
-                   (value (subseq string (1+ index))))
+                   (name (if index
+                             (name->option-name (subseq string 0 index))
+                             (warn "~@<Ignoring environment entry ~S.~@:>"
+                                   string)))
+                   (value (when index
+                            (subseq string (1+ index)))))
               (when name
-                (notify *sink* :added   name)
-                (notify *sink* :changed name value))))))
-    (mapc #'variable->option (sb-impl::posix-environ))))
+                (notify sink :added     name nil   :source source)
+                (notify sink :new-value name value :source source))))))
+    (iter (for entry in (sb-impl::posix-environ))
+          (restart-case
+              (variable->option entry)
+            (continue (&optional condition)
+              :report (lambda (stream)
+                        (format stream "~@<Skip entry ~S.~@:>" entry))
+              (declare (ignore condition)))))))
 
 (defmethod print-object ((object environment-variables-source) stream)
   (print-unreadable-object (object stream :type t :identity t)
