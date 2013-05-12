@@ -131,7 +131,7 @@
   (:function second))
 
 (esrap:defrule component/stringish
-    (+ (or component/quoted (not #\.)))
+    (+ (or component/quoted (not (or #\. wild))))
   (:text t))
 
 (esrap:defrule component
@@ -164,8 +164,11 @@
 
 (defun print-name (stream name &optional colon? at? width)
   "Print dot-separated components of NAME onto STREAM. If WIDTH is
-   supplied pad output to WIDTH."
-  (declare (ignore colon? at?))
+   supplied pad output to WIDTH.
+
+   If COLON? is non-NIL, print the empty name as \"<root>\" instead of
+   the empty string."
+  (declare (ignore at?))
 
   (check-type width (or null positive-integer))
   (let ((components (map 'list (lambda (component)
@@ -174,6 +177,10 @@
                                    (:wild-inferiors "**")
                                    (t               component)))
                          name)))
-    (if width
-        (format stream "~V@<~{~A~^.~}~>" width components)
-        (format stream "~{~A~^.~}" components))))
+    (cond
+      ((and (not components) colon?)
+       (format stream "<root>"))
+      (width
+       (format stream "~V@<~{~A~^.~}~>" width components))
+      (t
+       (format stream "~{~A~^.~}" components)))))

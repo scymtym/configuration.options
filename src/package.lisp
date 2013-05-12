@@ -42,6 +42,8 @@
 
    #:parse-name
 
+   #:print-name
+
    #:wildcard-name)
 
   ;; Value protocol

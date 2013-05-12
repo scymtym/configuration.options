@@ -44,7 +44,7 @@
   name)
 
 (defmethod name-equal ((left t) (right t))
-  (equal left right))
+  (equal (name-components left) (name-components right)))
 
 (defmethod name-matches ((query t) (name t))
   (name-equal query name))
@@ -57,7 +57,7 @@
   (concatenate (type-of left) left right))
 
 (defmethod merge-names ((left (eql nil)) (right t))
-  (concatenate 'list left right))
+  (concatenate (type-of right) left right))
 
 ;;; Value protocol
 
@@ -143,7 +143,7 @@
 
 ;; Default behavior
 
-(defmethod find-option :around ((name list) (container t)
+(defmethod find-option :around ((name t) (container t)
                                 &key
                                 (if-does-not-exist #'error)
                                 &allow-other-keys)

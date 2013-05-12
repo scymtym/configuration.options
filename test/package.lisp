@@ -14,6 +14,9 @@
 
    #:options)
 
+  (:import-from #:options
+   #:wild-name)
+
   (:export
    #:options.root)
 
