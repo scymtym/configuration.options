@@ -19,7 +19,8 @@
    #:wild-name
 
    #:type-based-validation-mixin
-   #:type-based-merging-mixin)
+   #:type-based-merging-mixin
+   #:type-based-conversion-mixin)
 
   (:import-from #:options.sources
    #:initialize)

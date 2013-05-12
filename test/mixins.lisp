@@ -111,3 +111,71 @@
      (((1 :inherit) (2))           (list integer :inherit? t) ((1 2) t))
      (((1) (2  :inherit))          (list integer :inherit? t) ((1)   t))
      (((1 :inherit) (2  :inherit)) (list integer :inherit? t) ((1 2) t)))))
+
+;;; `type-based-conversion-mixin'
+
+(def-suite options.type-based-conversion-mixin
+  :in options)
+(in-suite options.type-based-conversion-mixin)
+
+(defclass mock-type-based-conversion-schema-item (mock-typed-schema-item
+                                                  type-based-conversion-mixin)
+  ())
+
+(test smoke
+  "Smoke test for methods on `value->string', `string->value',
+   `value->string-using-type' and `string->value-using-type' for
+   `type-based-conversion-mixin'."
+  (mapc
+   (lambda+ ((type string value))
+     (let+ ((schema-item (make-instance
+                          'mock-type-based-conversion-schema-item
+                          :type type)))
+       (case value
+         (option-syntax-error
+          (signals option-syntax-error
+            (string->value schema-item string)))
+         (t
+          (is (equal string (value->string schema-item value)))
+          (is (equal value  (string->value schema-item string)))))))
+
+   '((boolean                    ""      option-syntax-error)
+     (boolean                    "1"     option-syntax-error)
+     (boolean                    "false" nil)
+     (boolean                    "true"  t)
+
+     (integer                    ""      option-syntax-error)
+     (integer                    "true"  option-syntax-error)
+     (integer                    "1"     1)
+     (integer                    "2"     2)
+
+     ((member :foo :bar)         ""      option-syntax-error)
+     ((member :foo :bar)         "1"     option-syntax-error)
+     ((member :foo :bar)         "BAZ"   option-syntax-error)
+     ((member :foo :bar)         "FOO"   :foo)
+     ((member :foo :bar)         "BAR"   :bar)
+     ((member :|foo| :|bar|)     "foo"   :|foo|)
+     ((member :|foo| :|bar|)     "bar"   :|bar|)
+
+     ((list integer)             ""      option-syntax-error)
+     ((list integer)             "1"     (1))
+     ((list integer)             "1:2"   (1 2))
+
+     ((list integer :inherit? t) ""      option-syntax-error)
+     ((list integer :inherit? t) ":"     (:inherit))
+     ((list integer :inherit? t) "1"     (1))
+     ((list integer :inherit? t) "1:"    (1 :inherit))
+     ((list integer :inherit? t) "1:2"   (1 2))
+     ((list integer :inherit? t) "1:2:"  (1 2 :inherit))
+
+     ((or boolean integer)       ""      option-syntax-error)
+     ((or boolean integer)       "FOO"   option-syntax-error)
+     ((or boolean integer)       "false" nil)
+     ((or boolean integer)       "true"  t)
+     ((or boolean integer)       "1"     1)
+     ((or boolean integer)       "2"     2)
+
+     ((and real integer)         ""      option-syntax-error)
+     ((and real integer)         "FOO"   option-syntax-error)
+     ((and real integer)         "1"     1)
+     ((and real integer)         "2"     2))))

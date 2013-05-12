@@ -21,13 +21,10 @@
                                      (type        (eql 'boolean))
                                      &key &allow-other-keys)
   (cond
-    ((member value '("true" "1") :test #'string=)
-     t)
-    ((member value '("false" "0") :test #'string=)
-     nil)
-    (t
-     (error "The value string ~S is invalid for option ~A of type ~S."
-            value schema-item type))))
+    ((string= value "true")  t)
+    ((string= value "false") nil)
+    (t                       (error "~@<~S is not a Boolean value~@:>"
+                                    value))))
 
 ;;; type `integer'
 
@@ -72,8 +69,22 @@
                                      inner-type)
   (if (member string inner-type :test #'string=)
       (values (make-keyword string))
-      (error #+later 'invalid-option-value "The value string ~S is invalid for option ~A. One of ~{~A~^, ~} expected."
-             string schema-item inner-type)))
+      (error "~@<~S is not one of ~{~A~^, ~}.~@:>"
+             string inner-type)))
+
+;;; type `pathname'
+
+(defmethod value->string-using-type ((schema-item type-based-conversion-mixin)
+                                     (value       pathname)
+                                     (type        (eql 'pathname))
+                                     &key &allow-other-keys)
+  (princ-to-string value))
+
+(defmethod string->value-using-type ((schema-item type-based-conversion-mixin)
+                                     (string      string)
+                                     (type        (eql 'pathname))
+                                     &key &allow-other-keys)
+  (parse-namestring string))
 
 ;;; type `list'
 
@@ -100,11 +111,12 @@
                                      (type        (eql 'list))
                                      &key
                                      inner-type)
-  (format nil "~{~A~^:~}"
+  (format nil "~{~A~^:~}~@[:~]"
           (mapcar (lambda (component)
                     (value->string-using-type
                      schema-item component (first inner-type)))
-                  value)))
+                  (remove :inherit value))
+          (ends-with :inherit value :test #'eq)))
 
 (defmethod string->value-using-type ((schema-item type-based-conversion-mixin)
                                      (string      string)
@@ -118,8 +130,49 @@
              (if (eq component :inherit)
                  component
                  (string->value-using-type schema-item component element-type)))
-           (if (and inherit? (ends-with "" components :test #'string=))
+           (if (and inherit?
+                    (not (length= 1 components ))
+                    (ends-with "" components :test #'string=))
                (remove-if
                 (conjoin #'stringp #'emptyp)
                 (substitute-if :inherit #'emptyp components :count 1 :from-end t))
                components))))
+
+;;; types `or' and `and'
+
+(macrolet
+    ((define-composite-conversion (type)
+       `(progn
+          (defmethod value->string-using-type
+              ((schema-item type-based-conversion-mixin)
+               (value       t)
+               (type        (eql ',type))
+               &key
+               inner-type)
+            (iter (for type1 in inner-type)
+                  (let+ (((&values value error?)
+                          (ignore-errors (value->string-using-type
+                                          schema-item value type1))))
+                    (when (not error?)
+                      (return-from value->string-using-type value))))
+            (error "~@<Could not ~S ~A ~S ~S.~@:>"
+                   'value->string schema-item value
+                   (list* type inner-type)))
+
+          (defmethod string->value-using-type
+              ((schema-item type-based-conversion-mixin)
+               (value  string)
+               (type   (eql ',type))
+               &key
+               inner-type)
+            (iter (for type1 in inner-type)
+                  (let+ (((&values value1 error?)
+                          (ignore-errors (string->value-using-type
+                                          schema-item value type1))))
+                    (when (not error?)
+                      (return-from string->value-using-type value1))))
+            (error "~@<~S is not valid for any of ~{~S~^, ~}.~@:>"
+                   value inner-type)))))
+
+  (define-composite-conversion or)
+  (define-composite-conversion and))

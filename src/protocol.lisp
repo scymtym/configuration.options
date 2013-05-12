@@ -290,20 +290,24 @@
 
 (defgeneric value->string (schema-item value)
   (:documentation
-   "TODO(jmoringe): document"))
+   "Return a string representation of VALUE taking into account
+    properties of SCHEMA-ITEM."))
 
 (defgeneric string->value (schema-item string)
   (:documentation
-   "TODO(jmoringe): document"))
+   "Parse STRING and return a value object taking into properties of
+   SCHEMA-ITEM."))
 
 (defgeneric value->string-using-type (schema-item value type &key inner-type)
   (:documentation
-   "Return the type of OPTION. The returned type is an expression
-    similar to a CL type."))
+   "Like `value->string' but may incorporate TYPE, besides
+    SCHEMA-ITEM, into the conversion of VALUE into a string
+    representation."))
 
 (defgeneric string->value-using-type (schema-item string type &key inner-type)
   (:documentation
-   "Return the name object naming OPTION."))
+   "Like `string->value' but may incorporate TYPE, besides
+    SCHEMA-ITEM, into the parsing of STRING into a value object."))
 
 ;; Default behavior
 
@@ -329,6 +333,22 @@
                    (call-next-method))
                  (handle-invalid))))
     (recur)))
+
+(defmethod string->value :around ((schema-item t) (string t))
+  (with-condition-translation (((error option-syntax-error)
+                                :option schema-item
+                                :value  string))
+    (call-next-method)))
+
+(defmethod string->value-using-type :around ((schema-item t) (string t) (type t)
+                                             &key inner-type)
+  (with-condition-translation (((error option-syntax-error)
+                                :option schema-item
+                                :value  string
+                                :type   (if inner-type
+                                            (list* type inner-type)
+                                            type)))
+    (call-next-method)))
 
 ;;; Option protocol
 

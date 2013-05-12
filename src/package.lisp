@@ -9,6 +9,7 @@
    #:cl
    #:alexandria
    #:split-sequence
+   #:iterate
    #:let-plus
    #:more-conditions
    #:print-items)
@@ -35,6 +36,9 @@
    #:option-value-error
 
    #:option-value-type-error
+
+   #:option-syntax-error
+   #:option-syntax-error-type
 
    #:notification-error
    #:notification-error-sink

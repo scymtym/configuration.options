@@ -99,9 +99,24 @@
     is encountered."))
 
 (define-condition option-syntax-error (option-value-error)
-  ()
+  ((type :initarg  :type
+         :reader   option-syntax-error-type
+         :initform nil
+         :documentation
+         "Stores the type that was used in the failed parsing
+          attempt."))
+  (:report
+   (lambda (condition stream)
+     (format stream "~@<The string ~S could not be parsed as a ~
+                     value~@[ of type ~A~] for option ~
+                     ~A~/more-conditions:maybe-print-cause/~@:>"
+             (value-condition-value    condition)
+             (option-syntax-error-type condition)
+             (option-condition-option  condition)
+             condition)))
   (:documentation
-   "TODO(jmoringe): document"))
+   "This error is signaled when a given string cannot be parsed as a
+    value of a particular option."))
 
 ;;; Sink-protocol-related conditions
 

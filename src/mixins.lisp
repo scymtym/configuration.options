@@ -136,10 +136,28 @@
 (defclass type-based-conversion-mixin ()
   ()
   (:documentation
-   "TODO(jmoringe): document"))
+   "This mixin class is intended to be mixed into schema item classes
+    which have to perform parsing and unparsing of values based their
+    types.
+
+    This behavior is implemented by a methods on `value->string' and
+    `string->value' which call `value->string-using-type' and
+    `string->value-using-type' respectively with the `option-type' of
+    the schema item.
+
+    Default behavior is provided for some types:
+
+    * boolean
+    * integer
+    * string
+    * member
+    * pathname
+    * (list TYPE [:inherit? INHERIT])
+    * (or ...)
+    * (and ...)"))
 
 (defmethod value->string ((schema-item type-based-conversion-mixin)
-                          (value       string))
+                          (value       t))
   (value->string-using-type schema-item value (option-type schema-item)))
 
 (defmethod string->value ((schema-item type-based-conversion-mixin)
