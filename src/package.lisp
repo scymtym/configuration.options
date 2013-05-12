@@ -89,12 +89,10 @@
    #:make-option
 
    #:validate-value
+   #:validate-value-using-type
 
    #:value->string
-   #:string->value)
-
-  ;; Type-based conversion protocol
-  (:export
+   #:string->value
    #:value->string-using-type
    #:string->value-using-type)
 

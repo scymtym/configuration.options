@@ -70,6 +70,7 @@
 ;;; `standard-schema-item' class
 
 (defclass standard-schema-item (named-mixin
+                                type-based-validation-mixin
                                 type-based-conversion-mixin
                                 type-based-merging-mixin
                                 print-items-mixin)
@@ -112,18 +113,6 @@
     (make-instance (option-class schema-item)
                    :name name
                    :cell cell)))
-
-(defmethod validate-value ((schema-item standard-schema-item)
-                           (value       t)
-                           &key if-invalid)
-  "TODO(jmoringe): document"
-  ;; TODO(jmoringe, 2013-02-05): untested
-  (unless (typep value (option-type schema-item))
-    (error 'option-value-type-error
-           :option        schema-item
-           :value         value
-           :expected-type (option-type schema-item)
-           :datum         value)))
 
 (defmethod merge-values ((schema-item standard-schema-item)
                          (values      sequence))

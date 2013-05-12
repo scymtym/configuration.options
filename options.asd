@@ -99,6 +99,7 @@
                  :components ((:file       "package")
                               (:file       "protocol")
                               (:file       "name")
+                              (:file       "mixins")
                               (:file       "schema")))
 
                 (:module     "sources"

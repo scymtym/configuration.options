@@ -72,13 +72,16 @@
 
 (define-condition option-value-error (error
                                       option-condition
-                                      value-condition)
+                                      value-condition
+                                      chainable-condition)
   ()
   (:report
    (lambda (condition stream)
-     (format stream "~@<The value ~S is invalid for option ~A.~@:>"
+     (format stream "~@<The value ~S is invalid for option ~
+                     ~A~/more-conditions:maybe-print-cause/~@:>"
              (value-condition-value   condition)
-             (option-condition-option condition))))
+             (option-condition-option condition)
+             condition)))
   (:documentation
    "This error and its subclasses is signaled when an error regarding
     an option value is encountered."))

@@ -250,7 +250,30 @@
 
 (defgeneric validate-value (schema-item value &key if-invalid)
   (:documentation
-   "TODO(jmoringe): document"))
+   "Determine whether VALUE is valid for SCHEMA-ITEM, signaling an
+    error or if it is invalid.
+
+    IF-INVALID controls the behavior in case VALUE is invalid for
+    SCHEMA-ITEM:
+
+    nil
+
+      Return nil.
+
+    'error, #'error
+
+      Signal an error which indicates VALUE being invalid.
+
+    a function
+
+      Call the function with an error object which indicates VALUE
+      being invalid as the sole argument."))
+
+(defgeneric validate-value-using-type (schema-item value type
+                                       &key inner-type)
+  (:documentation
+   "Like `validate-value' but may incorporate TYPE into the decision
+    whether VALUE is valid for SCHEMA-ITEM."))
 
 (defgeneric merge-values (schema-item values)
   (:documentation
@@ -276,6 +299,31 @@
 (defgeneric string->value-using-type (schema-item string type &key inner-type)
   (:documentation
    "Return the name object naming OPTION."))
+
+;; Default behavior
+
+(defmethod validate-value :around ((schema-item t)
+                                   (value       t)
+                                   &key
+                                   (if-invalid #'error))
+  (labels ((handle-invalid (&optional cause)
+             (error-behavior-restart-case
+                 (if-invalid
+                  (option-value-error
+                   :option schema-item
+                   :value  value
+                   :cause  cause))
+               (retry ()
+                 (recur))
+               (use-value (value)
+                 value)))
+           (recur ()
+             (or (handler-bind
+                     (((or simple-error option-value-error)
+                        #'handle-invalid))
+                   (call-next-method))
+                 (handle-invalid))))
+    (recur)))
 
 ;;; Option protocol
 

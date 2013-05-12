@@ -16,7 +16,9 @@
 
   (:import-from #:options
    #:name
-   #:wild-name)
+   #:wild-name
+
+   #:type-based-validation-mixin)
 
   (:import-from #:options.sources
    #:initialize)

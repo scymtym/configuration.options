@@ -30,6 +30,64 @@
   `((:name ,(option-name object) " ~/options::print-name/"
            ((:before :value) (:before :type)))))
 
+;;; `type-based-validation-mixin' class
+
+(defclass type-based-validation-mixin ()
+  ()
+  (:documentation
+   "This mixin class is intended to be mixed into schema item classes
+    which have to perform validation of values based their types.
+
+    This behavior is implemented by a method on `validate-value' which
+    calls `validate-value-using-type' with the `option-type' of the
+    schema item.
+
+    Default behavior is provided for types of the forms
+
+    * (integer ...)
+    * (and ...)
+    * (or ...)"))
+
+(defmethod validate-value ((schema-item type-based-validation-mixin)
+                           (value       t)
+                           &key
+                           if-invalid)
+  (declare (ignore if-invalid))
+  (validate-value-using-type
+   schema-item value (option-type schema-item)))
+
+(defmethod validate-value-using-type ((schema-item type-based-validation-mixin)
+                                      (value       t)
+                                      (type        cons)
+                                      &key
+                                      inner-type)
+  (if (member (first type) '(integer rational float real member))
+      (call-next-method)
+      (validate-value-using-type
+       schema-item value (first type)
+       :inner-type (append (rest type) (ensure-list inner-type)))))
+
+(defmethod validate-value-using-type ((schema-item type-based-validation-mixin)
+                                      (value       t)
+                                      (type        t)
+                                      &key
+                                      inner-type)
+  (declare (ignore inner-type))
+  (typep value type))
+
+(macrolet
+    ((define-composite-validation (type operator)
+       `(defmethod validate-value-using-type ((schema-item type-based-validation-mixin)
+                                              (value       t)
+                                              (type        (eql ',type))
+                                              &key
+                                              inner-type)
+        (,operator (curry #'validate-value-using-type schema-item value)
+                   inner-type))))
+
+  (define-composite-validation and every)
+  (define-composite-validation or  some))
+
 ;;; `type-based-conversion-mixin' class
 
 (defclass type-based-conversion-mixin ()
