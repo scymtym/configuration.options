@@ -109,7 +109,11 @@
                  :serial     t
                  :components ((:file       "package")
                               (:file       "protocol")
-                              (:file       "source-environment-variables")))))
+
+                              ;; Sources
+                              (:file       "source-environment-variables")
+                              (:file       "source-stream")
+                              (:file       "source-file")))))
 
 (defmethod perform ((op     test-op)
                     (system (eql (find-system :options-test))))

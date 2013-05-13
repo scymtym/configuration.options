@@ -37,6 +37,8 @@
 
   ;; Syntax protocol and syntax creation
   (:export
+   #:process-content
+
    #:make-syntax)
 
   (:documentation
