@@ -65,3 +65,49 @@
      (1     (or integer boolean) t)
      (0.5d0 (or integer boolean) nil)
      ("foo" (or integer boolean) nil))))
+
+;;; `type-based-merging-mixin'
+
+(def-suite options.type-based-merging-mixin
+  :in options)
+(in-suite options.type-based-merging-mixin)
+
+(defclass mock-type-based-merging-schema-item (mock-typed-schema-item
+                                               type-based-merging-mixin)
+  ())
+
+(test smoke
+  "Smoke test for methods on `merge-values' and
+   `merge-values-using-type' for `type-based-merging-mixin'."
+  (mapc
+   (lambda+ ((values type expected))
+     (let+ ((schema-item (make-instance
+                          'mock-type-based-merging-schema-item
+                          :type type)))
+       (is (equal expected
+                  (multiple-value-list
+                   (merge-values schema-item values))))))
+
+   '((()                           boolean                    (nil   nil))
+     ((nil)                        boolean                    (nil   t))
+     ((t)                          boolean                    (t     t))
+     ((nil nil)                    boolean                    (nil   t))
+     ((t   nil)                    boolean                    (t     t))
+
+     (()                           integer                    (nil   nil))
+     ((1)                          integer                    (1     t))
+     ((2)                          integer                    (2     t))
+     ((1 1)                        integer                    (1     t))
+     ((2 1)                        ingeter                    (2     t))
+
+     (()                           (list integer)             (nil   nil))
+     (((1))                        (list integer)             ((1)   t))
+     (((1) (2))                    (list integer)             ((1)   t))
+
+     (()                           (list integer :inherit? t) (nil   nil))
+     (((1))                        (list integer :inherit? t) ((1)   t))
+     (((1 :inherit))               (list integer :inherit? t) ((1)   t))
+     (((1) (2))                    (list integer :inherit? t) ((1)   t))
+     (((1 :inherit) (2))           (list integer :inherit? t) ((1 2) t))
+     (((1) (2  :inherit))          (list integer :inherit? t) ((1)   t))
+     (((1 :inherit) (2  :inherit)) (list integer :inherit? t) ((1 2) t)))))

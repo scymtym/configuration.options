@@ -277,11 +277,16 @@
 
 (defgeneric merge-values (schema-item values)
   (:documentation
-   "TODO(jmoringe): document"))
+   "Merge the sequence of values VALUES into a single value in the
+    appropriate way for the type of SCHEMA-ITEM and return two values:
+    1) nil or the merged value 2) t if the merge produced a value and
+    nil if the merge did not produce a value."))
 
-(defgeneric merge-values-using-type (schema-item values type &key inner-type)
-  (:documentation
-   "TODO(jmoringe): document"))
+(defgeneric merge-values-using-type (schema-item values type
+                                     &key inner-type)
+ (:documentation
+   "Like `merge-values' but may incorporate TYPE into the decision how
+    to merge VALUES."))
 
 (defgeneric value->string (schema-item value)
   (:documentation

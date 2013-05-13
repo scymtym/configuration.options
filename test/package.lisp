@@ -18,7 +18,8 @@
    #:name
    #:wild-name
 
-   #:type-based-validation-mixin)
+   #:type-based-validation-mixin
+   #:type-based-merging-mixin)
 
   (:import-from #:options.sources
    #:initialize)

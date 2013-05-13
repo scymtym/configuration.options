@@ -113,11 +113,3 @@
     (make-instance (option-class schema-item)
                    :name name
                    :cell cell)))
-
-(defmethod merge-values ((schema-item standard-schema-item)
-                         (values      sequence))
-  (let ((values (if (option-has-default? schema-item)
-                    (append (coerce values 'list)
-                            (list (option-default schema-item)))
-                    values)))
-    (call-next-method schema-item values)))

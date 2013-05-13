@@ -77,6 +77,24 @@
 
 ;;; type `list'
 
+(defmethod merge-values-using-type ((schema-item type-based-merging-mixin)
+                                    (values      sequence)
+                                    (type        (eql 'list))
+                                    &key
+                                    inner-type)
+  (let+ (((&plist-r/o (inherit? :inherit?)) (rest inner-type))
+         ((&flet remove-marker (list)
+            (remove :inherit list :count 1 :from-end t))))
+    (if inherit?
+        (remove-marker
+         (reduce
+          (lambda (left &optional right)
+            (if (ends-with :inherit left)
+                (concatenate 'list (remove-marker left) right)
+                left))
+          values))
+        (elt values 0))))
+
 (defmethod value->string-using-type ((schema-item type-based-conversion-mixin)
                                      (value       list)
                                      (type        (eql 'list))
@@ -105,19 +123,3 @@
                 (conjoin #'stringp #'emptyp)
                 (substitute-if :inherit #'emptyp components :count 1 :from-end t))
                components))))
-
-(defmethod merge-values-using-type ((schema-item type-based-merging-mixin)
-                                    (values      sequence)
-                                    (type        (eql 'list))
-                                    &key
-                                    inner-type)
-  (let+ (((&plist-r/o (inherit? :inherit?)) (rest inner-type)))
-    (if inherit?
-        (reduce
-         (lambda (left &optional right)
-           (if (ends-with :inherit left)
-               (concatenate
-                'list (remove :inherit left :count 1 :from-end t) right)
-               left))
-         values)
-        (elt values 0))))

@@ -99,8 +99,7 @@
                  :components ((:file       "package")
                               (:file       "protocol")
                               (:file       "name")
-                              (:file       "mixins")
-                              (:file       "schema")))
+                              (:file       "mixins")))
 
                 (:module     "sources"
                  :pathname   "test/sources"

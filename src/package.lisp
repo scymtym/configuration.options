@@ -91,6 +91,9 @@
    #:validate-value
    #:validate-value-using-type
 
+   #:merge-values
+   #:merge-values-using-type
+
    #:value->string
    #:string->value
    #:value->string-using-type

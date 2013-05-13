@@ -88,6 +88,49 @@
   (define-composite-validation and every)
   (define-composite-validation or  some))
 
+;;; `type-based-merging-mixin' class
+
+(defclass type-based-merging-mixin ()
+  ()
+  (:documentation
+   "This mixin class is intended to be mixed into schema item classes
+    which have to perform merging of values based their types.
+
+    This behavior is implemented by a method on `merges-values' which
+    calls `merge-value-using-type' with the `option-type' of the
+    schema item.
+
+    Default behavior is provided for some types:
+
+    * t: use the value with the highest priority; ignore other
+      values
+    * (list [:inherit? INHERIT]): depending on INHERIT either use the
+      value with highest priority or look for :inherit markers in
+      values and concatenate values appropriately."))
+
+(defmethod merge-values ((schema-item type-based-merging-mixin)
+                         (values      sequence))
+  (if (emptyp values)
+      (values nil nil)
+      (values (merge-values-using-type
+               schema-item values (option-type schema-item))
+              t)))
+
+(defmethod merge-values-using-type ((schema-item type-based-merging-mixin)
+                                    (values      sequence)
+                                    (type        cons)
+                                    &key
+                                    inner-type)
+  (merge-values-using-type
+   schema-item values (first type)
+   :inner-type (append (rest type) (ensure-list inner-type))))
+
+(defmethod merge-values-using-type ((schema-item type-based-merging-mixin)
+                                    (values      sequence)
+                                    (type        t)
+                                    &key &allow-other-keys)
+  (elt values 0))
+
 ;;; `type-based-conversion-mixin' class
 
 (defclass type-based-conversion-mixin ()
@@ -120,32 +163,6 @@
   (string->value-using-type
    schema-item value (first type)
    :inner-type (append (rest type) (ensure-list inner-type))))
-
-;;; `type-based-merging-mixin' class
-
-(defclass type-based-merging-mixin ()
-  ()
-  (:documentation
-   "TODO(jmoringe): document"))
-
-(defmethod merge-values ((schema-item type-based-merging-mixin)
-                         (values      t))
-  (merge-values-using-type schema-item values (option-type schema-item)))
-
-(defmethod merge-values-using-type ((schema-item type-based-merging-mixin)
-                                    (values      sequence)
-                                    (type        list)
-                                    &key
-                                    inner-type)
-  (merge-values-using-type
-   schema-item values (first type)
-   :inner-type (append (rest type) (ensure-list inner-type))))
-
-(defmethod merge-values-using-type ((schema-item type-based-merging-mixin)
-                                    (values      sequence)
-                                    (type        t)
-                                    &key &allow-other-keys)
-  (elt values 0))
 
 ;;; `list-container-mixin' class
 
