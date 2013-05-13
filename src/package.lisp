@@ -109,7 +109,8 @@
   (:export
    #:option-configuration
    #:option-schema-item
-   #:option-value)
+   #:option-value
+   #:option-values)
 
   ;; Configuration protocol
   (:export

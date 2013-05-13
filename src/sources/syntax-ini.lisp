@@ -45,9 +45,11 @@
                       (bounds     :bounds)) child)
          (name (append parent-name child-name)))
     (notify *sink* :added     name nil
-            :source (cons (syntax-source builder) bounds))
+            :source (syntax-source builder)
+            :bounds bounds)
     (notify *sink* :new-value name value
-            :source (cons (syntax-source builder) bounds))
+            :source (syntax-source builder)
+            :bounds bounds)
     parent))
 
 (defmethod process-content ((syntax ini-syntax)

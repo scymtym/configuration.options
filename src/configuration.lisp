@@ -35,7 +35,22 @@
                 "Stores the value of the option cell.
 
                  Is unbound when the option cell does not have a
-                 value."))
+                 value.")
+   (values      :type     vector
+                :accessor option-values
+                :initform (make-array 0)
+                :documentation
+                "Stores values and additional information regarding
+                 their origins for the option as provided by sources
+                 in order of decreasing priority. Entries are of the
+                 form
+
+                    (VALUE &rest PLIST)
+
+                 where VALUE is a parsed value PLIST contains at least
+                 the property :source holding the source object from
+                 which VALUE originated. Additional properties may
+                 describe the origin of VALUE in more detail."))
   (:default-initargs
    :schema-item (missing-required-initarg 'option-cell :schema-item))
   (:documentation
@@ -113,6 +128,7 @@
 
   (define-delegation option-schema-item)
   (define-delegation option-type)
+  (define-delegation option-values t)
   (define-delegation option-description))
 
 (defmethod option-default ((option standard-option)

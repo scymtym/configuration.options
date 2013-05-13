@@ -426,6 +426,11 @@
   (:documentation
    "TODO(jmoringe): document"))
 
+(defgeneric option-values (option)
+  (:documentation
+   "Return the (potentially empty) sequence of values from which the
+    effective value of OPTION has been constructed via merging."))
+
 ;; Default behavior
 
 (defmethod option-value :around ((option t)
