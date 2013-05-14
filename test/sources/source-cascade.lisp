@@ -96,6 +96,56 @@
           '(:added     ("d")     nil :index 2)
           '(:new-value ("d")     "3" :index 2))))))
 
+;;; Tests for `directory-source' class
+
+(test directory-source.construct
+  "Test constructing `directory-source' instances."
+
+  (mapc (lambda+ ((initargs expected))
+          (let+ (((&flet do-it ()
+                    (apply #'make-source :directory initargs))))
+            (case expected
+              (missing-required-initarg
+               (signals missing-required-argument (do-it)))
+              (t (do-it)))))
+        '(;; :pattern and :syntax are missing.
+          (()                                missing-required-initarg)
+          ((:pattern "/etc/sysctl.d/*.conf") missing-required-initarg)
+          ((:syntax  :mock)                  missing-required-initarg)
+
+          ;; These are valid.
+          ((:pattern "/etc/sysctl.d/*.conf"
+            :syntax  :mock)                  t))))
+
+(test directory-source.smoke
+  "Smoke test for `directory-source' class."
+
+  (let ((directory (format nil "/tmp/~A/" (make-random-string)))
+        (type      "conf"))
+    (with-files (((format nil "~A/00-foo.~A" directory type)
+                  "b.c=5")
+                 ((format nil "~A/01-baz.~A" directory type)
+                  "a=4")
+                 ((format nil "~A/02-bar.~A" directory type)
+                  "a=1 b.c=2 d=3"))
+      (with-source-and-sink ((:directory
+                              :pattern (merge-pathnames
+                                        (make-pathname :name :wild :type type)
+                                        directory)
+                              :syntax  :mock)
+                             :sink-var sink)
+        (expecting-sink-calls (sink)
+          '(:added     ("b" "c") nil :index 0)
+          '(:new-value ("b" "c") "5" :index 0)
+          '(:added     ("a")     nil :index 1)
+          '(:new-value ("a")     "4" :index 1)
+          '(:added     ("a")     nil :index 2)
+          '(:new-value ("a")     "1" :index 2)
+          '(:added     ("b" "c") nil :index 2)
+          '(:new-value ("b" "c") "2" :index 2)
+          '(:added     ("d")     nil :index 2)
+          '(:new-value ("d")     "3" :index 2))))))
+
 ;;; Tests for `common-cascade-source' class
 
 (test common-cascade-source.construct

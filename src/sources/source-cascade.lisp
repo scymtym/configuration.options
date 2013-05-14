@@ -176,6 +176,68 @@
           (name        (namestring config-file)))
      `((:config-file ,name " ~S" ((:before :num-sources)))))))
 
+;;; `directory-source'
+
+(defclass directory-source (cascade-source
+                            print-items-mixin)
+  ((pattern :initarg  :pattern
+            :type     (or string pathname)
+            :reader   source-pattern
+            :documentation
+            "A (wild) pathname or pathname designator which will be
+             used to collect files for the source."))
+  (:default-initargs
+   :pattern (missing-required-initarg 'directory-source :pattern)
+   :ignore  (load-time-value (curry #'starts-with #\.) t)
+   :compare (load-time-value
+             (lambda (x y)
+               (string< (pathname-name x) (pathname-name y)))
+             t))
+  (:documentation
+   "Instances of this class collect files according specified rules
+    and create subordinate sources for these files.
+
+    The following initargs are accepted:
+
+    :pattern PATTERN
+
+      A (wild) pathname or pathname designator which will be used to
+      collect files for the source.
+
+    :ignore FUNCTION-OF-ONE-ARGUMENT
+
+      A function or function designator that should be called on
+      collected candidate files to decide whether they should be used
+      or ignored.
+
+    :compare FUNCTION-OF-TWO-ARGUMENTS
+
+      A function or function designator that should be used to sort
+      collected files and thereby determine a processing order."))
+
+(service-provider:register-provider/class
+ 'source :directory :class 'directory-source)
+
+(defmethod shared-initialize :around ((instance   directory-source)
+                                      (slot-names t)
+                                      &rest args
+                                      &key
+                                      pattern
+                                      ignore
+                                      compare
+                                      &allow-other-keys)
+  (let+ ((other-args (remove-from-plist args :pattern :ignore :compare))
+         (files (sort (remove-if ignore (directory pattern)) compare)))
+    (apply #'call-next-method
+           instance slot-names
+           :sources (mapcar (lambda (file)
+                              (list* :file :pathname file other-args))
+                            files)
+           args)))
+
+(defmethod print-items append ((object directory-source))
+  `((:pattern ,(source-pattern object) " ~S" ((:before :num-sources)))))
+
 ;;; `common-cascade-source'
 
 (defclass common-cascade-source (cascade-source
