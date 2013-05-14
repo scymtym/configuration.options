@@ -19,12 +19,14 @@
    #:wild-name)
 
   (:export
-   #:options.root)
+   #:run-tests)
 
   (:documentation
    "This package contains unit tests for the options system."))
 
 (cl:in-package #:options.test)
+
+;;; Test suite
 
 (def-suite options
   :description
@@ -32,3 +34,20 @@
 
 (defun run-tests ()
   (run! 'options))
+
+
+;;; Mock sink class
+
+(defclass mock-sink ()
+  ((calls :type     list
+          :accessor sink-calls
+          :initform '())))
+
+(defmethod notify ((sink  mock-sink)
+                   (event t)
+                   (name  t)
+                   (value t)
+                   &rest args &key)
+  (appendf (sink-calls sink)
+           (list (list* event name value
+                        (remove-from-plist args :raw? :source)))))

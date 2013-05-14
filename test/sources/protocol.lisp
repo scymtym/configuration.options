@@ -6,6 +6,8 @@
 
 (cl:in-package #:options.sources.test)
 
+(in-suite options.sources)
+
 #+no (make-source '((:commandline)
                (:environment-variables :prefix   "RSB_")
                (:ini-file              :pathname "rsb.conf")
