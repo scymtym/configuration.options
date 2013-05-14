@@ -35,6 +35,10 @@
 
    #:make-source)
 
+  ;; Cascade source protocol
+  (:export
+   #:source-sources)
+
   ;; Syntax protocol and syntax creation
   (:export
    #:process-content

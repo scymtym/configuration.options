@@ -7,10 +7,11 @@
 (cl:defpackage #:options.sources.test
   (:use
    #:cl
-   #:alexandria ; TODO temp but probably needed
+   #:alexandria
    #:split-sequence
    #:iterate
    #:let-plus
+   #:more-conditions
 
    #:eos
 
@@ -55,6 +56,7 @@
                            :remove-empty-subseqs t))
         (let+ (((name value) (split-sequence #\= statement))
                (name (parse-name (string-trim '(#\Space) name))))
+          (notify sink :added     name nil)
           (notify sink :new-value name value :raw? t))))
 
 ;;; Utilities and macros
@@ -89,8 +91,8 @@
        (delete-file ,name))))
 
 (defmacro with-files (bindings &body body)
-  "Execute BODY with the files created and populated according to
-   BINDINGS entries of which are of the form
+  "Execute BODY with files created and populated according to BINDINGS
+   entries of which are of the form
 
      (PATHNAME CONTENT)
 
@@ -101,6 +103,25 @@
          (with-files ,(rest bindings)
            ,@body))
       `(progn ,@body)))
+
+(defmacro with-config-files
+    ((prefix basename &optional (type "conf"))
+     (&optional prefix-contents home-contents cwd-contents)
+     &body body)
+  "Execute BODY with config files created according to PREFIX,
+   BASENAME and TYPE and populated according to PREFIX-CONTENTS,
+   HOME-CONTENTS and CWD-CONTENTS."
+  (once-only (prefix basename type)
+    `(with-files (,@(when prefix-contents
+                      `(((format nil "~A/etc/~A.~A" ,prefix ,basename ,type)
+                         ,prefix-contents)))
+                  ,@(when home-contents
+                      `(((format nil "~~/.config/~A.~A" ,basename ,type)
+                         ,home-contents)))
+                  ,@(when cwd-contents
+                      `(((format nil "~A.~A" ,basename ,type)
+                         ,cwd-contents))))
+       ,@body)))
 
 (defmacro with-source-and-sink ((source-and-options
                                  &key
@@ -124,7 +145,7 @@
    is the value of SINK-VAR against the elements of EXPECTED."
   `(let ((calls/expected (list ,@expected))
          (calls/actual   (sink-calls ,sink-var)))
-     (and (is (= (length calls/actual) (length calls/expected)))
+     (and (is (= (length calls/expected) (length calls/actual)))
           (iter (for call/actual   in calls/actual)
                 (for call/expected in calls/expected)
                 (is (equal call/expected call/actual))))))

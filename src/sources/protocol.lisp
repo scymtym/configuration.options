@@ -59,6 +59,17 @@
   "TODO(jmoringe): document"
   (apply #'service-provider:make-provider 'source spec args))
 
+;;; Source cascade protocol
+
+(defgeneric source-sources (source)
+  (:documentation
+   "Return the inferior sources managed by SOURCE."))
+
+;; Default behavior
+
+(defmethod source-sources ((source t))
+  '())
+
 ;;; Syntax protocol
 
 (defgeneric process-content (syntax source sink)

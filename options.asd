@@ -81,7 +81,8 @@
                               (:file       "source-environment-variables")
                               (:file       "source-commandline")
                               (:file       "source-stream")
-                              (:file       "source-file"))))
+                              (:file       "source-file")
+                              (:file       "source-cascade"))))
 
   :in-order-to ((test-op (test-op :options-test))))
 
@@ -113,7 +114,8 @@
                               ;; Sources
                               (:file       "source-environment-variables")
                               (:file       "source-stream")
-                              (:file       "source-file")))))
+                              (:file       "source-file")
+                              (:file       "source-cascade")))))
 
 (defmethod perform ((op     test-op)
                     (system (eql (find-system :options-test))))
