@@ -9,7 +9,7 @@
 (defclass file-source (stream-source)
   ((pathname          :type     pathname
                       :reader   source-pathname
-                      :accessor %source-pathname
+                      :accessor source-%pathname
                       :documentation
                       "Stores the pathname of the file from which
                        configuration options should be read.")
@@ -31,7 +31,7 @@
                                      (slot-names t)
                                      &key
                                      pathname)
-  (setf (%source-pathname instance) (parse-namestring pathname)))
+  (setf (source-%pathname instance) (parse-namestring pathname)))
 
 (defmethod print-items append ((object file-source))
-  `((:pathname ,(source-pathname object) "~A")))
+  `((:pathname ,(source-pathname object) " ~A")))

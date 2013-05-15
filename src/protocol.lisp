@@ -192,14 +192,7 @@
   (labels
       ((recur ()
          (or (call-next-method)
-             (etypecase if-does-not-exist
-               (null
-                nil)
-               ((or (eql error) function)
-                (error 'no-such-option
-                       :name      name
-                       :container container)))
-             #+later (error-behavior-restart-case (if-does-not-exist
+             (error-behavior-restart-case (if-does-not-exist
                                            (no-such-option
                                             :name      name
                                             :container container))
@@ -401,11 +394,11 @@
 
 (defgeneric option-configuration (option)
   (:documentation
-   "Return the name object naming OPTION."))
+   "Return the configuration object containing OPTION."))
 
 (defgeneric option-schema-item (option)
   (:documentation
-   "TODO(jmoringe): document"))
+   "Return the schema item corresponding to OPTION."))
 
 (defgeneric option-value (option
                           &key

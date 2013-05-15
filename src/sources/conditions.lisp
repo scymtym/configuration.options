@@ -26,7 +26,7 @@
   (:report
    (lambda (condition stream)
      (format stream "~@<Could not initialize configuration source ~
-                     ~A~/more-conditions::maybe-print-cause/~@:>"
+                     ~A~/more-conditions:maybe-print-cause/~@:>"
              (source-condition-source condition)
              condition)))
   (:documentation
@@ -53,8 +53,8 @@
   ()
   (:report
    (lambda (condition stream)
-     (format stream "~@<Could not process configuration source ~
-                     ~A and sink ~A~/more-conditions::maybe-print-cause/~@:>"
+     (format stream "~@<Could not process configuration source ~A and ~
+                     sink ~A~/more-conditions:maybe-print-cause/~@:>"
              (source-condition-source condition)
              (sink-condition-sink condition)
              condition)))

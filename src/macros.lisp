@@ -1,4 +1,4 @@
-;;;; macros.lisp ---
+;;;; macros.lisp --- Macros provided by the options system.
 ;;;;
 ;;;; Copyright (C) 2012, 2013 Jan Moringen
 ;;;;

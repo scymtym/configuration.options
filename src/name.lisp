@@ -30,7 +30,7 @@
 
 (defmethod print-object ((object wildcard-name) stream)
   (print-unreadable-object (object stream :type t :identity t)
-    (format stream "~/options::print-name/" object)))
+    (format stream "~/options:print-name/" object)))
 
 ;; sequence protocol
 

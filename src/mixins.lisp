@@ -27,7 +27,7 @@
     (setf (option-%name instance) (make-name name))))
 
 (defmethod print-items append ((object named-mixin))
-  `((:name ,(option-name object) " ~/options::print-name/"
+  `((:name ,(option-name object) " ~/options:print-name/"
            ((:before :value) (:before :type)))))
 
 ;;; `event-hook-mixin' class
@@ -232,7 +232,6 @@
 
 (defmethod find-options ((name      t)
                          (container list-container-mixin))
-  "TODO(jmoringe): document"
   (remove name (options container)
           :key  #'option-name
           :test (complement #'name-matches)))
@@ -240,7 +239,6 @@
 (defmethod find-option ((name      t)
                         (container list-container-mixin)
                         &key &allow-other-keys)
-  "TODO(jmoringe): document"
   (find name (options container)
         :key  #'option-name
         :test #'name-equal))

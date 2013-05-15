@@ -126,11 +126,10 @@
 
 (defmethod make-option ((schema-item standard-schema-item)
                         (name        list))
-  "TODO(jmoringe): document"
-  #+no (unless (option-name-equal name (option-name schema-item))
+  (unless (name-matches (option-name schema-item) name)
     (error "Cannot make option ~S" name))
 
-  ;;; TODO(jmoringe, 2013-03-01): use `option-class' for cell instead of option?
+  ;; TODO(jmoringe, 2013-03-01): use `option-class' for cell instead of option?
   (let ((cell (make-instance 'option-cell
                              :schema-item schema-item)))
     (make-instance (option-class schema-item)

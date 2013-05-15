@@ -38,7 +38,7 @@
                option could not be found."))
   (:report
    (lambda (condition stream)
-     (format stream "~@<No option named ~/options::print-name/ in ~
+     (format stream "~@<No option named ~/options:print-name/ in ~
                      ~A.~@:>"
              (no-such-option-name      condition)
              (no-such-option-container condition))))
@@ -164,9 +164,9 @@
   (:report
    (lambda (condition stream)
      (format stream "~@<When notifying sink ~A of ~S option ~
-                     ~/options::print-name/~@[ with value ~S~]~@[ by ~
+                     ~/options:print-name/~@[ with value ~S~]~@[ by ~
                      source ~A~]~
-                     ~/more-conditions::maybe-print-cause/~@:>"
+                     ~/more-conditions:maybe-print-cause/~@:>"
              (notification-error-sink   condition)
              (notification-error-event  condition)
              (notification-error-name   condition)

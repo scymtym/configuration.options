@@ -1,4 +1,4 @@
-;;;; macros.lisp ---
+;;;; macros.lisp --- Test for the macros provided by the options system.
 ;;;;
 ;;;; Copyright (C) 2013 Jan Moringen
 ;;;;
