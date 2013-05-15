@@ -40,11 +40,13 @@
 
 (service-provider:define-service source
   (:documentation
-   "TODO
+   "This service is provided by implementations which process
+    configuration sources such as configuration files or environment
+    variables.
 
-Providers implement the above source protocol."))
+    Providers implement the source protocol."))
 
-;; TODO(jmoringe, 2013-03-12): source should get schema (e.g. clon)
+;; TODO(jmoringe, 2013-03-12): source should get configuration schema (e.g. for clon)
 (defgeneric make-source (spec
                          &key &allow-other-keys)
   (:documentation

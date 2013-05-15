@@ -28,6 +28,14 @@
    #:no-such-option-name
    #:no-such-option-container
 
+   #:option-condition-option
+
+   #:value-condition-value
+
+   #:option-value-error
+
+   #:option-value-type-error
+
    #:notification-error
    #:notification-error-sink
    #:notification-error-event

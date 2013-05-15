@@ -12,11 +12,12 @@
   ((name :reader   option-name
          :writer   (setf option-%name)
          :documentation
-         ""))
+         "Stores the name of the option."))
   (:default-initargs
    :name (missing-required-initarg 'named-mixin :name))
   (:documentation
-   "TODO(jmoringe): document"))
+   "This class is intended to be mixed into classes instances of which
+    have an associated name."))
 
 (defmethod shared-initialize :after ((instance   named-mixin)
                                      (slot-names t)

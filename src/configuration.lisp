@@ -26,7 +26,9 @@
   ((schema-item :initarg  :schema-item
                 :reader   option-schema-item
                 :documentation
-                "")
+                "Stores the associated schema-item which in turn
+                 stores the type, default and documentation for the
+                 option.")
    (value       :initarg  :value
                 :accessor option-value
                 :documentation
@@ -38,7 +40,12 @@
    :schema-item (missing-required-initarg
                  'option-cell :schema-item))
   (:documentation
-   "TODO(jmoringe): document"))
+   "Instances of this class represent all aspects of options but their
+    name.
+
+    Options point to cells for value storage and, transitively, the
+    associated schema-item. Multiple options can point to one
+    `option-cell' instance."))
 
 (macrolet
     ((define-delegation (name)

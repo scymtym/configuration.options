@@ -52,21 +52,23 @@
   ((option :initarg  :option
            :reader   option-condition-option
            :documentation
-           ""))
+           "Stores the involved option or its name."))
   (:default-initargs
    :option (missing-required-initarg 'option-condition :option))
   (:documentation
-   "TODO(jmoringe): document"))
+   "Subclasses of this condition class are signaled when a problem
+    involving an option is encountered."))
 
 (define-condition value-condition (condition)
   ((value :initarg  :value
           :reader   value-condition-value
           :documentation
-          ""))
+          "Stores the problematic option value."))
   (:default-initargs
    :value (missing-required-initarg 'value-condition :value))
   (:documentation
-   "TODO(jmoringe): document"))
+   "Subclasses of this condition class are signaled when a problem
+    regarding an option value is encountered."))
 
 (define-condition option-value-error (error
                                       option-condition
@@ -75,10 +77,11 @@
   (:report
    (lambda (condition stream)
      (format stream "~@<The value ~S is invalid for option ~A.~@:>"
-             (option-condition-option condition)
-             (value-condition-value   condition))))
+             (value-condition-value   condition)
+             (option-condition-option condition))))
   (:documentation
-   "TODO(jmoringe): document"))
+   "This error and its subclasses is signaled when an error regarding
+    an option value is encountered."))
 
 (define-condition option-value-type-error (option-value-error
                                            type-error)
@@ -86,10 +89,11 @@
   (:report
    (lambda (condition stream)
      (format stream "~@<The value ~S is invalid for option ~A.~@:>"
-             (option-condition-option condition)
-             (value-condition-value   condition))))
+             (value-condition-value   condition)
+             (option-condition-option condition))))
   (:documentation
-   "TODO(jmoringe): document"))
+   "This error is signaled when a type error regarding an option value
+    is encountered."))
 
 (define-condition option-syntax-error (option-value-error)
   ()

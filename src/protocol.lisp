@@ -220,11 +220,11 @@
 
 (defgeneric option-name (option)
   (:documentation
-   "TODO(jmoringe): document"))
+   "Return the name object naming OPTION."))
 
 (defgeneric option-type (option)
   (:documentation
-   "TODO(jmoringe): document"))
+   "Return the type of option."))
 
 (defgeneric option-has-default? (option)
   (:documentation
