@@ -26,19 +26,18 @@
   ((schema-item :initarg  :schema-item
                 :reader   option-schema-item
                 :documentation
-                "Stores the associated schema-item which in turn
+                "Stores the associated schema item which in turn
                  stores the type, default and documentation for the
                  option.")
-   (value       :initarg  :value
-                :accessor option-value
+   (value       :writer   (setf option-value)
+                :accessor option-%value
                 :documentation
                 "Stores the value of the option cell.
 
                  Is unbound when the option cell does not have a
                  value."))
   (:default-initargs
-   :schema-item (missing-required-initarg
-                 'option-cell :schema-item))
+   :schema-item (missing-required-initarg 'option-cell :schema-item))
   (:documentation
    "Instances of this class represent all aspects of options but their
     name.
@@ -47,22 +46,45 @@
     associated schema-item. Multiple options can point to one
     `option-cell' instance."))
 
+(defmethod shared-initialize :after ((instance   option-cell)
+                                     (slot-names t)
+                                     &key
+                                     (value nil value-supplied?))
+  (when value-supplied?
+    (setf (option-value instance) value)))
+
 (macrolet
     ((define-delegation (name)
        `(defmethod ,name ((option option-cell))
           (,name (option-schema-item option)))))
 
   (define-delegation option-type)
-  (define-delegation option-default)
   (define-delegation option-description))
+
+(defmethod option-default ((option option-cell)
+                           &key
+                           if-does-not-exist)
+  (option-default (option-schema-item option)
+                  :if-does-not-exist if-does-not-exist))
+
+(defmethod option-value ((option option-cell)
+                         &key
+                         if-does-not-exist)
+  (declare (ignore if-does-not-exist))
+  (when (slot-boundp option 'value)
+    (values (option-%value option) t)))
 
 (defmethod (setf option-value) :before ((new-value t)
                                         (option    option-cell))
   (validate-value (option-schema-item option) new-value))
 
 (defmethod print-items append ((object option-cell))
-  `((:type  ,(option-type object)  ": ~A" ((:before :value)))
-    (:value ,(option-value object) " = ~S")))
+  (let+ ((type (option-type object))
+         ((&values value value?)
+          (option-value object :if-does-not-exist nil))
+         (value (list (if value? (list 1 value) (list 0)))))
+    `((:type  ,type  ": ~A" ((:before :value)))
+      (:value ,value " ~:{~[<no value>~;= ~S~]~}"))))
 
 ;;; `standard-option' class
 
@@ -80,20 +102,33 @@
     and potentially an option value."))
 
 (macrolet
-    ((define-delegation (name)
-       `(defmethod ,name ((option standard-option))
-          (,name (option-%cell option)))))
+    ((define-delegation (name &optional setf?)
+       `(progn
+          (defmethod ,name ((option standard-option))
+            (,name (option-%cell option)))
+
+          ,@(when setf?
+              `((defmethod (setf ,name) ((new-value t) (option standard-option))
+                  (setf (,name (option-%cell option)) new-value)))))))
 
   (define-delegation option-schema-item)
   (define-delegation option-type)
-  (define-delegation option-default)
-  (define-delegation option-description)
-  (define-delegation option-value)
-  #+no (define-delegation (setf option-value) (new-value)))
+  (define-delegation option-description))
+
+(defmethod option-default ((option standard-option)
+                           &key
+                           if-does-not-exist)
+  (declare (ignore if-does-not-exist))
+  (option-default (option-%cell option) :if-does-not-exist nil))
+
+(defmethod option-value ((option standard-option)
+                         &key
+                         if-does-not-exist)
+  (declare (ignore if-does-not-exist))
+  (option-value (option-%cell option) :if-does-not-exist nil))
 
 (defmethod (setf option-value) ((new-value t) (option standard-option))
   (setf (option-value (option-%cell option)) new-value))
 
 (defmethod print-items append ((object standard-option))
-  `((:type  ,(option-type object)  ": ~A" ((:before :value)))
-    (:value ,(option-value object) " = ~S")))
+  (print-items (option-%cell object)))

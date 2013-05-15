@@ -33,6 +33,9 @@
 
    #:value-condition-value
 
+   #:no-such-value-error
+   #:no-such-value-error-which
+
    #:option-value-error
 
    #:option-value-type-error
@@ -83,7 +86,6 @@
   (:export
    #:option-name
    #:option-type
-   #:option-has-default?
    #:option-default
    #:option-description)
 

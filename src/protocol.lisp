@@ -224,19 +224,55 @@
 
 (defgeneric option-type (option)
   (:documentation
-   "Return the type of option."))
+   "Return the type of OPTION. The returned type is an expression
+    similar to a CL type."))
 
-(defgeneric option-has-default? (option)
+(defgeneric option-default (option &key if-does-not-exist)
   (:documentation
-   "TODO(jmoringe): document"))
+   "Return two values describing the default value of OPTION: 1) nil
+    or the default value of OPTION 2) nil if OPTION does not have a
+    default value and t if OPTION has a default value.
 
-(defgeneric option-default (option)
-  (:documentation
-   "TODO(jmoringe): document"))
+    IF-DOES-NOT-EXIST controls the behavior in case OPTION does not
+    have default value:
+
+    nil
+
+      Return the two values nil, nil.
+
+    'error, #'error
+
+      Signal a `no-such-value-error' error indicating that OPTION does
+      not have a default value.
+
+    a function
+
+      Call the function with a `no-such-value-error' object indicating
+      that OPTION does not have a default value."))
 
 (defgeneric option-description (option)
   (:documentation
    "TODO(jmoringe): document"))
+
+;; Default behavior
+
+(defmethod option-default :around ((option t)
+                                   &key
+                                   (if-does-not-exist #'error))
+  (labels
+      ((recur ()
+         (or (let+ (((&values default default?) (call-next-method)))
+               (when default?
+                 (return-from recur (values default default?))))
+             (error-behavior-restart-case (if-does-not-exist
+                                           (no-such-value-error
+                                            :option option
+                                            :which :default))
+               (retry ()
+                 (recur))
+               (use-value (value)
+                 value)))))
+    (recur)))
 
 ;;; Schema item protocol
 
@@ -358,16 +394,57 @@
 
 (defgeneric option-schema-item (option)
   (:documentation
-   "Return the name object naming OPTION."))
+   "TODO(jmoringe): document"))
 
-(defgeneric option-value (option)
+(defgeneric option-value (option
+                          &key
+                          if-does-not-exist)
   (:documentation
-   "Return the name object naming OPTION."))
+   "Return two values describing the value of OPTION: 1) nil or the
+    value of OPTION 2) nil if OPTION does not have a value and t if
+    OPTION has a value.
+
+    IF-DOES-NOT-EXIST controls the behavior in case OPTION does not
+    have value:
+
+    nil
+
+      Return the two values nil, nil.
+
+    'error, #'error
+
+      Signal a `no-such-value-error' error indicating that OPTION does
+      not have a value.
+
+    a function
+
+      Call the function with a `no-such-value-error' object indicating
+      that OPTION does not have a value."))
 
 ;;; TODO(jmoringe, 2012-02-22): always supported?
 (defgeneric (setf option-value) (new-value option)
   (:documentation
-   "Return the name object naming OPTION."))
+   "TODO(jmoringe): document"))
+
+;; Default behavior
+
+(defmethod option-value :around ((option t)
+                                 &key
+                                 (if-does-not-exist #'error))
+  (labels
+      ((recur ()
+         (or (let+ (((&values value value?) (call-next-method)))
+               (when value?
+                 (return-from recur (values value value?))))
+             (error-behavior-restart-case (if-does-not-exist
+                                           (no-such-value-error
+                                            :option option
+                                            :which :value))
+               (retry ()
+                 (recur))
+               (use-value (value)
+                 value)))))
+    (recur)))
 
 ;;; Sink protocol
 

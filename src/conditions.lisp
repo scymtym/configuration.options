@@ -70,6 +70,24 @@
    "Subclasses of this condition class are signaled when a problem
     regarding an option value is encountered."))
 
+(define-condition no-such-value-error (error
+                                       option-condition)
+  ((which :initarg  :which
+          :type     symbol
+          :reader   no-such-value-error-which
+          :initform :value
+          :documentation
+          "Stores a symbol describing the option value which was
+           requested but did not exist."))
+  (:report
+   (lambda (condition stream)
+     (format stream "~@<The option ~A does not have a ~A.~@:>"
+             (option-condition-option   condition)
+             (no-such-value-error-which condition))))
+  (:documentation
+   "This error is signaled when a option value is requested which does
+    not exist."))
+
 (define-condition option-value-error (error
                                       option-condition
                                       value-condition

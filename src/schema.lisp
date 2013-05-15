@@ -79,13 +79,16 @@
                  :documentation
                  "Stores the type of the option as an expression
                   similar to a CL type.")
+   (default      :accessor option-%default
+                 :documentation
+                 "Stores the default value of the schema item. Is
+                  unbound when the schema item does not have a default
+                  value.")
    (option-class :initarg  :option-class
                  :type     symbol
                  :reader   option-class
                  :documentation
-                 "")
-   (default      :initarg  :default
-                 :reader   option-default)
+                 "TODO")
    (description  :initarg  :description
                  :type     (or null string)
                  :reader   option-description
@@ -96,10 +99,34 @@
    :type         (missing-required-initarg 'standard-schema-item 'type)
    :option-class 'standard-option)
   (:documentation
-   "TODO(jmoringe): document"))
+   "Instances of this class associate an name or name pattern to a
+    type and optionally a default value."))
 
-(defmethod option-has-default? ((option standard-schema-item))
-  (slot-boundp option 'default))
+(defmethod shared-initialize :after ((instance   standard-schema-item)
+                                     (slot-names t)
+                                     &key
+                                     (default nil default-supplied?))
+  (when default-supplied?
+    (setf (option-%default instance) default)))
+
+(defmethod print-items append ((object standard-schema-item))
+  (let+ ((type (option-type object))
+         ((&values default default?)
+          (option-default object :if-does-not-exist nil))
+         (default (list (if default? (list 1 default) (list 0)))))
+    `((:type    ,type    ": ~A" ((:before :default)))
+      (:default ,default " ~:{~[<no default>~;default ~S~]~}"))))
+
+(defmethod option-default ((option standard-schema-item)
+                           &key
+                           if-does-not-exist)
+  (declare (ignore if-does-not-exist))
+  (when (slot-boundp option 'default)
+    (values (option-%default option) t)))
+
+(defmethod (setf option-%default) :before ((new-value t)
+                                           (option    standard-schema-item))
+  (validate-value option new-value))
 
 (defmethod make-option ((schema-item standard-schema-item)
                         (name        list))
