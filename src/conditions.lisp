@@ -95,3 +95,44 @@
   ()
   (:documentation
    "TODO(jmoringe): document"))
+
+;;; Sink-protocol-related conditions
+
+(define-condition notification-error (error
+                                      value-condition
+                                      chainable-condition)
+  ((sink   :initarg  :sink
+           :reader   notification-error-sink
+           :documentation
+           "Stores the sink which was being notified when the error
+            was encountered.")
+   (event  :initarg  :event
+           :reader   notification-error-event
+           :documentation
+           "Stores the event of which the was being notified when the
+            error was encountered")
+   (name   :initarg  :name
+           :reader   notification-error-name
+           :documentation
+           "Stores the name of the option that was the subject of the
+            notification during which the error was encountered.")
+   (source :initarg  :source
+           :reader   notification-error-source
+           :documentation
+           "Stores the source from which the notification
+            originated."))
+  (:report
+   (lambda (condition stream)
+     (format stream "~@<When notifying sink ~A of ~S option ~
+                     ~/options::print-name/~@[ with value ~S~]~@[ by ~
+                     source ~A~]~
+                     ~/more-conditions::maybe-print-cause/~@:>"
+             (notification-error-sink   condition)
+             (notification-error-event  condition)
+             (notification-error-name   condition)
+             (value-condition-value     condition)
+             (notification-error-source condition)
+             condition)))
+  (:documentation
+   "This error is signaled when an error is encountered during
+    notification of a sink of an event originating from a source."))

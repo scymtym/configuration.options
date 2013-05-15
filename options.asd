@@ -68,6 +68,7 @@
                  :depends-on ("src")
                  :serial     t
                  :components ((:file       "package")
+                              (:file       "conditions")
                               (:file       "protocol")
 
                               ;; Mixins

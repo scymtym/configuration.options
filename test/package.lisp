@@ -18,6 +18,9 @@
    #:name
    #:wild-name)
 
+  (:import-from #:options.sources
+   #:initialize)
+
   (:export
    #:run-tests)
 
@@ -35,13 +38,16 @@
 (defun run-tests ()
   (run! 'options))
 
-
 ;;; Mock sink class
 
 (defclass mock-sink ()
   ((calls :type     list
           :accessor sink-calls
           :initform '())))
+
+(defmethod initialize ((sink   mock-sink)
+                       (schema (eql :intentional-error)))
+  (error "~@<Intentional error.~@:>"))
 
 (defmethod notify ((sink  mock-sink)
                    (event t)
@@ -51,3 +57,10 @@
   (appendf (sink-calls sink)
            (list (list* event name value
                         (remove-from-plist args :raw? :source)))))
+
+(defmethod notify ((sink  mock-sink)
+                   (event (eql :intentional-error))
+                   (name  t)
+                   (value t)
+                   &key)
+  (error "~@<Intentional error.~@:>"))

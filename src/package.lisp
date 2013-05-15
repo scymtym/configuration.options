@@ -28,7 +28,11 @@
    #:no-such-option-name
    #:no-such-option-container
 
-   )
+   #:notification-error
+   #:notification-error-sink
+   #:notification-error-event
+   #:notification-error-name
+   #:notification-error-source)
 
   ;; Name protocol
   (:export
@@ -106,6 +110,10 @@
 
    #:wildcard-option-name
    #:wildcard-schema-item)
+
+  ;; Sink protocol
+  (:export
+   #:notify)
 
   ;; Macros
   (:export

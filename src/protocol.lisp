@@ -295,3 +295,50 @@
 (defgeneric (setf option-value) (new-value option)
   (:documentation
    "Return the name object naming OPTION."))
+
+;;; Sink protocol
+
+(defgeneric notify (sink event name value
+                    &key
+                    raw?
+                    source
+                    &allow-other-keys)
+  (:documentation
+   "SINK is notified about some change regarding the option named
+    NAME.
+
+    EVENT can be, for example, :added, :removed, :new-value. For these
+    three, the remaining parameters are interpreted as follows:
+
+    EVENT      NAME        VALUE
+    :added     OPTION-NAME SHOULD-BE-IGNORED
+    :removed   OPTION-NAME SHOULD-BE-IGNORED
+    :new-value OPTION-NAME [RAW-]NEW-VALUE
+
+    RAW? indicates whether VALUE is an unparsed string value or
+    whether it has already been parsed.
+
+    The value of the keyword parameter SOURCE usually is the source
+    object that produced the event, but may be nil."))
+
+;; Default behavior
+
+(defmethod notify :around ((sink t) (event t) (name t) (value t)
+                           &key
+                           source
+                           &allow-other-keys)
+  (restart-case
+      (with-condition-translation
+          (((error notification-error)
+            :sink   sink
+            :event  event
+            :name   name
+            :value  value
+            :source source))
+        (call-next-method))
+    (continue (&optional condition)
+      :report (lambda (stream)
+                (format stream "~@<Skip notifying ~A of this ~
+                                particular event.~@:>"
+                        sink))
+      (declare (ignore condition)))))

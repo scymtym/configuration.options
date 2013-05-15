@@ -1,4 +1,4 @@
-;;;; protocol.lisp ---
+;;;; protocol.lisp --- Tests for protocol functions of the sources module.
 ;;;;
 ;;;; Copyright (C) 2013 Jan Moringen
 ;;;;
@@ -8,8 +8,21 @@
 
 (in-suite options.sources)
 
-#+no (make-source '((:commandline)
-               (:environment-variables :prefix   "RSB_")
-               (:ini-file              :pathname "rsb.conf")
-               (:ini-file              :pathname "~/.config/rsb.conf")
-               (:ini-file              :pathname "/etc/rsb.conf")))
+(test initialize.default-behavior
+  "Test for default behavior of `initialize' function."
+
+  (let ((sink (make-instance 'mock-sink)))
+    ;; An arbitrary error signaled by a sink during `initialize'
+    ;; should be wrapped in a `initialization-error'.
+    (signals initialization-error
+      (initialize sink :intentional-error))))
+
+(test notify.default-behavior
+  "Test for default behavior of `notify' function."
+
+  (let ((sink (make-instance 'mock-sink)))
+    (initialize sink :does-not-matter)
+    ;; An arbitrary error signaled by a sink during `notify' should be
+    ;; wrapped in a `notification-error'.
+    (signals notification-error
+      (notify sink :intentional-error nil nil))))
