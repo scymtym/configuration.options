@@ -27,6 +27,10 @@
    #:initialize)
 
   (:export
+   #:make-random-string
+
+   #:mock-sink
+   #:sink-calls
 
    #:+simple-schema+)
 
@@ -46,6 +50,16 @@
 
 (defun run-tests ()
   (run! 'options))
+
+;;; Utilities
+
+(defun make-random-string (&key (case :upper) (length 20))
+  "Return a random string of length LENGTH."
+  (let ((base (case case
+                (:upper (char-code #\A))
+                (:lower (char-code #\a)))))
+    (map-into (make-string length)
+              (lambda () (code-char (+ base (random 26)))))))
 
 ;;; Simple schema for tests
 
@@ -75,9 +89,10 @@
                    (name  t)
                    (value t)
                    &rest args &key)
-  (appendf (sink-calls sink)
-           (list (list* event name value
-                        (remove-from-plist args :raw? :source)))))
+  (let ((args/clean (remove-from-plist
+                     args :raw? :source :bounds :option)))
+    (appendf (sink-calls sink)
+             (list (list* event name value args/clean)))))
 
 (defmethod notify ((sink  mock-sink)
                    (event (eql :intentional-error))

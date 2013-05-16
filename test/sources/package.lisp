@@ -16,11 +16,9 @@
    #:eos
 
    #:options
-   #:options.sources)
+   #:options.sources
 
-  (:import-from #:options.test
-   #:mock-sink
-   #:sink-calls)
+   #:options.test)
 
   (:export
    #:options.sources.root)
@@ -60,11 +58,6 @@
           (notify sink :new-value name value :raw? t))))
 
 ;;; Utilities and macros
-
-(defun make-random-string (&optional (length 20))
-  "Return a random string of length LENGTH."
-  (map-into (make-string length)
-            (lambda () (code-char (+ 65 (random 26))))))
 
 (defmacro with-environment-variable ((name value) &body body)
   "Execute BODY with the environment variable named NAME set to
@@ -125,6 +118,7 @@
 
 (defmacro with-source-and-sink ((source-and-options
                                  &key
+                                 (schema     '+simple-schema+)
                                  (source-var 'source)
                                  (sink-var   'sink))
                                 &body body)
@@ -137,7 +131,8 @@
   (let+ (((source &rest initargs) (ensure-list source-and-options)))
     `(let ((,source-var (make-source ,source ,@initargs))
            (,sink-var   (make-instance 'mock-sink)))
-       (process source sink)
+       (initialize ,source-var ,schema)
+       (process ,source-var ,sink-var)
        ,@body)))
 
 (defmacro expecting-sink-calls ((&optional sink-var) &body expected)

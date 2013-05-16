@@ -285,8 +285,11 @@
                       basename (make-pathname :name "_" :type type))))
        (call-next-method
         instance slot-names
-        :sources `(#+no (:commandline
-                         :prefix ,prefix/commandline)
+        :sources `(,@(when (service-provider:find-provider
+                            'source :commandline
+                            :if-does-not-exist nil)
+                       `((:commandline
+                          :prefix ,prefix/commandline)))
                    (:environment-variables
                     :prefix ,prefix/environment-variables)
                    (:config-file-cascade

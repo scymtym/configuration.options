@@ -180,7 +180,11 @@
 
   (let ((prefix   (format nil "/tmp/~A/" (make-random-string)))
         (basename (make-random-string))
-        (type     "conf"))
+        (type     "conf")
+        (offset   (if (service-provider:find-provider
+                       'options.sources::source :commandline
+                       :if-does-not-exist nil)
+                      1 0)))
     (with-environment-variable ((format nil "~A_B_C" basename) "1")
       (with-config-files (prefix basename type)
           ("a=2 b.c=3 d=4"
@@ -193,18 +197,18 @@
                                 :syntax   :mock)
                                :sink-var sink)
           (expecting-sink-calls (sink)
-            '(:added     ("b" "c") nil :index 0)
-            '(:new-value ("b" "c") "1" :index 0)
+            `(:added     ("b" "c") nil :index ,(+ 0 offset))
+            `(:new-value ("b" "c") "1" :index ,(+ 0 offset))
 
-            '(:added     ("b" "c") nil :index 1)
-            '(:new-value ("b" "c") "6" :index 1)
+            `(:added     ("b" "c") nil :index ,(+ 1 offset))
+            `(:new-value ("b" "c") "6" :index ,(+ 1 offset))
 
-            '(:added     ("a")     nil :index 2)
-            '(:new-value ("a")     "5" :index 2)
+            `(:added     ("a")     nil :index ,(+ 2 offset))
+            `(:new-value ("a")     "5" :index ,(+ 2 offset))
 
-            '(:added     ("a")     nil :index 3)
-            '(:new-value ("a")     "2" :index 3)
-            '(:added     ("b" "c") nil :index 3)
-            '(:new-value ("b" "c") "3" :index 3)
-            '(:added     ("d")     nil :index 3)
-            '(:new-value ("d")     "4" :index 3)))))))
+            `(:added     ("a")     nil :index ,(+ 3 offset))
+            `(:new-value ("a")     "2" :index ,(+ 3 offset))
+            `(:added     ("b" "c") nil :index ,(+ 3 offset))
+            `(:new-value ("b" "c") "3" :index ,(+ 3 offset))
+            `(:added     ("d")     nil :index ,(+ 3 offset))
+            `(:new-value ("d")     "4" :index ,(+ 3 offset))))))))

@@ -115,6 +115,7 @@
 
                               ;; Sources
                               (:file       "source-environment-variables")
+                              (:file       "source-commandline")
                               (:file       "source-stream")
                               (:file       "source-file")
                               (:file       "source-cascade")))))
