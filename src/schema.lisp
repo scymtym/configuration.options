@@ -48,7 +48,7 @@
        option)
       ((not option)
        (process-child child))
-      ((name-< (car child) (option-name option))
+      ((name< (car child) (option-name option))
        (process-child child))
       (t
        option))))
@@ -62,7 +62,7 @@
 (defmethod (setf find-child) :after ((new-value t)
                                      (key       t)
                                      (schema    standard-schema))
-  (setf (%children schema) (sort (%children schema) #'name-< :key #'car)))
+  (setf (%children schema) (sort (%children schema) #'name< :key #'car)))
 
 (defmethod make-configuration ((schema standard-schema))
   (make-instance 'standard-configuration :schema schema))

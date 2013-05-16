@@ -100,36 +100,29 @@
 
      ("*.b.**.e"   "a.b.c.d.e" t) ("*.b.**.e"   "a.c.b.d.e" nil))))
 
-(test name-<.smoke
-  "Smoke test for `name-<' function."
+(test name<.smoke
+  "Smoke test for `name<' function."
 
   (mapc
    (lambda+ ((left right expected))
-     (is (eq expected (name-< (make-name left) (make-name right)))))
+     (is (eq expected (name< (make-name left) (make-name right)))
+         "expected ~S to~:[ not~:;~] be ~S ~S."
+         left expected 'name< right))
 
-   `((()                ()                nil)
-     (()                ("a")             t)
-     (()                ("b")             t)
-     (()                (:wild)           t)
-     (()                (:wild-inferiors) t)
+   `((()   ()   nil) (()   "a"  t)   (()   "b"  t)
+     (()   "*"  t)   (()   "**" t)
 
-     (("a")             ()                nil)
-     (("a")             ("a")             nil)
-     (("a")             ("b")             nil)
-     (("a")             (:wild)           t)
-     (("a")             (:wild-inferiors) t)
+     ("a"  ()   nil) ("a"  "a"  nil) ("a"  "b"  t)
+     ("a"  "*"  t)   ("a"  "**" t)
 
-     ((:wild)           ()                nil)
-     ((:wild)           ("a")             nil)
-     ((:wild)           ("b")             nil)
-     ((:wild)           (:wild)           t)
-     ((:wild)           (:wild-inferiors) t)
+     ("b"  ()   nil) ("b"  "a"  nil) ("b"  "b"  nil)
+     ("b"  "*"  t)   ("b"  "**" t)
 
-     ((:wild-inferiors) ()                nil)
-     ((:wild-inferiors) ("a")             nil)
-     ((:wild-inferiors) ("b")             nil)
-     ((:wild-inferiors) (:wild)           nil)
-     ((:wild-inferiors) (:wild-inferiors) t))))
+     ("*"  ()   nil) ("*"  "a"  nil) ("*"  "b"  nil)
+     ("*"  "*"  nil) ("*"  "**" t)
+
+     ("**" ()   nil) ("**" "a"  nil) ("**" "b"  nil)
+     ("**" "*"  nil) ("**" "**" nil))))
 
 (test merge-names.smoke
   "Smoke test for `merge-names' function."

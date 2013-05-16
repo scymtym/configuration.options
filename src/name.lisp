@@ -89,32 +89,11 @@
                      (cons '() (maplist #'identity name))))))))
     (recur (name-components query) (name-components name))))
 
-(defmethod name-< ((left wildcard-name) (right wildcard-name))
-  (let+ (((&labels+ recur ((&optional left-first  &rest left-rest)
-                           (&optional right-first &rest right-rest))
-            (etypecase left-first
-              (null
-               t)
-              (string
-               (typecase right-first
-                 (null   nil)
-                 (string (recur left-rest right-rest))
-                 (t      t)))
-              ((eql :wild)
-               (typecase right-first
-                 ((or null string) nil)
-                 ((eql :wild)      (recur left-rest right-rest))
-                 (t                t)))
-              ((eql :wild-inferiors)
-               (when (eq right-first :wild-inferiors)
-                 (recur left-rest right-rest)))))))
-    (recur (name-components left) (name-components right))))
+(defmethod name< ((left sequence) (right wildcard-name))
+  (or (not (typep left 'wild-name)) (call-next-method)))
 
-(defmethod name-< ((left list) (right wildcard-name))
-  t)
-
-(defmethod name-< ((left wildcard-name) (right list))
-  nil)
+(defmethod name< ((left wildcard-name) (right sequence))
+  (and (typep right 'wild-name) (call-next-method)))
 
 (defmethod merge-names ((left t) (right wildcard-name))
   (concatenate 'wildcard-name left right))

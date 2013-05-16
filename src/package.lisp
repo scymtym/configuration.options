@@ -38,7 +38,7 @@
 
    #:name-equal
    #:name-matches
-   #:name-<
+   #:name<
    #:merge-names
 
    #:parse-name

@@ -130,4 +130,4 @@
                                       (container list-container-mixin)
                                       &key &allow-other-keys)
   (setf (%options container)
-        (sort (options container) #'name-< :key #'option-name)))
+        (sort (options container) #'name< :key #'option-name)))

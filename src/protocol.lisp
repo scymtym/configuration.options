@@ -31,7 +31,7 @@
     either when QUERY and NAME are equal or when QUERY contains :wild
     or :wild-inferiors components matching components of NAME."))
 
-(defgeneric name-< (left right)
+(defgeneric name< (left right)
   (:documentation
    "Return non-nil when LEFT is BEFORE in the following ordering:
     components induce a lexicographical ordering where :wild-inferiors
@@ -59,9 +59,30 @@
 (defmethod name-matches ((query t) (name t))
   (name-equal query name))
 
-(defmethod name-< ((left t) (right t))
-  (< (length (name-components left))
-     (length (name-components right))))
+(defmethod name< ((left t) (right t))
+  (let+ (((&labels+ recur ((&optional left-first  &rest left-rest)
+                           (&optional right-first &rest right-rest))
+            (etypecase left-first
+              (null
+               (not (null right-first)))
+              (string
+               (typecase right-first
+                 (null   nil)
+                 (string (cond
+                           ((string= left-first right-first)
+                            (recur left-rest right-rest))
+                           ((string< left-first right-first)
+                            t)))
+                 (t      t)))           ; RIGHT-FIRST is :wild or :wild-inferiors
+              ((eql :wild)
+               (typecase right-first
+                 ((or null string) nil)
+                 ((eql :wild)      (recur left-rest right-rest))
+                 (t                t))) ; RIGHT-FIRST is :wild-inferiors
+              ((eql :wild-inferiors)
+               (when (eq right-first :wild-inferiors)
+                 (recur left-rest right-rest)))))))
+    (recur (name-components left) (name-components right))))
 
 (defmethod merge-names ((left t) (right t))
   (concatenate (type-of left) left right))
