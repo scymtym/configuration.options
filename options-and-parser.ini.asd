@@ -1,6 +1,6 @@
-;;;; options-and-ini.asd --- System definition for the options system.
+;;;; options-and-parser.ini.asd --- Ini syntax for the options system.
 ;;;;
-;;;; Copyright (C) 2011, 2012, 2013 Jan Moringen
+;;;; Copyright (C) 2013 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -15,7 +15,7 @@
   :maintainer  "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :version     #.(version/string)
   :license     "LLGPLv3; see COPYING file for details."
-  :description "A simple options system that supports multiple options sources."
+  :description "Ini syntax support for options system."
   :depends-on  (:alexandria
                 (:version :let-plus         "0.2")
 
@@ -26,32 +26,25 @@
                  :pathname   "src/sources"
                  :components ((:file       "syntax-ini"))))
 
-  #+no :in-order-to #+no ((test-op (test-op :options-and-parser.ini-test))))
+  :in-order-to ((test-op (test-op :options-and-parser.ini-test))))
 
-#+no (defsystem :options-and-parser.ini-test
+(defsystem :options-and-parser.ini-test
   :author      "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :maintainer  "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :version     #.(version/string)
   :license     "LLGPLv3; see COPYING file for details."
-  :description "A simple options system that supports multiple options sources."
+  :description "Unit tests for ini syntax support of options system."
   :depends-on  (:alexandria
-                (:version :let-plus "0.2")
+                (:version :let-plus               "0.2")
 
-                :eos)
-  :components  ((:module     "test"
-                 :serial     t
-                 :components ((:file       "package")
-                              (:file       "protocol")
-                              (:file       "name")
-                              (:file       "schema")))
+                (:version :options-and-parser.ini #.(version/string))
 
-                (:module     "sources"
+                :eos
+                (:version :options-test           #.(version/string)))
+  :components  ((:module     "sources"
                  :pathname   "test/sources"
-                 :depends-on ("test")
-                 :serial     t
-                 :components ((:file       "package")
-                              (:file       "protocol")))))
+                 :components ((:file       "syntax-ini")))))
 
-#+no (defmethod perform ((op     test-op)
+(defmethod perform ((op     test-op)
                     (system (eql (find-system :options-and-parser.ini-test))))
   (funcall (find-symbol "RUN-TESTS" :options.test)))

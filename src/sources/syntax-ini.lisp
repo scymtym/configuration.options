@@ -37,20 +37,25 @@
 (defmethod parser.ini:add-child ((builder ini-syntax)
                                  (parent  list)
                                  (child   list))
-  ;; TODO record location
-  ;; TODO continue restart?
-  (let+ (((&plist-r/o (parent-name :name)) parent)
-         ((&plist-r/o (child-name :name)
-                      (value      :value)
-                      (bounds     :bounds)) child)
-         (name (append parent-name child-name)))
-    (notify *sink* :added     name nil
-            :source (syntax-source builder)
-            :bounds bounds)
-    (notify *sink* :new-value name value
-            :source (syntax-source builder)
-            :bounds bounds)
-    parent))
+  (restart-case
+      (let+ (((&plist-r/o (parent-name :name)) parent)
+             ((&plist-r/o (child-name :name)
+                          (value      :value)
+                          (bounds     :bounds)) child)
+             (name (append parent-name child-name))
+             ((&flet notify (event &optional value)
+                (notify *sink* event name value
+                        :source (syntax-source builder)
+                        :bounds bounds))))
+        (notify :added)
+        (notify :new-value value))
+    (continue (&optional condition)
+      :report (lambda (stream)
+                (format stream "~@<Do not process ~S and ~
+                                continue.~@:>"
+                        child))
+      (declare (ignore condition))))
+  parent)
 
 (defmethod process-content ((syntax ini-syntax)
                             (source stream)
