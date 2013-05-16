@@ -38,8 +38,6 @@
 
    #:option-value-error
 
-   #:option-value-type-error
-
    #:option-syntax-error
    #:option-syntax-error-type
 

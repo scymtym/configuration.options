@@ -104,18 +104,6 @@
    "This error and its subclasses is signaled when an error regarding
     an option value is encountered."))
 
-(define-condition option-value-type-error (option-value-error
-                                           type-error)
-  ()
-  (:report
-   (lambda (condition stream)
-     (format stream "~@<The value ~S is invalid for option ~A.~@:>"
-             (value-condition-value   condition)
-             (option-condition-option condition))))
-  (:documentation
-   "This error is signaled when a type error regarding an option value
-    is encountered."))
-
 (define-condition option-syntax-error (option-value-error)
   ((type :initarg  :type
          :reader   option-syntax-error-type
