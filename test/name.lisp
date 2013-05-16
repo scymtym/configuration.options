@@ -129,32 +129,24 @@
 
   (mapc
    (lambda+ ((left right expected))
-     (is (name-matches (make-name expected)
-                       (merge-names (make-name left) (make-name right)))))
+     (is (name-equal (make-name expected)
+                     (merge-names (make-name left) (make-name right)))))
 
-   `((()                ()                ())
-     (()                ("a")             ("a"))
-     (()                ("b")             ("b"))
-     (()                (:wild)           (:wild))
-     (()                (:wild-inferiors) (:wild-inferiors))
+   `((()   ()   ())
+     (()   "a"  "a")    (()   "b"  "b")
+     (()   "*"  "*")    (()   "**" "**")
 
-     (("a")             ()                ("a"))
-     (("a")             ("a")             ("a" "a"))
-     (("a")             ("b")             ("a" "b"))
-     (("a")             (:wild)           ("a" :wild))
-     (("a")             (:wild-inferiors) ("a" :wild-inferiors))
+     (()   "a"  "a")    ("a"  ()   "a")
+     ("a"  "a"  "a.a")  ("a"  "b"  "a.b")
+     ("a"  "*"  "a.*")  ("a"  "**" "a.**")
 
-     ((:wild)           ()                (:wild))
-     ((:wild)           ("a")             (:wild "a"))
-     ((:wild)           ("b")             (:wild "b"))
-     ((:wild)           (:wild)           (:wild :wild))
-     ((:wild)           (:wild-inferiors) (:wild :wild-inferiors))
+     (()  "*"   "*")    ("*"  ()   "*")
+     ("*"  "a"  "*.a")  ("*"  "b"  "*.b")
+     ("*"  "*"  "*.*")  ("*"  "**" "*.**")
 
-     ((:wild-inferiors) ()                (:wild-inferiors))
-     ((:wild-inferiors) ("a")             (:wild-inferiors "a"))
-     ((:wild-inferiors) ("b")             (:wild-inferiors "b"))
-     ((:wild-inferiors) (:wild)           (:wild-inferiors :wild))
-     ((:wild-inferiors) (:wild-inferiors) (:wild-inferiors :wild-inferiors)))))
+     (()   "**" "**")   ("**" ()   "**")
+     ("**" "a"  "**.a") ("**" "b"  "**.b")
+     ("**" "*"  "**.*") ("**" "**" "**.**"))))
 
 (test parse-name.smoke
   "Smoke test for `parse-name' function."
