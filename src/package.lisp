@@ -15,11 +15,9 @@
 
   ;; Types
   (:export
+   #:non-wild-name-component
    #:wild-name-component
-   #:name-component
-
-   #+maybe-later #:name
-   #+maybe-later #:wild-name)
+   #:name-component)
 
   ;; Conditions
   (:export
@@ -34,7 +32,10 @@
 
   ;; Name protocol
   (:export
+   #:make-name
+
    #:name-components
+
    #:name-equal
    #:name-matches
    #:name-<

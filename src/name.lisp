@@ -56,6 +56,19 @@
                                 (index     integer))
   (setf (nth index (name-components sequence)) new-value))
 
+;; construction protocol
+
+(defmethod make-name ((thing string))
+  (values (parse-name thing)))
+
+(defmethod make-name ((thing sequence))
+  (etypecase thing
+    (wild-name (make-instance 'wildcard-name :components thing))
+    (name      (coerce thing 'list))))
+
+(defmethod make-name ((thing wildcard-name))
+  thing)
+
 ;; relation protocols
 
 (defmethod name-matches ((query wildcard-name)

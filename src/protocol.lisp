@@ -12,6 +12,11 @@
 ;;; components which are either strings or one of the symbols :wild
 ;;; and :wild-inferiors.
 
+(defgeneric make-name (thing)
+  (:documentation
+   "Return a name corresponding to THING which can be a name string, a
+    sequence of `name-component's or a name."))
+
 (defgeneric name-components (name)
   (:documentation
    "Return a sequence of the components of NAME."))
@@ -39,6 +44,11 @@
     LEFT and RIGHT."))
 
 ;; Default behavior
+
+(defmethod make-name ((thing t))
+  (error 'type-error
+         :datum         thing
+         :expected-type '(or string sequence wildcard-name)))
 
 (defmethod name-components ((name list))
   name)

@@ -9,14 +9,21 @@
 ;;; `named-mixin' class
 
 (defclass named-mixin ()
-  ((name :initarg  :name
-         :reader   option-name
+  ((name :reader   option-name
+         :writer   (setf option-%name)
          :documentation
          ""))
   (:default-initargs
    :name (missing-required-initarg 'named-mixin :name))
   (:documentation
    "TODO(jmoringe): document"))
+
+(defmethod shared-initialize :after ((instance   named-mixin)
+                                     (slot-names t)
+                                     &key
+                                     (name nil name-supplied?))
+  (when name-supplied?
+    (setf (option-%name instance) (make-name name))))
 
 (defmethod print-items append ((object named-mixin))
   `((:name ,(option-name object) " ~/options::print-name/"
