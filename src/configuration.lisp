@@ -22,7 +22,8 @@
 
 ;;; `option-cell' class
 
-(defclass option-cell (print-items-mixin)
+(defclass option-cell (event-hook-mixin
+                       print-items-mixin)
   ((schema-item :initarg  :schema-item
                 :reader   option-schema-item
                 :documentation
@@ -93,6 +94,11 @@
                                         (option    option-cell))
   (validate-value (option-schema-item option) new-value))
 
+(defmethod (setf option-value) :after ((new-value t)
+                                       (option    option-cell))
+  (hooks:run-hook (hooks:object-hook option 'event-hook)
+                  :new-value option new-value))
+
 (defmethod print-items append ((object option-cell))
   (let+ ((type (option-type object))
          ((&values value value?)
@@ -104,6 +110,7 @@
 ;;; `standard-option' class
 
 (defclass standard-option (named-mixin
+                           event-hook-mixin
                            print-items-mixin)
   ((cell :initarg  :cell
          :reader   option-%cell

@@ -49,6 +49,10 @@
    #:notification-error-name
    #:notification-error-source)
 
+  ;; Event hook protocol
+  (:export
+   #:event-hook)
+
   ;; Name protocol
   (:export
    #:make-name

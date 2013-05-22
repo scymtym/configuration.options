@@ -30,6 +30,21 @@
   `((:name ,(option-name object) " ~/options::print-name/"
            ((:before :value) (:before :type)))))
 
+;;; `event-hook-mixin' class
+
+(defclass event-hook-mixin ()
+  ((event-hook :type     list
+               :initform '()
+               :documentation
+               "Stores the handlers of the event hook of the
+                object."))
+  (:documentation
+   "This class is intended to be mixed into classes which have to emit
+    or relay events using the event hooks mechanism."))
+
+(defmethod event-hook ((object event-hook-mixin))
+  (hooks:object-hook object 'event-hook))
+
 ;;; `type-based-validation-mixin' class
 
 (defclass type-based-validation-mixin ()
@@ -184,7 +199,7 @@
 
 ;;; `list-container-mixin' class
 
-(defclass list-container-mixin ()
+(defclass list-container-mixin (event-hook-mixin)
   ((options :type     list
             :reader   options
             :accessor %options
@@ -224,4 +239,7 @@
                                       (container list-container-mixin)
                                       &key &allow-other-keys)
   (setf (%options container)
-        (sort (options container) #'name< :key #'option-name)))
+        (sort (options container) #'name< :key #'option-name))
+
+  (hooks:run-hook
+   (event-hook container) (if new-value :added :removed) name new-value))

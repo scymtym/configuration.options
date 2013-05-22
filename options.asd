@@ -47,6 +47,7 @@
                 (:version :let-plus              "0.2")
                 (:version :more-conditions       "0.3")
                 (:version :utilities.print-items "0.1")
+                (:version :cl-hooks              "0.2")
                 (:version :service-provider      "0.1")
 
                 (:version :esrap                 "0.9"))

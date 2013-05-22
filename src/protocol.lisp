@@ -127,6 +127,17 @@
         option-or-value
         (option-value option-or-value))))
 
+;;; Event hook protocol
+;;;
+;;; Objects with event hooks emit events for handlers with
+;;; lambda-lists of the form
+;;;
+;;;   (EVENT NAME VALUE &rest PROPERTIES &key)
+
+(defgeneric event-hook (object)
+  (:documentation
+   "Return the event hook, a `hooks:object-hook', for OBJECT."))
+
 ;;; Option container protocol
 ;;;
 ;;; CONTAINER can be (at least) a schema or a configuration.
