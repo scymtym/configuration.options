@@ -136,6 +136,12 @@
   (:export
    #:notify)
 
+  ;; Synchronizer protocol
+  (:export
+   #:synchronizer-target
+
+   #:standard-synchronizer)
+
   ;; Macros
   (:export
    #:map-schema-spec

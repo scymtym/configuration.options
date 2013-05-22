@@ -62,6 +62,9 @@
                               (:file       "schema")
                               (:file       "configuration")
                               (:file       "conversion")
+
+                              (:file       "synchronizer")
+
                               (:file       "macros")))
 
                 (:module     "sources"
@@ -104,6 +107,7 @@
                               (:file       "mixins")
                               (:file       "configuration")
                               (:file       "schema")
+                              (:file       "synchronizer")
                               (:file       "macros")))
 
                 (:module     "sources"
