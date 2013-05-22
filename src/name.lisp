@@ -73,8 +73,8 @@
 
 (defmethod name-matches ((query wildcard-name)
                          (name  t))
-  (let+ (((&labels+ recur ((&optional query-first  &rest query-rest)
-                           (&optional name-first &rest name-rest))
+  (let+ (((&labels+ recur ((            &optional query-first &rest query-rest)
+                           (&whole name &optional name-first  &rest name-rest))
             (etypecase query-first
               (null
                (null name-first))
@@ -86,7 +86,7 @@
                  (recur query-rest name-rest)))
               ((eql :wild-inferiors)
                (some (curry #'recur query-rest)
-                     (cons '() (maplist #'identity name-rest))))))))
+                     (cons '() (maplist #'identity name))))))))
     (recur (name-components query) (name-components name))))
 
 (defmethod name-< ((left wildcard-name) (right wildcard-name))

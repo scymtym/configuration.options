@@ -84,10 +84,21 @@
      (is (eq expected
              (name-matches (make-name query) (make-name name)))))
 
-   `((("a" "b" :wild)                     ("a" "b" "c")                          t)
-     (("a" "b" :wild "d")                 ("a" "b" "c" "d")                      t)
-     (("a" "b" :wild-inferiors "e")       ("a" "b" "c" "d" "e")                  t)
-     (("rsb" "transport" :wild "enabled") ("rsb" "transport" "spread" "enabled") t))))
+   `((()           ()          t)
+     ("a"          "a"         t) ("a"          "b"         nil)
+     ("a.b"        "a.b"       t) ("a.b"        "a.c"       nil)
+     ("a.b.c"      "a.b.c"     t)
+
+     ("*"          "a"         t) ("*"          "a.b"       nil)
+     ("a.b.*"      "a.b.c"     t) ("a.b.*"      "a.d.c"     nil)
+     ("*.b.c"      "a.b.c"     t) ("*.b.c"      "a.b.d"     nil)
+
+     ("**"         ()          t)
+     ("**"         "a"         t)
+     ("**.a"       "a"         t) ("**.a"       "b"         nil)
+     ("a.b.**.e"   "a.b.c.d.e" t) ("a.b.**.e"   "a.b.c.d.f" nil)
+
+     ("*.b.**.e"   "a.b.c.d.e" t) ("*.b.**.e"   "a.c.b.d.e" nil))))
 
 (test name-<.smoke
   "Smoke test for `name-<' function."
