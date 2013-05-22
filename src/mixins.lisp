@@ -45,6 +45,24 @@
 (defmethod event-hook ((object event-hook-mixin))
   (hooks:object-hook object 'event-hook))
 
+;;; `documentation-mixin' class
+
+(defclass documentation-mixin ()
+  ((documentation :initarg  :documentation
+                  :type     (or null string)
+                  :accessor option-documentation
+                  :initform nil
+                  :documentation
+                  "Stores nil or the documentation string associated
+                   to the option."))
+  (:documentation
+   "This class is intended to be mixed into all classes instances of
+    which can have an associated documentation string."))
+
+(defmethod documentation ((option documentation-mixin)
+                          (type   (eql t)))
+  (option-documentation option))
+
 ;;; `type-based-validation-mixin' class
 
 (defclass type-based-validation-mixin ()

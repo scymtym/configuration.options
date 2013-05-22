@@ -20,6 +20,13 @@
   (:documentation
    "Instances of this class store collections of named options."))
 
+(defmethod option-documentation ((option standard-configuration))
+  (option-documentation (configuration-schema option)))
+
+(defmethod documentation ((object standard-configuration)
+                          (type   (eql t)))
+  (option-documentation object))
+
 ;;; `option-cell' class
 
 (defclass option-cell (event-hook-mixin
@@ -75,7 +82,7 @@
           (,name (option-schema-item option)))))
 
   (define-delegation option-type)
-  (define-delegation option-description))
+  (define-delegation option-documentation))
 
 (defmethod option-default ((option option-cell)
                            &key
@@ -136,7 +143,7 @@
   (define-delegation option-schema-item)
   (define-delegation option-type)
   (define-delegation option-values t)
-  (define-delegation option-description))
+  (define-delegation option-documentation))
 
 (defmethod option-default ((option standard-option)
                            &key
@@ -155,3 +162,7 @@
 
 (defmethod print-items append ((object standard-option))
   (print-items (option-%cell object)))
+
+(defmethod documentation ((object standard-option)
+                          (type   (eql t)))
+  (option-documentation object))

@@ -91,7 +91,7 @@
    #:option-name
    #:option-type
    #:option-default
-   #:option-description)
+   #:option-documentation)
 
   ;; Schema item protocol
   (:export

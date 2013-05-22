@@ -9,6 +9,7 @@
 ;;; `standard-schema' class
 
 (defclass standard-schema (list-container-mixin
+                           documentation-mixin
                            print-items-mixin)
   ((children :type     list
              :reader   schema-children
@@ -70,6 +71,7 @@
 ;;; `standard-schema-item' class
 
 (defclass standard-schema-item (named-mixin
+                                documentation-mixin
                                 type-based-validation-mixin
                                 type-based-conversion-mixin
                                 type-based-merging-mixin
@@ -88,13 +90,7 @@
                  :type     symbol
                  :reader   option-class
                  :documentation
-                 "TODO")
-   (description  :initarg  :description
-                 :type     (or null string)
-                 :reader   option-description
-                 :initform nil
-                 :documentation
-                 ""))
+                 "TODO"))
   (:default-initargs
    :type         (missing-required-initarg 'standard-schema-item 'type)
    :option-class 'standard-option)

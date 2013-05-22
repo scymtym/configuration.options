@@ -261,7 +261,7 @@
       Call the function with a `no-such-value-error' object indicating
       that OPTION does not have a default value."))
 
-(defgeneric option-description (option)
+(defgeneric option-documentation (option)
   (:documentation
    "TODO(jmoringe): document"))
 
@@ -331,7 +331,7 @@
 
 (defgeneric merge-values-using-type (schema-item values type
                                      &key inner-type)
- (:documentation
+  (:documentation
    "Like `merge-values' but may incorporate TYPE into the decision how
     to merge VALUES."))
 
