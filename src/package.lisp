@@ -81,6 +81,9 @@
 
   ;; Schema protocol
   (:export
+   #:schema-children
+   #:find-child
+
    #:make-configuration)
 
   ;; Option-like protocol

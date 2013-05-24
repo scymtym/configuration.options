@@ -12,7 +12,6 @@
                            documentation-mixin
                            print-items-mixin)
   ((children :type     list
-             :reader   schema-children
              :accessor %children
              :initform nil
              :documentation
@@ -70,15 +69,29 @@
       (t
        option))))
 
+(defmethod schema-children ((container standard-schema))
+  (mapcar #'cdr (%children container)))
+
+(defmethod find-child ((name      t)
+                       (container standard-schema)
+                       &key &allow-other-keys)
+  (cdr (find name (%children container)
+             :key  #'car
+             :test #'name-equal)))
+
 (defmethod (setf find-child) ((new-value t)
-                              (key       wildcard-name)
-                              (schema    standard-schema))
-  "TODO(jmoringe): document"
-  (push (cons key new-value) (%children schema)))
+                              (key       sequence)
+                              (schema    standard-schema)
+                              &key &allow-other-keys)
+  (let+ (((&accessors (children %children)) schema))
+    (setf children (delete key children :key #'car :test #'name-equal))
+    (push (cons key new-value) children))
+  new-value)
 
 (defmethod (setf find-child) :after ((new-value t)
                                      (key       t)
-                                     (schema    standard-schema))
+                                     (schema    standard-schema)
+                                     &key &allow-other-keys)
   (setf (%children schema) (sort (%children schema) #'name< :key #'car)))
 
 (defmethod make-configuration ((schema standard-schema))

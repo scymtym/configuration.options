@@ -8,6 +8,33 @@
 
 (in-suite options)
 
+(test find-child.smoke
+  "Smoke test for the `find-child' and (setf find-child) functions."
+
+  (macrolet
+      ((test (&body body)
+         `(let ((schema (make-instance 'standard-schema))
+                (child  (make-instance 'standard-schema)))
+            (declare (ignorable child))
+            ,@body)))
+
+    ;; Reader
+    (test (signals no-such-option
+            (find-child "no.such.child" schema)))
+    (test (is (not (find-child "no.such.child" schema
+                               :if-does-not-exist nil))))
+
+    ;; Writer
+    (test
+      (is (eq child (setf (find-child "child" schema) child)))
+      (is (equal (list child) (schema-children schema)))
+      (signals error
+        (setf (find-child "child" schema) child))
+      (setf (find-child "child" schema :if-exists :keep)
+            child)
+      (setf (find-child "child" schema :if-exists :supersede)
+            child))))
+
 (test make-option.smoke
   "Smoke test for the `make-option' function."
 

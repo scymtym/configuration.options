@@ -248,9 +248,103 @@
 
 ;;; Schema protocol
 
+(defgeneric schema-children (schema)
+  (:documentation
+   "Return a sequence of the schema items contained in SCHEMA."))
+
+(defgeneric find-child (name schema
+                        &key
+                        if-does-not-exist
+                        if-exists)
+  (:documentation
+   "Find and return the child schema stored under NAME in SCHEMA.
+
+    IF-DOES-NOT-EXIST controls the behavior in case there is no child
+    schema named NAME in SCHEMA. Acceptable values are functions
+    accepting a condition object and nil.
+
+    IF-EXISTS is accepted for parity with `(setf find-child)'."))
+
+(defgeneric (setf find-child) (new-value name schema
+                               &key
+                               if-does-not-exist
+                               if-exists)
+  (:documentation
+   "Store the child schema NEW-VALUE under the name NAME in SCHEMA.
+
+    IF-DOES-NOT-EXIST is accepted for parity with `find-child'.
+
+    IF-EXISTS controls the behavior in case a child schema name is
+    already stored in SCHEMA. Acceptable values are :supersede
+    and :keep."))
+
 (defgeneric make-configuration (schema)
   (:documentation
-   "TODO(jmoringe): document"))
+   "Make and return a configuration object the option objects in which
+    comply to schema."))
+
+;; Default behavior
+
+(defmethod find-child :around ((name string) (schema t)
+                               &rest args &key &allow-other-keys)
+  (apply #'find-child (make-name name) schema args))
+
+(defmethod (setf find-child) :around ((new-value t) (name string) (schema t)
+                                       &rest args &key &allow-other-keys)
+  (apply #'(setf find-child) new-value (make-name name) schema
+         args))
+
+(defmethod find-child :around ((name t) (schema t)
+                               &key
+                               (if-does-not-exist #'error)
+                               &allow-other-keys)
+  (labels
+      ((recur ()
+         (or (call-next-method)
+             (error-behavior-restart-case (if-does-not-exist
+                                           (no-such-option ; TODO condition
+                                            :name      name
+                                            :container schema))
+               (retry ()
+                 (recur))
+               (use-value (value)
+                 value)))))
+    (recur)))
+
+(defmethod (setf find-child) :around ((new-value t)
+                                      (name      t)
+                                      (schema    t)
+                                      &key
+                                      if-does-not-exist
+                                      (if-exists        #'error))
+  (declare (ignore if-does-not-exist))
+  (let (existing)
+    (cond
+      ((eq if-exists :supersede)
+       (call-next-method))
+      ((not (setf existing (find-child name schema
+                                       :if-does-not-exist nil)))
+       (call-next-method))
+      ((eq if-exists :keep)
+       existing)
+      (t
+       (error-behavior-restart-case
+           (if-exists (simple-error ; TODO condition
+                       :format-control   "~@<Name ~/options:print-name/ ~
+                                          is already associated with ~
+                                          ~A in ~A.~@:>"
+                       :format-arguments (list name existing schema)))
+         (continue (&optional condition)
+           :report (lambda (stream)
+                     (format stream "~@<Replace existing child ~A with ~
+                                     ~A.~@:>"
+                             existing new-value))
+           (declare (ignore condition))
+           (call-next-method))
+         (keep ()
+           :report (lambda (stream)
+                     (format stream "~@<Keep existing child ~A.~@:>"
+                             existing))))))))
 
 ;;; Configuration protocol
 
