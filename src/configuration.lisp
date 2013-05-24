@@ -23,6 +23,23 @@
 (defmethod option-documentation ((option standard-configuration))
   (option-documentation (configuration-schema option)))
 
+(defmethod find-option :around ((name      t)
+                                (container standard-configuration)
+                                &key
+                                if-does-not-exist
+                                &allow-other-keys)
+  (case if-does-not-exist
+    (:create
+     (or (call-next-method name container :if-does-not-exist nil)
+         (let* ((schema      (configuration-schema container))
+                (schema-item (find-option name schema
+                                          :match-wildcards?  t
+                                          :if-does-not-exist #'error)))
+           (setf (find-option name container)
+                 (make-option schema-item name)))))
+    (t
+     (call-next-method))))
+
 (defmethod documentation ((object standard-configuration)
                           (type   (eql t)))
   (option-documentation object))

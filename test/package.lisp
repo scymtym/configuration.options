@@ -20,10 +20,15 @@
 
    #:type-based-validation-mixin
    #:type-based-merging-mixin
-   #:type-based-conversion-mixin)
+   #:type-based-conversion-mixin
+   #:list-container-mixin)
 
   (:import-from #:options.sources
    #:initialize)
+
+  (:export
+
+   #:+simple-schema+)
 
   (:export
    #:run-tests)
@@ -41,6 +46,18 @@
 
 (defun run-tests ()
   (run! 'options))
+
+;;; Simple schema for tests
+
+(define-schema +simple-schema+
+  "Simple configuration options."
+  ("foo" :type integer :default 1
+         :documentation
+         "This option controls foo.")
+  ("bar" :type boolean)
+  ("foo" ("fez" :type integer))
+  ("bar" ("fez" :type pathname))
+  ("baz" ("foo" :type string)))
 
 ;;; Mock sink class
 

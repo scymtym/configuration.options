@@ -185,6 +185,15 @@
 
 ;; Default behavior
 
+(defmethod find-option :around ((name string) (container t)
+                                &rest args &key &allow-other-keys)
+  (apply #'find-option (make-name name) container args))
+
+(defmethod (setf find-option) :around ((new-value t) (name string) (container t)
+                                       &rest args &key &allow-other-keys)
+  (apply #'(setf find-option) new-value (make-name name) container
+         args))
+
 (defmethod find-option :around ((name t) (container t)
                                 &key
                                 (if-does-not-exist #'error)
@@ -202,9 +211,40 @@
                  value)))))
     (recur)))
 
-(defmethod find-option ((name symbol) (container t)
-                        &rest args &key &allow-other-keys)
-  (apply #'find-option (list name) container args))
+(defmethod (setf find-option) :around ((new-value t)
+                                       (name      t)
+                                       (container t)
+                                       &key
+                                       if-does-not-exist
+                                       (if-exists        #'error))
+  (declare (ignore if-does-not-exist))
+  (let (existing)
+    (cond
+      ((eq if-exists :supersede)
+       (call-next-method))
+      ((not (setf existing (find-option name container
+                                        :if-does-not-exist nil)))
+       (call-next-method))
+      ((eq if-exists :keep)
+       existing)
+      (t
+       (error-behavior-restart-case
+           (if-exists (simple-error ; TODO condition
+                       :format-control   "~@<Name ~/options:print-name/ ~
+                                          is already associated with ~
+                                          ~A in ~A.~@:>"
+                       :format-arguments (list name existing container)))
+         (continue (&optional condition)
+           :report (lambda (stream)
+                     (format stream "~@<Replace existing option ~A ~
+                                     with ~A.~@:>"
+                             existing new-value))
+           (declare (ignore condition))
+           (call-next-method))
+         (keep ()
+           :report (lambda (stream)
+                     (format stream "~@<Keep existing option ~A.~@:>"
+                             existing))))))))
 
 ;;; Schema protocol
 
@@ -286,7 +326,12 @@
 
 (defgeneric make-option (schema-item name)
   (:documentation
-   "TODO(jmoringe): document"))
+   "Make and return an option object according to SCHEMA-ITEM and
+    NAME.
+
+    The new option will be named NAME and point to a new option cell
+    which will in turn point to SCHEMA-ITEM for type, default,
+    documentation, etc."))
 
 (defgeneric validate-value (schema-item value &key if-invalid)
   (:documentation

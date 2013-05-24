@@ -33,24 +33,40 @@
 (defmethod find-option ((name      t)
                         (container standard-schema)
                         &key
-                        if-does-not-exist
+                        (match-wildcards? nil)
                         &allow-other-keys)
-  (let+ ((option (find name (options container)
-                       :key  #'option-name
-                       :test (lambda (name query) (name-matches query name))))
-         (child  (find name (%children container)
-                       :key  #'car
-                       :test (lambda (name query) (name-matches query name))))
+  (unless match-wildcards?
+    (return-from find-option (call-next-method)))
+
+  (let+ ((option   (find name (options container)
+                         :key  #'option-name
+                         :test (lambda (name query) (name-matches query name))))
+         ;; TODO add :start :end to name-matches instead?
+         ((&flet name-matches* (name query)
+            (iter (for i :from (length name) :downto (length query))
+                  (thereis (name-matches query (subseq name 0 i))))))
+         (children (remove name (%children container)
+                           :key  #'car
+                           :test (complement #'name-matches*)))
          ((&flet+ process-child ((key . child))
-            (let ((sub-name (subseq name (1- (length key)))))
-              (find-option sub-name child :if-does-not-exist nil)))))
+            (let* ((index    (if (ends-with-subseq
+                                  '(:wild-inferiors) (name-components key))
+                                 (1- (length name))
+                                 (length key)))
+                   (sub-name (subseq name index)))
+              (when-let ((option (find-option sub-name child
+                                              :match-wildcards?  match-wildcards?
+                                              :if-does-not-exist nil)))
+                (return-from find-option option))))))
     (cond
-      ((not child)
+      ((not children)
        option)
       ((not option)
-       (process-child child))
-      ((name< (car child) (option-name option))
-       (process-child child))
+       (mapc #'process-child children)
+       nil)
+      ((name< (car (first children)) (option-name option))
+       (mapc #'process-child children)
+       nil)
       (t
        option))))
 
@@ -125,9 +141,13 @@
   (validate-value option new-value))
 
 (defmethod make-option ((schema-item standard-schema-item)
-                        (name        list))
-  (unless (name-matches (option-name schema-item) name)
-    (error "Cannot make option ~S" name))
+                        (name        sequence))
+  (unless (name-matches
+           (merge-names (make-name "**") (option-name schema-item))
+            name)
+    (error "~@<Schema item with name ~/options:print-name/ cannot make ~
+            option with name ~/options:print-name/.~@:>"
+           (option-name schema-item) name))
 
   ;; TODO(jmoringe, 2013-03-01): use `option-class' for cell instead of option?
   (let ((cell (make-instance 'option-cell

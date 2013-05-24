@@ -103,6 +103,7 @@
                               (:file       "name")
                               (:file       "mixins")
                               (:file       "configuration")
+                              (:file       "schema")
                               (:file       "macros")))
 
                 (:module     "sources"

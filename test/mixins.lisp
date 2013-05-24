@@ -179,3 +179,39 @@
      ((and real integer)         "FOO"   option-syntax-error)
      ((and real integer)         "1"     1)
      ((and real integer)         "2"     2))))
+
+;;; `list-container-mixin'
+
+(def-suite options.list-container-mixin
+  :in options)
+(in-suite options.list-container-mixin)
+
+(test find-option.smoke
+  "Smoke test for the `find-option' and setf find-option functions."
+
+  (macrolet
+      ((test (&body body)
+         `(let* ((container   (make-instance 'list-container-mixin))
+                 (schema-item (make-instance 'standard-schema-item
+                                             :name "foo"
+                                             :type 'integer))
+                 (option      (make-option schema-item (make-name "foo"))))
+            (declare (ignorable option))
+            ,@body)))
+
+    ;; Reader
+    (test (signals no-such-option
+            (find-option "no.such.option" container)))
+    (test (is (not (find-option "no.such.option" container
+                                :if-does-not-exist nil))))
+
+    ;; Writer
+    (test
+      (is (eq option (setf (find-option "foo" container) option)))
+      (is (equal (list option) (options container)))
+      (signals error
+        (setf (find-option "foo" container) option))
+      (setf (find-option "foo" container :if-exists :keep)
+            option)
+      (setf (find-option "foo" container :if-exists :supersede)
+            option))))

@@ -223,9 +223,11 @@
             :accessor %options
             :initform nil
             :documentation
-            ""))
+            "Stores a sorted list of named options. The contained
+             options are sorted according to `name<'."))
   (:documentation
-   "TODO(jmoringe): document"))
+   "This class is intended to be mixed into classes which act as a
+    container of options."))
 
 (defmethod print-items append ((object list-container-mixin))
   `((:count ,(length (options object)) " (~D)")))
@@ -243,11 +245,22 @@
         :key  #'option-name
         :test #'name-equal))
 
+(defmethod (setf find-option) :before ((new-value t)
+                                       (name      t)
+                                       (container list-container-mixin)
+                                       &key &allow-other-keys)
+  (let+ (((&accessors (options %options)) container))
+    (setf options (delete name options
+                          :key  #'option-name
+                          :test #'name-equal))))
+
 (defmethod (setf find-option) ((new-value t)
                                (name      t)
                                (container list-container-mixin)
                                &key &allow-other-keys)
-  (push new-value (%options container))
+  (when new-value
+    (let+ (((&accessors (options %options)) container))
+      (push new-value options)))
   new-value)
 
 (defmethod (setf find-option) :after ((new-value t)
