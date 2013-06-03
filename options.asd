@@ -75,11 +75,6 @@
                               (:file       "conditions")
                               (:file       "protocol")
 
-                              ;; Mixins
-                              (:file       "mixins")
-
-                              ;; Syntax
-
                               ;; Sources
                               (:file       "source-environment-variables")
                               (:file       "source-commandline")
