@@ -135,6 +135,9 @@
 
   ;; Macros
   (:export
+   #:map-schema-spec
+   #:eval-schema-spec
+
    #:define-schema)
 
   (:documentation

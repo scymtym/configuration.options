@@ -102,7 +102,8 @@
                               (:file       "protocol")
                               (:file       "name")
                               (:file       "mixins")
-                              (:file       "configuration")))
+                              (:file       "configuration")
+                              (:file       "macros")))
 
                 (:module     "sources"
                  :pathname   "test/sources"

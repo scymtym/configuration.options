@@ -10,7 +10,27 @@
    configuration options, sources of option values and handling of
    changes of option values.
 * TODO Tutorial
-** TODO Specifying a Schema
+** STARTED Specifying a Schema
+   A schema can be defined in at least three ways:
+
+   1. Programmatically
+   2. Using ~options:eval-schema-spec~
+   3. Using ~options:define-schema~
+
+   Since the second and third options use the same syntax, it is
+   sufficient to discuss ~options:define-schema~. Here is an example:
+   #+BEGIN_SRC lisp
+   (options:define-schema *my-schema*
+     ("logging"
+       ("level" :type (member :info :warning :error)
+                :default :warning
+                :documentation
+                "Default log level.")))
+   #+END_SRC
+   The above code creates a schema object and stores it in the
+   parameter ~*my-schema*~. The schema consists of one item named
+   =logging.level= with allowed values =:info=, =:warning= and
+   =:error= and default value =:warning=.
 ** TODO Populating a Configuration
 ** TODO Querying a Configuration
 ** TODO Tracking Changes of Option Values
