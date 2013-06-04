@@ -44,19 +44,21 @@
     configuration sources such as configuration files or environment
     variables.
 
-    Providers implement the source protocol."))
+    Providers implement some or all of the above source protocols."))
 
-;; TODO(jmoringe, 2013-03-12): source should get configuration schema (e.g. for clon)
-(defgeneric make-source (spec
-                         &key &allow-other-keys)
+(defgeneric make-source (spec &key &allow-other-keys)
   (:documentation
-   "TODO(jmoringe): document"))
+   "Construct and return an object implementing the source protocol
+    according to SPEC and the remaining keyword arguments.
+
+    For example, when SPEC is a symbol naming a provider of the
+    `source' service, the remaining keyword arguments are used as
+    initargs."))
 
 ;; Default behavior
 
 (defmethod make-source ((spec symbol)
                         &rest args &key)
-  "TODO(jmoringe): document"
   (apply #'service-provider:make-provider 'source spec args))
 
 ;;; Source cascade protocol
@@ -87,14 +89,17 @@
 
     Providers implement the above syntax protocol."))
 
-(defgeneric make-syntax (spec
-                         &key &allow-other-keys)
+(defgeneric make-syntax (spec &key &allow-other-keys)
   (:documentation
-   "TODO(jmoringe): document"))
+   "Construct and return an object implementing the syntax protocol
+    according to SPEC and the remaining keyword arguments.
+
+    For example, when SPEC is a symbol naming a provider of the
+    `syntax' service, the remaining keyword arguments are used as
+    initargs."))
 
 ;; Default behavior
 
 (defmethod make-syntax ((spec symbol)
                         &rest args &key)
-  "TODO(jmoringe): document"
   (apply #'service-provider:make-provider 'syntax spec args))

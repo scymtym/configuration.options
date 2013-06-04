@@ -20,9 +20,6 @@
 
    #:options.test)
 
-  (:export
-   #:options.sources.root)
-
   (:documentation
    "This package contains unit tests for the sources module"))
 

@@ -350,7 +350,7 @@
 
 (defgeneric configuration-schema (configuration)
   (:documentation
-   "TODO(jmoringe): document"))
+   "Return the schema object governing CONFIGURATION."))
 
 ;;; Option-like protocol
 ;;
@@ -390,7 +390,7 @@
 
 (defgeneric option-documentation (option)
   (:documentation
-   "TODO(jmoringe): document"))
+   "Return nil or the documentation string of OPTION."))
 
 ;; Default behavior
 

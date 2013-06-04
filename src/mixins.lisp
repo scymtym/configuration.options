@@ -123,6 +123,7 @@
 
 ;;; `type-based-merging-mixin' class
 
+;; TODO store merge strategy in separate slot instead of in type?
 (defclass type-based-merging-mixin ()
   ()
   (:documentation

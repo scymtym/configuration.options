@@ -20,7 +20,7 @@
    "Instances of this class parse textual configuration information
     according to the widely used \"ini\" syntax."))
 
-(service-provider::register-provider/class 'syntax :ini :class 'ini-syntax)
+(service-provider:register-provider/class 'syntax :ini :class 'ini-syntax)
 
 (declaim (special *sink*))
 

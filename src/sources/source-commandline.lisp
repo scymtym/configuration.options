@@ -22,6 +22,7 @@
               "Either t or the list of commandline arguments that
                should be processed by the source. If t, the \"real\"
                commandline arguments are used.")
+   ;; The following slots are implementation details.
    (context   :reader   source-context
               :accessor source-%context
               :documentation
@@ -104,8 +105,8 @@
                           (when root?
                             (list (com.dvlsoft.clon:make-flag :long-name "help")))
                           options
-                          (mapcan (rcurry #'do-schema '("foo"))
-                                  (options::schema-children schema)))))))))))
+                          (mapcan (rcurry #'do-schema '("foo")) ; TODO
+                                  (schema-children schema)))))))))))
 
     ;; Create synopsis and context based on SCHEMA. Wildcard options
     ;; may required use of "postfix" syntax.
