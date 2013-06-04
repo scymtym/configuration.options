@@ -198,18 +198,18 @@
                                 &key
                                 (if-does-not-exist #'error)
                                 &allow-other-keys)
-  (labels
-      ((recur ()
-         (or (call-next-method)
-             (error-behavior-restart-case (if-does-not-exist
-                                           (no-such-option
-                                            :name      name
-                                            :container container))
-               (retry ()
-                 (recur))
-               (use-value (value)
-                 value)))))
-    (recur)))
+  (tagbody
+   :start
+     (return-from find-option
+       (or (call-next-method)
+           (error-behavior-restart-case (if-does-not-exist
+                                         (no-such-option
+                                          :name      name
+                                          :container container))
+             (retry ()
+               (go :start))
+             (use-value (value)
+               value))))))
 
 (defmethod (setf find-option) :around ((new-value t)
                                        (name      t)
@@ -298,18 +298,18 @@
                                &key
                                (if-does-not-exist #'error)
                                &allow-other-keys)
-  (labels
-      ((recur ()
-         (or (call-next-method)
-             (error-behavior-restart-case (if-does-not-exist
-                                           (no-such-option ; TODO condition
-                                            :name      name
-                                            :container schema))
-               (retry ()
-                 (recur))
-               (use-value (value)
-                 value)))))
-    (recur)))
+  (tagbody
+   :start
+     (return-from find-child
+       (or (call-next-method)
+           (error-behavior-restart-case (if-does-not-exist
+                                         (no-such-option ; TODO condition
+                                          :name      name
+                                          :container schema))
+             (retry ()
+               (go :start))
+             (use-value (value)
+               value))))))
 
 (defmethod (setf find-child) :around ((new-value t)
                                       (name      t)
@@ -397,20 +397,20 @@
 (defmethod option-default :around ((option t)
                                    &key
                                    (if-does-not-exist #'error))
-  (labels
-      ((recur ()
-         (or (let+ (((&values default default?) (call-next-method)))
-               (when default?
-                 (return-from recur (values default default?))))
-             (error-behavior-restart-case (if-does-not-exist
-                                           (no-such-value-error
-                                            :option option
-                                            :which :default))
-               (retry ()
-                 (recur))
-               (use-value (value)
-                 value)))))
-    (recur)))
+  (tagbody
+   :start
+     (return-from option-default
+       (or (let+ (((&values default default?) (call-next-method)))
+             (when default?
+               (return-from option-default (values default default?))))
+           (error-behavior-restart-case (if-does-not-exist
+                                         (no-such-value-error
+                                          :option option
+                                          :which :default))
+             (retry ()
+               (go :start))
+             (use-value (value)
+               value))))))
 
 ;;; Schema item protocol
 
@@ -501,17 +501,16 @@
                    :option schema-item
                    :value  value
                    :cause  cause))
-               (retry ()
-                 (recur))
-               (use-value (value)
-                 value)))
-           (recur ()
-             (or (handler-bind
-                     (((or simple-error option-value-error)
-                        #'handle-invalid))
-                   (call-next-method))
-                 (handle-invalid))))
-    (recur)))
+               (continue (&optional condition)
+                 :report (lambda (stream)
+                           (format stream "~@<Ignore the problem.~@:>"))
+                 (declare (ignore condition))
+                 t))))
+    (or (handler-bind
+            (((or simple-error option-value-error)
+               #'handle-invalid))
+          (call-next-method))
+        (handle-invalid))))
 
 (defmethod string->value :around ((schema-item t) (string t))
   (with-condition-translation (((error option-syntax-error)
@@ -579,20 +578,20 @@
 (defmethod option-value :around ((option t)
                                  &key
                                  (if-does-not-exist #'error))
-  (labels
-      ((recur ()
-         (or (let+ (((&values value value?) (call-next-method)))
-               (when value?
-                 (return-from recur (values value value?))))
-             (error-behavior-restart-case (if-does-not-exist
-                                           (no-such-value-error
-                                            :option option
-                                            :which :value))
-               (retry ()
-                 (recur))
-               (use-value (value)
-                 value)))))
-    (recur)))
+  (tagbody
+   :start
+     (return-from option-value
+       (or (let+ (((&values value value?) (call-next-method)))
+             (when value?
+               (return-from option-value (values value value?))))
+           (error-behavior-restart-case (if-does-not-exist
+                                         (no-such-value-error
+                                          :option option
+                                          :which :value))
+             (retry ()
+               (go :start))
+             (use-value (value)
+               value))))))
 
 ;;; Sink protocol
 

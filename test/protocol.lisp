@@ -57,3 +57,15 @@
     '(()     nil            nil)
     '((1)    1              t)
     '((nil)  nil            t)))
+
+(test validate-value.default-behavior
+  "Smoke test for the default behavior of the `validate-value'
+   function."
+
+  (let ((schema-item (make-instance 'standard-schema-item
+                                    :name "a"
+                                    :type 'boolean)))
+    (is (eq :foo (validate-value schema-item 1 :if-invalid :foo)))
+
+    (handler-bind ((option-value-error #'continue))
+      (is (eq t (validate-value schema-item 1))))))

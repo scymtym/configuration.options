@@ -23,6 +23,12 @@
             (find-child "no.such.child" schema)))
     (test (is (not (find-child "no.such.child" schema
                                :if-does-not-exist nil))))
+    (test (is (eq (handler-bind ((no-such-option
+                                   (lambda (condition)
+                                     (declare (ignore condition))
+                                     (invoke-restart 'use-value :foo))))
+                    (find-option "no.such.child" schema))
+                  :foo)))
 
     ;; Writer
     (test
