@@ -13,7 +13,23 @@
            "Stores the source originally containing the configuration
             information (e.g. a `file-source'). The sole purpose of
             storing the source is the possibility to annotate provided
-            options with the source from which they originated."))
+            options with the source from which they originated.")
+   (syntax :initarg  :syntax
+           :reader   syntax-syntax
+           :type     list
+           :initform '((parser.ini:*name-component-separator*                . #\.)
+                       (parser.ini:*assignment-operator*                     . #\=)
+                       (parser.ini:*value-terminating-whitespace-expression* . #\Newline))
+           :documentation
+           "Stores and alist of the form
+
+              (VARIABLE-NAME . VALUE)
+
+            where VARIABLE-NAME is a symbol naming one of the special
+            variables provided by the parser.ini system for
+            controlling syntax variants and VALUE is the value to
+            which the designated variable should be bound while
+            parsing."))
   (:default-initargs
    :source (missing-required-initarg 'ini-syntax :source))
   (:documentation
@@ -66,7 +82,9 @@
 (defmethod process-content ((syntax ini-syntax)
                             (source stream)
                             (sink   t))
-  (let ((content (read-stream-content-into-string source))
-        (*sink*  sink))
-    (parser.ini:parse content syntax))
+  (let ((ini-syntax (syntax-syntax syntax))
+        (content    (read-stream-content-into-string source))
+        (*sink*     sink))
+    (progv (mapcar #'car ini-syntax) (mapcar #'cdr ini-syntax)
+      (parser.ini:parse content syntax)))
   (values))
