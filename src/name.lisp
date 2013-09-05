@@ -108,10 +108,15 @@
   "Controls whether \"**\" is accepted and interpreted
    as :wild-inferiors component when parsing names.")
 
-#+later (esrap:defgrammar #:options.option-name
-            (:documentation
-             ""))
-#+later (esrap:in-grammar #:options.option-name)
+#+esrap.grammar-class
+(esrap:defgrammar #:options.option-name
+  (:documentation
+   "This grammar contains rules for parsing option names consisting of
+    multiple string components separated by \".\". Wildcards of the
+    form \"*\" (\"wild\") and \"**\" (\"wild inferiors\") are also
+    supported."))
+#+esrap.grammar-class
+(esrap:in-grammar #:options.option-name)
 
 (esrap:defrule wild-inferiors
     (and #\* #\*)
@@ -172,6 +177,8 @@
     (let ((*parse-wild-allowed*           wild-allowed)
           (*parse-wild-inferiors-allowed* wild-inferiors-allowed))
       (esrap:parse 'name string
+                   #+esrap.grammar-class :grammar
+                   #+esrap.grammar-class '#:options.option-name
                    :start        start
                    :end          end
                    :junk-allowed junk-allowed))))
