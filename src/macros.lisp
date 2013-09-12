@@ -41,24 +41,38 @@
 
    If DOCUMENTATION is supplied, it is used as the documentation
    string of the toplevel schema item in SPEC."
-  (let+ (((&flet do-spec (kind name rest &key prefix schema &allow-other-keys)
+  (let+ (((&flet make-initarg-when-supplied (initarg form supplied?)
+            (when supplied?
+              (list initarg (eval form)))))
+         ((&flet do-spec (kind name rest &key prefix schema &allow-other-keys)
             (etypecase kind
               ((member :schema :wild-schema)
                (or schema (make-instance 'standard-schema
                                          :documentation documentation)))
               #+TODO-no? ((eql :wild-schema)
-                (unless schema
-                  (error "~@<Toplevel schema cannot have wildcard name.~@:>"))
-                (setf (find-child (merge-names prefix name) schema)
-                      (make-instance 'standard-schema)))
+                          (unless schema
+                            (error "~@<Toplevel schema cannot have wildcard name.~@:>"))
+                          (setf (find-child (merge-names prefix name) schema)
+                                (make-instance 'standard-schema)))
               ((eql :item)
-               (let ((name/merged       (merge-names prefix name))
-                     (schema-item-class 'standard-schema-item))
+               (let+ (((&key
+                        (type    nil type-supplied?)
+                        (default nil default-supplied?)
+                        &allow-other-keys) rest)
+                      (name/merged       (merge-names prefix name))
+                      (schema-item-class 'standard-schema-item))
                  (setf (find-option name/merged schema :if-exists #'error)
                        (apply #'make-instance schema-item-class
                               :name name/merged
-                              (remove-from-plist
-                               rest :prefix :schema :schema-item-class)))))))))
+                              (append
+                               (make-initarg-when-supplied
+                                :type type type-supplied?)
+                               (make-initarg-when-supplied
+                                :default default default-supplied?)
+                               (remove-from-plist
+                                rest
+                                :prefix :schema :schema-item-class
+                                :type :default))))))))))
     (map-schema-spec #'do-spec spec)))
 
 (defmacro define-schema (name-and-args &body docstring-and-specs)
@@ -78,6 +92,9 @@
      SCHEMA-SPEC ::= (NAME SPEC*)
      OPTION-SPEC ::= (NAME &key type default documentation)
 
+   The arguments of the type and default keyword parameters are
+   evaluated.
+
    When DOCSTRING-AND-SPECS starts with a documentation string, it is
    used as the documentation string of the toplevel schema object.
 
@@ -85,12 +102,12 @@
 
      (define-schema *my-schema*
        \"Schema for my configuration\"
+
        (\"section\"
-         (\"option\" :type integer)))"
+         (\"option\" :type 'integer))) ; Note: :type argument is evaluated "
   (let+ (((name) (ensure-list name-and-args))
          ((&values specs &ign documentation)
           (parse-body docstring-and-specs :documentation t)))
     `(defparameter ,name
-       (eval-schema-spec '(() ,@specs)
-                         :documentation ,documentation)
+       (eval-schema-spec '(() ,@specs) :documentation ,documentation)
        ,@(when documentation `(,documentation)))))

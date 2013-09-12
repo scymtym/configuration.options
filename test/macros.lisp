@@ -37,9 +37,13 @@
                        queries))))))
 
         '(;; Some invalid cases.
-          (((() ("a" :type string) ("a" :type string))) ; duplicate name
+          (((() ("a" :type string)))                      ; invalid type (evaluated)
            error)
-          (((() ("a" :type boolean :default 1)))        ; invalid default
+          (((() ("a" :type 'string) ("a" :type 'string))) ; duplicate name
+           error)
+          (((() ("a" :type 'boolean :default unbound)))   ; invalid default (evaluated)
+           error)
+          (((() ("a" :type 'boolean :default 1)))         ; invalid default
            option-value-error)
 
           ;; Some valid cases.
@@ -49,30 +53,40 @@
           (((()) :documentation "foo")
            ("foo" ()))
 
-          (((() ("a" :type string)))
+          (((() ("a" :type 'string)))
            (nil (("a" string))))
 
-          (((() ("a" :type integer :default 5)))
+          (((() ("a" :type 'integer :default 5)))
            (nil (("a" integer 5))))
 
-          (((() ("a" :type boolean :default t :documentation "bar")))
+          (((() ("a" :type 'boolean :default t :documentation "bar")))
            (nil (("a" boolean t "bar"))))
 
-          (((() ("a" ("b" :type boolean))))
+          (((() ("a" ("b" :type 'boolean))))
            (nil (("a.b" boolean)))))))
 
 (test define-schema.smoke
   "Smoke test for the `define-schema' macro."
 
+  ;; Invalid type (when evaluated).
+  (signals error
+    (define-schema *schema*
+      ("a" :type string)))
+
   ;; Duplicate name.
   (signals error
     (define-schema *schema*
-      ("a" :type string) ("a" :type string)))
+      ("a" :type 'string) ("a" :type 'string)))
+
+  ;; Invalid default (when evaluated).
+  (signals error
+    (define-schema *schema*
+      ("a" :type 'boolean :default unbound)))
 
   ;; Invalid default.
   (signals option-value-error
     (define-schema *schema*
-        ("a" :type boolean :default 1)))
+        ("a" :type 'boolean :default 1)))
 
   ;; A real-world schema.
   (define-schema *schema*
@@ -80,37 +94,38 @@
     ("rsc"
      ("logging"
       (:wild-inferiors
-       ("LEVEL" :type (member :debug :info :warning :error :fatal)))))
+       ("LEVEL" :type '(member :debug :info :warning :error :fatal)))))
 
     ("qualityofservice"
      ("reliability"
-      :type (member :unreliable :reliable))
+      :type '(member :unreliable :reliable))
      ("ordering"
-      :type (member :unordered :ordered)))
+      :type '(member :unordered :ordered)))
 
     ("errorhandling"
-     ("onhandlererror" :type (member :log :print :exit)))
+     ("onhandlererror" :type '(member :log :print :exit)))
 
     ("plugins"
      (:wild
-      ("path" :type (list pathname :inherit? t))
-      ("load" :type (list string :inherit? t))))
+      ("path" :type '(list pathname :inherit? t))
+      ("load" :type '(list string :inherit? t))))
 
     ("transport"
      (:wild
       ("enabled"
        :schema-item-class standard-schema-item
        :option-class foo
-       :type boolean
+       :type 'boolean
        :default nil)
       (:wild
-       :type integer))
+       :type 'integer))
      ("socket"
-      ("host"   :type string)
-      ("port"   :type (integer 0 65535))
-      ("server" :type (or boolean (member :auto))
-                :documentation "Act as server or client or determine role automatically.")))
+      ("host"   :type 'string)
+      ("port"   :type '(integer 0 65535))
+      ("server" :type '(or boolean (member :auto))
+                :documentation
+                "Act as server or client or determine role automatically.")))
 
     (:wild-inferiors
-     ("config-file" :type pathname)
-     (:wild :type string))))
+     ("config-file" :type 'pathname)
+     (:wild :type 'string))))

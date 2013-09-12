@@ -66,14 +66,14 @@
 ;;; Simple schema for tests
 
 (define-schema +simple-schema+
-  "Simple configuration options."
-  ("foo" :type integer :default 1
+  "Simple configuration options for tests."
+  ("foo" :type 'integer :default 1
          :documentation
          "This option controls foo.")
-  ("bar" :type boolean)
-  ("foo" ("fez" :type integer))
-  ("bar" ("fez" :type pathname))
-  ("baz" ("foo" :type string)))
+  ("bar" :type 'boolean)
+  ("foo" ("fez" :type 'integer))
+  ("bar" ("fez" :type 'pathname))
+  ("baz" ("foo" :type 'string)))
 
 ;;; Mock sink class
 
