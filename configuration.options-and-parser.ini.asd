@@ -40,7 +40,8 @@
 
                 (:version :configuration.options-and-parser.ini #.(version/string))
 
-                :eos
+                (:version :fiveam                               "1.1")
+
                 (:version :configuration.options-test           #.(version/string)))
   :components  ((:module     "sources"
                  :pathname   "test/sources"

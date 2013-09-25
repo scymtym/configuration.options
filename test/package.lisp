@@ -10,7 +10,7 @@
    #:alexandria
    #:let-plus
 
-   #:eos
+   #:fiveam
 
    #:options)
 

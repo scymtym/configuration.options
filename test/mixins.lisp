@@ -190,7 +190,7 @@
   "Smoke test for the `find-option' and setf find-option functions."
 
   (macrolet
-      ((test (&body body)
+      ((test-case (&body body)
          `(let* ((container   (make-instance 'list-container-mixin))
                  (schema-item (make-instance 'standard-schema-item
                                              :name "foo"
@@ -200,19 +200,22 @@
             ,@body)))
 
     ;; Reader
-    (test (signals no-such-option
-            (find-option "no.such.option" container)))
-    (test (is (not (find-option "no.such.option" container
-                                :if-does-not-exist nil))))
-    (test (is (eq (handler-bind ((no-such-option
-                                   (lambda (condition)
-                                     (declare (ignore condition))
-                                     (invoke-restart 'use-value :foo))))
-                    (find-option "no.such.options" container))
-                  :foo)))
+    (test-case
+     (signals no-such-option
+       (find-option "no.such.option" container)))
+    (test-case
+     (is (not (find-option "no.such.option" container
+                           :if-does-not-exist nil))))
+    (test-case
+     (is (eq (handler-bind ((no-such-option
+                              (lambda (condition)
+                                (declare (ignore condition))
+                                (invoke-restart 'use-value :foo))))
+               (find-option "no.such.options" container))
+             :foo)))
 
     ;; Writer
-    (test
+    (test-case
       (is (eq option (setf (find-option "foo" container) option)))
       (is (equal (list option) (options container)))
       (signals error

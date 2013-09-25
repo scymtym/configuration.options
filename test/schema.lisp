@@ -12,26 +12,29 @@
   "Smoke test for the `find-child' and (setf find-child) functions."
 
   (macrolet
-      ((test (&body body)
+      ((test-case (&body body)
          `(let ((schema (make-instance 'standard-schema))
                 (child  (make-instance 'standard-schema)))
             (declare (ignorable child))
             ,@body)))
 
     ;; Reader
-    (test (signals no-such-option
-            (find-child "no.such.child" schema)))
-    (test (is (not (find-child "no.such.child" schema
-                               :if-does-not-exist nil))))
-    (test (is (eq (handler-bind ((no-such-option
-                                   (lambda (condition)
-                                     (declare (ignore condition))
-                                     (invoke-restart 'use-value :foo))))
-                    (find-option "no.such.child" schema))
-                  :foo)))
+    (test-case
+     (signals no-such-option
+       (find-child "no.such.child" schema)))
+    (test-case
+     (is (not (find-child "no.such.child" schema
+                          :if-does-not-exist nil))))
+    (test-case
+     (is (eq (handler-bind ((no-such-option
+                              (lambda (condition)
+                                (declare (ignore condition))
+                                (invoke-restart 'use-value :foo))))
+               (find-option "no.such.child" schema))
+             :foo)))
 
     ;; Writer
-    (test
+    (test-case
       (is (eq child (setf (find-child "child" schema) child)))
       (is (equal (list child) (schema-children schema)))
       (signals error

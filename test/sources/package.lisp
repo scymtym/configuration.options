@@ -13,7 +13,7 @@
    #:let-plus
    #:more-conditions
 
-   #:eos
+   #:fiveam
 
    #:options
    #:options.sources

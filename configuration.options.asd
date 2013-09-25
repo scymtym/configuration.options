@@ -93,7 +93,7 @@
   :depends-on  (:alexandria
                 (:version :let-plus "0.2")
 
-                :eos)
+                (:version :fiveam   "1.1"))
   :components  ((:module     "test"
                  :serial     t
                  :components ((:file       "package")
