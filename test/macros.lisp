@@ -6,6 +6,9 @@
 
 (cl:in-package #:options.test)
 
+(define-schema *child-schema* ; used in next test
+  ("b" :type 'string))
+
 (test eval-schema-spec.smoke
   "Smoke test for the `eval-schema-spec' function."
 
@@ -13,6 +16,8 @@
           (let+ (((&flet do-it () (apply #'eval-schema-spec input))))
             (case expected
               (error (signals error (do-it)))
+              (schema-syntax-error
+               (signals schema-syntax-error (do-it)))
               (option-value-error
                (signals option-value-error (do-it)))
               (t
@@ -26,7 +31,7 @@
                                   &optional
                                   (expected-default nil expected-default-supplied?)
                                   expected-documentation))
-                         (let ((item (find-option query schema)))
+                         (let ((item (find-option query schema :match-wildcards? t)))
                            (is (equal expected-type (option-type item)))
                            (when expected-default-supplied?
                              (is (equal expected-default (option-default item))))
@@ -37,6 +42,10 @@
                        queries))))))
 
         '(;; Some invalid cases.
+          (((() ("a")))          schema-syntax-error)     ; incomplete specification
+          (((() ("a" ())))       schema-syntax-error)     ; likewise
+          (((() ("a "("b"))))    schema-syntax-error)     ; likewise
+          (((() ("a" ("b" ())))) schema-syntax-error)     ; likewise
           (((() ("a" :type string)))                      ; invalid type (evaluated)
            error)
           (((() ("a" :type 'string) ("a" :type 'string))) ; duplicate name
@@ -63,10 +72,18 @@
            (nil (("a" boolean t "bar"))))
 
           (((() ("a" ("b" :type 'boolean))))
-           (nil (("a.b" boolean)))))))
+           (nil (("a.b" boolean))))
+
+          (((() ("a" *child-schema*)))
+           (nil (("a.b" string)))))))
 
 (test define-schema.smoke
   "Smoke test for the `define-schema' macro."
+
+  ;; Incomplete specification
+  (signals schema-syntax-error
+    (define-schema *schema*
+      ("a")))
 
   ;; Invalid type (when evaluated).
   (signals error

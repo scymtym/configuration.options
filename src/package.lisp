@@ -41,6 +41,9 @@
    #:option-syntax-error
    #:option-syntax-error-type
 
+   #:schema-syntax-error
+   #:schema-syntax-error-specification
+
    #:notification-error
    #:notification-error-sink
    #:notification-error-event

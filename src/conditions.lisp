@@ -124,6 +124,24 @@
    "This error is signaled when a given string cannot be parsed as a
     value of a particular option."))
 
+;;; Macro-related conditions
+
+(define-condition schema-syntax-error (error)
+  ((specification :initarg  :specification
+                  :reader   schema-syntax-error-specification
+                  :documentation
+                  "Stores the offending specification."))
+  (:report
+   (lambda (condition stream)
+     (format stream "~@<Ill-formed schema entry specification: ~S~@:>"
+             (schema-syntax-error-specification condition))))
+  (:default-initargs
+   :specification (missing-required-initarg
+                   'schema-syntax-error :specification))
+  (:documentation
+   "This error is signaled when a schema specification is
+    syntactically incorrect."))
+
 ;;; Sink-protocol-related conditions
 
 (define-condition notification-error (error

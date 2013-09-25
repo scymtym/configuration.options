@@ -21,18 +21,25 @@
   (let+ (((&labels+ recur ((&whole spec name &rest rest) prefix schema)
             (let* ((name        (make-name (ensure-list name)))
                    (prefix/next (merge-names prefix name)))
-             (etypecase spec
-               ((cons t (cons keyword)) ; item
-                (funcall function :item name rest :prefix prefix :schema schema))
-               ((cons t list)           ; sub-schema
-                (let* ((kind        (etypecase name
-                                      (wild-name      :wild-schema)
-                                      ((or null name) :schema)))
-                       (schema/next (funcall function kind name nil
-                                             :prefix prefix
-                                             :schema schema)))
-                  (mapc (rcurry #'recur prefix/next schema/next) rest)
-                  schema/next)))))))
+              (typecase spec
+                ((cons t (or null (cons null)))                    ; incomplete, non-root
+                 (unless (and (emptyp name) (emptyp prefix))
+                   (error 'schema-syntax-error :specification spec)))
+                ((cons t (cons keyword))                           ; item
+                 (funcall function :item name rest :prefix prefix :schema schema))
+                ((cons t (cons (not (or null cons keyword)) null)) ; sub-schema as value
+                 (funcall function :schema-value name rest :prefix prefix :schema schema))
+                ((cons t list)                                     ; sub-schema as spec
+                 (let* ((kind        (etypecase name
+                                       (wild-name      :wild-schema)
+                                       ((or null name) :schema)))
+                        (schema/next (funcall function kind name nil
+                                              :prefix prefix
+                                              :schema schema)))
+                   (mapc (rcurry #'recur prefix/next schema/next) rest)
+                   schema/next))
+                (t
+                 (error 'schema-syntax-error :specification spec)))))))
     (recur spec '() nil)))
 
 (defun eval-schema-spec (spec &key documentation)
@@ -44,16 +51,22 @@
   (let+ (((&flet make-initarg-when-supplied (initarg form supplied?)
             (when supplied?
               (list initarg (eval form)))))
+         ((&flet ensure-schema (schema)
+            (or schema (make-instance 'standard-schema
+                                      :documentation documentation))))
          ((&flet do-spec (kind name rest &key prefix schema &allow-other-keys)
             (etypecase kind
               ((member :schema :wild-schema)
-               (or schema (make-instance 'standard-schema
-                                         :documentation documentation)))
+               (ensure-schema schema))
               #+TODO-no? ((eql :wild-schema)
                           (unless schema
                             (error "~@<Toplevel schema cannot have wildcard name.~@:>"))
                           (setf (find-child (merge-names prefix name) schema)
                                 (make-instance 'standard-schema)))
+              ((eql :schema-value)
+               (let ((name/merged (merge-names prefix name)))
+                 (setf (find-child name/merged (ensure-schema schema))
+                       (eval (first rest)))))
               ((eql :item)
                (let+ (((&key
                         (type    nil type-supplied?)
@@ -73,7 +86,7 @@
                                 rest
                                 :prefix :schema :schema-item-class
                                 :type :default))))))))))
-    (map-schema-spec #'do-spec spec)))
+    (ensure-schema (map-schema-spec #'do-spec spec))))
 
 (defmacro define-schema (name-and-args &body docstring-and-specs)
   "Define a parameter (like `cl:defparameter') named according to
@@ -88,9 +101,12 @@
    specifications (optionally preceded by a documentation string)
    where each specification is of the form
 
-     SPEC        ::= SCHEMA-SPEC | OPTION-SPEC
-     SCHEMA-SPEC ::= (NAME SPEC*)
-     OPTION-SPEC ::= (NAME &key type default documentation)
+     SPEC              ::= SCHEMA-SPEC | SCHEMA-VALUE-SPEC | OPTION-SPEC
+     SCHEMA-SPEC       ::= (NAME SPEC*)
+     SCHEMA-VALUE-SPEC ::= (NAME SCHEMA-VALUE)
+     OPTION-SPEC       ::= (NAME &key type default documentation &allow-other-keys)
+
+   where SCHEMA-VALUE is evaluated and has to return a schema object.
 
    The arguments of the type and default keyword parameters are
    evaluated.
