@@ -1,4 +1,4 @@
-#+TITLE:       options README
+#+TITLE:       configuration.options README
 #+AUTHOR:      Jan Moringen
 #+EMAIL:       jmoringe@techfak.uni-bielefeld.de
 #+DESCRIPTION:
@@ -6,9 +6,9 @@
 #+LANGUAGE:    en
 
 * STARTED Introduction
-  The =options= system provides data structures and functions for
-   configuration options, sources of option values and handling of
-   changes of option values.
+  The =configuration.options= system provides data structures and
+  functions for configuration options, sources of option values and
+  handling of changes of option values.
 * TODO Tutorial
 ** STARTED Specifying a Schema
    A schema can be defined in at least three ways:

@@ -1,10 +1,10 @@
-;;;; options.asd --- System definition for the options system.
+;;;; configuration.options.asd --- System definition for the configuration.options system.
 ;;;;
 ;;;; Copyright (C) 2011, 2012, 2013 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
-(cl:defpackage #:options-system
+(cl:defpackage #:configuration.options-system
   (:use
    #:cl
    #:asdf)
@@ -13,7 +13,7 @@
    #:version/list
    #:version/string))
 
-(cl:in-package #:options-system)
+(cl:in-package #:configuration.options-system)
 
 ;;; Version stuff
 
@@ -36,7 +36,7 @@
 
 ;;; System definition
 
-(defsystem :options
+(defsystem :configuration.options
   :author      "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :maintainer  "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :version     #.(version/string)
@@ -44,13 +44,13 @@
   :description "A simple options system that supports multiple options sources."
   :depends-on  (:alexandria
                 :split-sequence
-                (:version :let-plus              "0.2")
-                (:version :more-conditions       "0.3")
-                (:version :utilities.print-items "0.1")
-                (:version :cl-hooks              "0.2")
-                (:version :service-provider      "0.1")
+                (:version :let-plus                      "0.2")
+                (:version :more-conditions               "0.3")
+                (:version :utilities.print-items         "0.1")
+                (:version :cl-hooks            "0.2") ; TODO
+                (:version :architecture.service-provider "0.1")
 
-                (:version :esrap                 "0.9"))
+                (:version :esrap                         "0.9"))
   :components  ((:module     "src"
                  :serial     t
                  :components ((:file       "package")
@@ -82,14 +82,14 @@
                               (:file       "source-file")
                               (:file       "source-cascade"))))
 
-  :in-order-to ((test-op (test-op :options-test))))
+  :in-order-to ((test-op (test-op :configuration.options-test))))
 
-(defsystem :options-test
+(defsystem :configuration.options-test
   :author      "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :maintainer  "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :version     #.(version/string)
   :license     "LLGPLv3; see COPYING file for details."
-  :description "A simple options system that supports multiple options sources."
+  :description "Unit tests for the configuration.options system."
   :depends-on  (:alexandria
                 (:version :let-plus "0.2")
 
@@ -120,5 +120,5 @@
                               (:file       "source-cascade")))))
 
 (defmethod perform ((op     test-op)
-                    (system (eql (find-system :options-test))))
+                    (system (eql (find-system :configuration.options-test))))
   (funcall (find-symbol "RUN-TESTS" :options.test)))
