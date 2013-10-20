@@ -8,6 +8,109 @@
 
 (in-suite options)
 
+;;; Helper for name coercion tests
+
+(defvar *mock-container/name-coercion-testing-find-option* nil)
+
+(defvar *mock-container/name-coercion-testing-find-child* nil)
+
+(defclass mock-container/name-coercion () ())
+
+(defmethod find-options ((query t) (container mock-container/name-coercion))
+  (list query))
+
+(defmethod find-option ((name t) (container mock-container/name-coercion)
+                        &key &allow-other-keys)
+  (when *mock-container/name-coercion-testing-find-option*
+    (list name)))
+
+(defmethod (setf find-option) ((new-value t)
+                               (name      t)
+                               (container mock-container/name-coercion)
+                               &key &allow-other-keys)
+  (list name))
+
+(defmethod find-child ((name t) (container mock-container/name-coercion)
+                       &key &allow-other-keys)
+  (when *mock-container/name-coercion-testing-find-child*
+    (list name)))
+
+(defmethod (setf find-child) ((new-value t)
+                              (name      t)
+                              (container mock-container/name-coercion)
+                              &key &allow-other-keys)
+  (list name))
+
+(defclass mock-schema-item/name-coercion () ())
+
+(defmethod make-option ((schema-item mock-schema-item/name-coercion)
+                        (name        t))
+  (list name))
+
+(defun call-with-name-coercion-cases (container thunk)
+  (let+ (((&flet+ test-case ((name expected-wild?))
+            (let+ (((result) (funcall thunk name container)))
+              (if expected-wild?
+                  (is (typep result 'wild-name))
+                  (is (typep result '(and name (not wild-name)))))))))
+    (mapc #'test-case '((()        nil)
+                        (#()       nil)
+                        (("a")     nil)
+                        (("a" "b") nil)
+                        (("*")     nil)
+                        (("**")    nil)
+                        ("a"       nil)
+                        ("a.b"     nil)
+                        ("*"       t)
+                        ("**"      t)))))
+
+;;; Option container protocol
+
+;; Name coercion
+
+(test find-options.name-coercion
+  "Test name coercion performed by the `find-options' generic
+   function."
+  (call-with-name-coercion-cases
+   (make-instance 'mock-container/name-coercion) #'find-options))
+
+(test find-option.name-coercion
+  "Test name coercion performed by the `find-option' generic
+   function."
+  (let ((*mock-container/name-coercion-testing-find-option* t))
+    (call-with-name-coercion-cases
+     (make-instance 'mock-container/name-coercion) #'find-option)))
+
+(test setf-find-options.name-coercion
+  "Test name coercion performed by the setf `find-option' generic
+   function."
+  (call-with-name-coercion-cases
+   (make-instance 'mock-container/name-coercion)
+   (lambda (name container)
+     (setf (find-option name container) t))))
+
+;;; Schema protocol
+
+;; Name coercion
+
+(test find-child.name-coercion
+  "Test name coercion performed by the `find-child' generic
+   function."
+  (let ((*mock-container/name-coercion-testing-find-child* t))
+    (call-with-name-coercion-cases
+     (make-instance 'mock-container/name-coercion)
+     #'find-child)))
+
+(test setf-find-childs.name-coercion
+  "Test name coercion performed by the setf `find-child' generic
+   function."
+  (call-with-name-coercion-cases
+   (make-instance 'mock-container/name-coercion)
+   (lambda (name container)
+     (setf (find-child name container) t))))
+
+;;; Option-like protocol
+
 (macrolet
     ((define-value-function-test ((name &key (value-var 'value))
                                   construction-expression
@@ -78,3 +181,16 @@
 
     (handler-bind ((option-value-error #'continue))
       (is (eq t (validate-value schema-item 1))))))
+
+;;; Schema-item protocol
+
+;; Name coercion
+
+(test make-option.name-coercion
+  "Test name coercion performed by the `make-option' generic
+   function."
+
+  (call-with-name-coercion-cases
+   (make-instance 'mock-schema-item/name-coercion)
+   (lambda (name container)
+     (make-option container name))))

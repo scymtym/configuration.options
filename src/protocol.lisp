@@ -15,7 +15,11 @@
 (defgeneric make-name (thing)
   (:documentation
    "Return a name corresponding to THING which can be a name string, a
-    sequence of `name-component's or a name."))
+    sequence of `name-component's or a name.
+
+    The second return value is true if something other than
+    THING (i.e. the result of coercing THING to a name) is returned
+    and false if THING is returned."))
 
 (defgeneric name-components (name)
   (:documentation
@@ -184,16 +188,35 @@
 ;; * type is correct
 ;; * value is of correct type
 
-;; Default behavior
+;; Name coercion
 
-(defmethod find-option :around ((name string) (container t)
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defmacro if-name (var then else)
+    (check-type var symbol)
+    (with-gensyms (changed?)
+      `(let+ (((&values ,var ,changed?) (make-name ,var)))
+         (if ,changed? ,else ,then)))))
+
+(defmethod find-options :around ((query sequence) (container t))
+  (if-name query
+    (call-next-method)
+    (find-options query container)))
+
+(defmethod find-option :around ((name sequence) (container t)
                                 &rest args &key &allow-other-keys)
-  (apply #'find-option (make-name name) container args))
+  (if-name name
+    (call-next-method)
+    (apply #'find-option name container args)))
 
-(defmethod (setf find-option) :around ((new-value t) (name string) (container t)
+(defmethod (setf find-option) :around ((new-value t)
+                                       (name      sequence)
+                                       (container t)
                                        &rest args &key &allow-other-keys)
-  (apply #'(setf find-option) new-value (make-name name) container
-         args))
+  (if-name name
+    (call-next-method)
+    (apply #'(setf find-option) new-value name container args)))
+
+;; Default behavior
 
 (defmethod find-option :around ((name t) (container t)
                                 &key
@@ -293,16 +316,21 @@
    "Make and return a configuration object the option objects in which
     comply to schema."))
 
-;; Default behavior
+;; Name coercion
 
-(defmethod find-child :around ((name string) (schema t)
+(defmethod find-child :around ((name sequence) (schema t)
                                &rest args &key &allow-other-keys)
-  (apply #'find-child (make-name name) schema args))
+  (if-name name
+    (call-next-method)
+    (apply #'find-child name schema args)))
 
-(defmethod (setf find-child) :around ((new-value t) (name string) (schema t)
+(defmethod (setf find-child) :around ((new-value t) (name sequence) (schema t)
                                        &rest args &key &allow-other-keys)
-  (apply #'(setf find-child) new-value (make-name name) schema
-         args))
+  (if-name name
+    (call-next-method)
+    (apply #'(setf find-child) new-value name schema args)))
+
+;; Default behavior
 
 (defmethod find-child :around ((name t) (schema t)
                                &key
@@ -497,6 +525,13 @@
   (:documentation
    "Like `string->value' but may incorporate TYPE, besides
     SCHEMA-ITEM, into the parsing of STRING into a value object."))
+
+;; Name coercion
+
+(defmethod make-option :around ((schema-item t) (name sequence))
+  (if-name name
+    (call-next-method)
+    (make-option schema-item name)))
 
 ;; Default behavior
 

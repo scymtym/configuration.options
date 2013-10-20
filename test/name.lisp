@@ -36,17 +36,20 @@
   (mapc
    (lambda+ ((input expected-name?
               &optional
-              expected-wild-name? expected-components))
+              expected-wild-name? expected-components expected-converted?))
      (let+ (((&flet do-it () (make-name input))))
        (case expected-name?
          (type-error       (signals type-error (do-it)))
          (name-parse-error (signals name-parse-error (do-it)))
-         (t                (let ((name (do-it)))
+         (t                (let+ (((&values name converted?) (do-it)))
                              (is (typep name 'name))
                              (when expected-wild-name?
                                (is (typep name 'wild-name)))
                              (is (equal expected-components
-                                        (name-components name))))))))
+                                        (name-components name)))
+                             (is (eq expected-converted? converted?)
+                                 "~@<Converted for ~S was ~S expected ~S.~@:>"
+                                 input converted? expected-converted?))))))
 
    `(;; Some invalid cases
      (1                  type-error)        ; completely wrong type
@@ -57,24 +60,24 @@
      ("***"              name-parse-error)  ; likewise
 
      ;; No-op
-     (,(make-name "a.b") t nil ("a" "b"))
-     (,(make-name "a.*") t t   ("a" :wild))
+     (,(make-name "a.b") t nil ("a" "b")         nil)
+     (,(make-name "a.*") t t   ("a" :wild)       nil)
 
      ;; Some non-wild cases.
-     ("a"                t nil ("a"))
-     (("a")              t nil ("a"))
-     (,#("a")            t nil ("a"))
-     ("a.b"              t nil ("a" "b"))
-     (("a" "b")          t nil ("a" "b"))
-     (,#("a" "b")        t nil ("a" "b"))
-     (("*")              t nil ("*"))       ; non-wild with no string
-     (("**")             t nil ("**"))      ; likewise
+     ("a"                t nil ("a")             t)
+     (("a")              t nil ("a")             nil)
+     (,#("a")            t nil ("a")             t)
+     ("a.b"              t nil ("a" "b")         t)
+     (("a" "b")          t nil ("a" "b")         nil)
+     (,#("a" "b")        t nil ("a" "b")         t)
+     (("*")              t nil ("*")             nil) ; non-wild with no string
+     (("**")             t nil ("**")            nil) ; likewise
 
      ;; Some wild cases.
-     ("*"                t t   (:wild))
-     ((:wild)            t t   (:wild))
-     ("**"               t t   (:wild-inferiors))
-     ((:wild-inferiors)  t t   (:wild-inferiors)))))
+     ("*"                t t   (:wild)           t)
+     ((:wild)            t t   (:wild)           t)
+     ("**"               t t   (:wild-inferiors) t)
+     ((:wild-inferiors)  t t   (:wild-inferiors) t))))
 
 (test name-matches.smoke
   "Smoke test for `name-matches' function."

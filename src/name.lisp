@@ -71,12 +71,16 @@
 ;; construction protocol
 
 (defmethod make-name ((thing string))
-  (values (parse-name thing)))
+  (values (parse-name thing) t))
 
 (defmethod make-name ((thing sequence))
   (etypecase thing
-    (wild-name (make-instance 'wildcard-name :components thing))
-    (name      (coerce thing 'list))))
+    (wild-name
+     (values (make-instance 'wildcard-name :components thing) t))
+    ((and name list)
+     thing)
+    (name
+     (values (coerce thing 'list) t))))
 
 (defmethod make-name ((thing wildcard-name))
   thing)
