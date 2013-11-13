@@ -28,6 +28,25 @@
    '((()                     nil)
      ((:documentation "foo") "foo"))))
 
+(test find-option.create
+  "Test :if-does-not-exist :create for `find-option'."
+
+  (let ((configuration (make-configuration +simple-schema+)))
+    ;; Option is not in schema
+    (signals no-such-option
+      (find-option "no.such.option" configuration
+                   :if-does-not-exist :create))
+
+    ;; Some valid cases
+    (let+ (((&flet test-case (name)
+              (let ((option/create (find-option name configuration
+                                                :if-does-not-exist :create))
+                    (option/find   (find-option name configuration)))
+                (is (not (null option/create)))
+                (is (eq option/create option/find))))))
+
+      (mapc #'test-case '("foo" "bar" "foo.fez" "bar.fez" "baz.foo")))))
+
 (def-suite standard-option
   :in options
   :description
