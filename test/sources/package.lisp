@@ -54,7 +54,39 @@
           (notify sink :added     name nil)
           (notify sink :new-value name value :raw? t))))
 
-;;; Utilities and macros
+;;; Test utilities and macros
+
+(defun call-as-source-construct-test (cases thunk)
+  (mapc (lambda+ ((initargs expected))
+          (let+ (((&flet do-it () (funcall thunk initargs))))
+            (case expected
+              (incompatible-initargs
+               (signals incompatible-initargs (do-it)))
+              (missing-required-initarg
+               (signals missing-required-argument (do-it)))
+              (t (do-it)))))
+        cases))
+
+(defmacro source-construct-test ((test-case-name source-name) &body cases)
+  "Define a test case named TEST-CASE-NAME for source SOURCE-NAME
+   which tests constructing the source according to CASES. CASES is a
+   list of evaluated specifications of the form
+
+     (INITARGS EXPECTED)
+
+   where EXPECTED is one of `incompatible-initargs',
+   `missing-required-argument' or t."
+  (let+ (((&values cases &ign documentation)
+          (parse-body cases :documentation t)))
+    `(test ,test-case-name
+       ,@(when documentation `(,documentation))
+
+       (call-as-source-construct-test
+        (list ,@cases)
+        (lambda (initargs)
+          (apply #'make-source ',source-name initargs))))))
+
+;;; Fixture-like utilities and macros
 
 (defmacro with-environment-variable ((name value) &body body)
   "Execute BODY with the environment variable named NAME set to

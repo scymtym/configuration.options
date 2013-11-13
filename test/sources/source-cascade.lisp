@@ -38,36 +38,28 @@
 
 ;;; Tests for `config-file-cascade-source' class
 
-(test config-file-cascade-source.construct
+(source-construct-test (config-file-cascade-source.construct
+                        :config-file-cascade)
   "Test constructing `config-file-cascade-source' instances."
 
-  (mapc (lambda+ ((initargs expected))
-          (let+ (((&flet do-it ()
-                    (apply #'make-source :config-file-cascade initargs))))
-            (case expected
-              (incompatible-initargs
-               (signals incompatible-initargs (do-it)))
-              (missing-required-initarg
-               (signals missing-required-argument (do-it)))
-              (t (do-it)))))
-        '(;; Incompatible initargs.
-          ((:sources () :prefix "/")             incompatible-initargs)
-          ((:sources () :paths ("/" "/" "/"))    incompatible-initargs)
-          ((:sources () :config-file "foo.conf") incompatible-initargs)
+  ;; Incompatible initargs.
+  '((:sources () :prefix "/")             incompatible-initargs)
+  '((:sources () :paths ("/" "/" "/"))    incompatible-initargs)
+  '((:sources () :config-file "foo.conf") incompatible-initargs)
 
-          ((:paths ("/" "/" "/") :prefix "/")    incompatible-initargs)
+  '((:paths ("/" "/" "/") :prefix "/")    incompatible-initargs)
 
-          ;; :config-file is missing.
-          ((:paths ("/" "/" "/"))                missing-required-initarg)
-          ((:prefix "/")                         missing-required-initarg)
+  ;; :config-file is missing.
+  '((:paths ("/" "/" "/"))                missing-required-initarg)
+  '((:prefix "/")                         missing-required-initarg)
 
-          ;; :syntax is missing.
-          ((:config-file "foo.conf")             missing-required-initarg)
+  ;; :syntax is missing.
+  '((:config-file "foo.conf")             missing-required-initarg)
 
-          ;; These are valid.
-          (()                                    t)
-          ((:config-file "foo.conf"
-            :syntax      :mock)                  t))))
+  ;; These are valid.
+  '(()                                    t)
+  '((:config-file "foo.conf"
+     :syntax      :mock)                  t))
 
 (test config-file-cascade-source.smoke
   "Smoke test for `config-file-cascade-source' class."
@@ -98,24 +90,17 @@
 
 ;;; Tests for `directory-source' class
 
-(test directory-source.construct
+(source-construct-test (directory-source.construct :directory)
   "Test constructing `directory-source' instances."
 
-  (mapc (lambda+ ((initargs expected))
-          (let+ (((&flet do-it ()
-                    (apply #'make-source :directory initargs))))
-            (case expected
-              (missing-required-initarg
-               (signals missing-required-argument (do-it)))
-              (t (do-it)))))
-        '(;; :pattern and :syntax are missing.
-          (()                                missing-required-initarg)
-          ((:pattern "/etc/sysctl.d/*.conf") missing-required-initarg)
-          ((:syntax  :mock)                  missing-required-initarg)
+  ;; :pattern and :syntax are missing.
+  '(()                                missing-required-initarg)
+  '((:pattern "/etc/sysctl.d/*.conf") missing-required-initarg)
+  '((:syntax  :mock)                  missing-required-initarg)
 
-          ;; These are valid.
-          ((:pattern "/etc/sysctl.d/*.conf"
-            :syntax  :mock)                  t))))
+  ;; These are valid.
+  '((:pattern "/etc/sysctl.d/*.conf"
+     :syntax  :mock)                  t))
 
 (test directory-source.smoke
   "Smoke test for `directory-source' class."
@@ -148,32 +133,22 @@
 
 ;;; Tests for `common-cascade-source' class
 
-(test common-cascade-source.construct
+(source-construct-test (common-cascade-source.construct :common-cascade)
   "Test constructing `common-cascade-source' instances."
+  ;; :basename and :syntax are missing.
+  '(()                     missing-required-initarg)
+  '((:paths ("/" "/" "/")) missing-required-initarg)
+  '((:prefix "/")          missing-required-initarg)
 
-  (mapc (lambda+ ((initargs expected))
-          (let+ (((&flet do-it ()
-                    (apply #'make-source :common-cascade initargs))))
-            (case expected
-              (incompatible-initargs
-               (signals incompatible-initargs (do-it)))
-              (missing-required-initarg
-               (signals missing-required-argument (do-it)))
-              (t (do-it)))))
-        '(;; :basename and :syntax are missing.
-          (()                     missing-required-initarg)
-          ((:paths ("/" "/" "/")) missing-required-initarg)
-          ((:prefix "/")          missing-required-initarg)
+  ;; :syntax is missing
+  '((:basename "foo")      missing-required-initarg)
 
-          ;; :syntax is missing
-          ((:basename "foo")      missing-required-initarg)
-
-          ;; These are valid.
-          ((:basename "foo"
-            :syntax    :mock)     t)
-          ((:basename "foo"
-            :type      "ini"
-            :syntax    :mock)     t))))
+  ;; These are valid.
+  '((:basename "foo"
+     :syntax    :mock)     t)
+  '((:basename "foo"
+     :type      "ini"
+     :syntax    :mock)     t))
 
 (test common-cascade-source.smoke
   "Smoke test for `common-cascade-source' class."
