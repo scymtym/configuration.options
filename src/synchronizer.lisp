@@ -6,9 +6,45 @@
 
 (cl:in-package #:options)
 
+;;; Utilities
+
 (defconstant +no-value+ '..no-value..
   "This object is used to indicate that a value cell is not
    occupied.")
+
+(defclass synchronizer-handler (closer-mop:funcallable-standard-object)
+  ((synchronizer :initarg  :synchronizer
+                 :reader    synchronizer-handler-synchronizer
+                 :documentation
+                 "Stores the synchronizer which created this
+                  handler."))
+  (:metaclass closer-mop:funcallable-standard-class)
+  (:default-initargs
+   :synchronizer (missing-required-initarg 'synchronizer-handler :synchronizer)
+   :option       (missing-required-initarg 'synchronizer-handler :option))
+  (:documentation
+   "Instances of this class are attached to event hooks of
+    `option-cell's by synchronizers in order to forward events to the
+    event hooks of options."))
+
+(defmethod shared-initialize :after ((instance   synchronizer-handler)
+                                     (slot-names t)
+                                     &key
+                                     option)
+  (let ((hook (event-hook option)))
+    (closer-mop:set-funcallable-instance-function
+     instance
+     (lambda (event cell value)
+       (declare (ignore cell value))
+       (hooks:run-hook hook event (option-name option) option)))))
+
+(defun handler-of (synchronizer)
+  (lambda (handler)
+    (when (typep handler 'synchronizer-handler)
+      (eq synchronizer
+          (synchronizer-handler-synchronizer handler)))))
+
+;;; `standard-synchronizer' class
 
 (defclass standard-synchronizer ()
   ((target :initarg  :target
@@ -21,7 +57,9 @@
   (:documentation
    "Instances of this class are notified of configuration changes via
     calls of `notify' generic function and implement these changes in
-    \"target\" objects such as `standard-configuration' instances."))
+    \"target\" objects such as `standard-configuration' instances.
+
+    Note: this synchronizer is not thread-safe."))
 
 (defmethod notify ((sink  standard-synchronizer)
                    (event (eql :added))
@@ -31,8 +69,9 @@
                    (index 0)
                    &allow-other-keys)
   (declare (ignore value))
-  (let+ ((option (find-option name (synchronizer-target sink)
-                              :if-does-not-exist :create))
+  (let+ ((option    (find-option name (synchronizer-target sink)
+                                 :if-does-not-exist :create))
+         (cell-hook (event-hook (option-%cell option)))
          ((&accessors (values      option-values)
                       (schema-item option-schema-item)) option)
          ((&values default default?)
@@ -40,12 +79,12 @@
 
     ;; Connect the event hook of OPTION to the event hook of its
     ;; option cell.
-    (hooks:add-to-hook
-     (event-hook (option-%cell option))
-     (lambda (event cell value)
-       (declare (ignore cell value))
-       (hooks:run-hook
-        (event-hook option) event (option-name option) option)))
+    (unless (find-if (handler-of sink) (hooks:hook-handlers cell-hook))
+      (hooks:add-to-hook
+       (event-hook (option-%cell option))
+       (make-instance 'synchronizer-handler
+                      :synchronizer sink
+                      :option       option)))
 
     ;; Adjust size of VALUES to NUMBER-OF-SOURCES + 1 so OPTION's
     ;; default value can be stored as final element. Save default
@@ -73,9 +112,13 @@
                    (value t)
                    &key &allow-other-keys)
   (let+ (((&accessors-r/o (target synchronizer-target)) sink)
-         (option (find-option name target)))
+         (option (find-option name target))
+         (cell-hook (event-hook (option-%cell option))))
 
-    ;; TODO Disconnect option event hook from cell event hook.
+    ;; Disconnect option event hook from cell event hook.
+    (when-let ((handler (find-if (handler-of sink)
+                                 (hooks:hook-handlers cell-hook))))
+      (hooks:remove-from-hook cell-hook handler))
 
     ;; Remove the option named NAME from TARGET.
     (setf (find-option name target) nil))
