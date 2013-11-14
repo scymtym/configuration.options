@@ -32,7 +32,8 @@
                                      (value       integer)
                                      (type        (eql 'integer))
                                      &key &allow-other-keys)
-  (princ-to-string value))
+  (with-standard-io-syntax
+    (princ-to-string value)))
 
 (defmethod string->value-using-type ((schema-item type-based-conversion-mixin)
                                      (value       string)
@@ -60,15 +61,17 @@
                                      (value       symbol)
                                      (type        (eql 'member))
                                      &key &allow-other-keys)
-  (princ-to-string value))
+  (with-standard-io-syntax
+    (let ((*readtable* (copy-readtable)))
+      (setf (readtable-case *readtable*) :invert)
+      (princ-to-string value))))
 
 (defmethod string->value-using-type ((schema-item type-based-conversion-mixin)
                                      (string      string)
                                      (type        (eql 'member))
                                      &key
                                      inner-type)
-  (if (member string inner-type :test #'string=)
-      (values (make-keyword string))
+  (or (find string inner-type :test #'string-equal)
       (error "~@<~S is not one of ~{~A~^, ~}.~@:>"
              string inner-type)))
 
@@ -78,7 +81,7 @@
                                      (value       pathname)
                                      (type        (eql 'pathname))
                                      &key &allow-other-keys)
-  (princ-to-string value))
+  (namestring value))
 
 (defmethod string->value-using-type ((schema-item type-based-conversion-mixin)
                                      (string      string)
