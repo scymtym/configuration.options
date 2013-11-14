@@ -179,6 +179,12 @@
 
    #:define-schema)
 
+  ;; Let-plus integration
+  (:export
+   #:&options-r/o
+   #:&options
+   #:&options/synchronizer)
+
   (:documentation
    "This package contains, options and option containers which are
     either parts of a configuration or of a schema. Thus, the basic
