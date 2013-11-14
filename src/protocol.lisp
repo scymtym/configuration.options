@@ -208,8 +208,17 @@
                                           :name      name
                                           :container container))
              (retry ()
+               :report (lambda (stream)
+                         (format stream "~@<Retry finding an item ~
+                                         named ~A in ~A~@:>"
+                                 name container))
                (go :start))
              (use-value (value)
+               :report (lambda (stream)
+                         (format stream "~@<Use a particular value ~
+                                         instead of the missing item ~
+                                         named ~A in ~A~@:>"
+                                 name container))
                value))))))
 
 (defmethod (setf find-option) :around ((new-value t)

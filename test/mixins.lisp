@@ -1,6 +1,6 @@
 ;;;; mixin.lisp --- Unit tests for mixins used by the options system.
 ;;;;
-;;;; Copyright (C) 2013 Jan Moringen
+;;;; Copyright (C) 2013, 2016 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -212,7 +212,13 @@
      (is (eq (handler-bind ((no-such-option
                               (lambda (condition)
                                 (declare (ignore condition))
-                                (invoke-restart 'use-value :foo))))
+                                (let ((restart (find-restart 'retry)))
+                                  (is-true restart)
+                                  (is (not (emptyp (princ-to-string restart)))))
+                                (let ((restart (find-restart 'use-value)))
+                                  (is-true restart)
+                                  (is (not (emptyp (princ-to-string restart))))
+                                  (invoke-restart restart :foo)))))
                (find-option "no.such.options" container))
              :foo)))
 

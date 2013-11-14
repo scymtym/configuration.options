@@ -1,6 +1,6 @@
 ;;;; package.lisp --- Package definition for cl-options system.
 ;;;;
-;;;; Copyright (C) 2011, 2012, 2013 Jan Moringen
+;;;; Copyright (C) 2011-2016 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -19,6 +19,10 @@
    #:non-wild-name-component
    #:wild-name-component
    #:name-component)
+
+  ;; Restart names
+  (:export
+   #:retry)
 
   ;; Conditions
   (:export
