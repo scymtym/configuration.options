@@ -1,6 +1,6 @@
 ;;;; protocol.lisp --- Test for the protocol functions of the options system.
 ;;;;
-;;;; Copyright (C) 2013 Jan Moringen
+;;;; Copyright (C) 2013, 2014 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -57,6 +57,15 @@
     '(()     nil            nil)
     '((1)    1              t)
     '((nil)  nil            t)))
+
+(test setf-option-value.if-does-not-exist
+  "Test that setf `option-value' accepts the :if-does-not-exist
+   option (despite ignoring it)."
+
+  (let* ((item   (make-instance 'standard-schema-item
+                                :name '("a") :type t))
+         (option (make-option item '("a"))))
+    (setf (option-value option :if-does-not-exist #'error) 1)))
 
 (test validate-value.default-behavior
   "Smoke test for the default behavior of the `validate-value'

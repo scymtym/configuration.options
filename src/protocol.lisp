@@ -565,7 +565,9 @@
       that OPTION does not have a value."))
 
 ;;; TODO(jmoringe, 2012-02-22): always supported?
-(defgeneric (setf option-value) (new-value option)
+(defgeneric (setf option-value) (new-value option
+                                 &key
+                                 if-does-not-exist)
   (:documentation
    "TODO(jmoringe): document"))
 

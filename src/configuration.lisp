@@ -54,8 +54,7 @@
                 "Stores the associated schema item which in turn
                  stores the type, default and documentation for the
                  option.")
-   (value       :writer   (setf option-value)
-                :accessor option-%value
+   (value       :accessor option-%value
                 :documentation
                 "Stores the value of the option cell.
 
@@ -123,11 +122,25 @@
     (values (option-%value option) t)))
 
 (defmethod (setf option-value) :before ((new-value t)
-                                        (option    option-cell))
+                                        (option    option-cell)
+                                        &key
+                                        if-does-not-exist)
+  (declare (ignore if-does-not-exist))
   (validate-value (option-schema-item option) new-value))
 
+(defmethod (setf option-value) ((new-value t)
+                                (option    option-cell)
+                                &key
+                                if-does-not-exist)
+  (declare (ignore if-does-not-exist))
+  (setf (option-%value option) new-value))
+
+
 (defmethod (setf option-value) :after ((new-value t)
-                                       (option    option-cell))
+                                       (option    option-cell)
+                                       &key
+                                       if-does-not-exist)
+  (declare (ignore if-does-not-exist))
   (hooks:run-hook (hooks:object-hook option 'event-hook)
                   :new-value option new-value))
 
@@ -182,7 +195,11 @@
   (declare (ignore if-does-not-exist))
   (option-value (option-%cell option) :if-does-not-exist nil))
 
-(defmethod (setf option-value) ((new-value t) (option standard-option))
+(defmethod (setf option-value) ((new-value t)
+                                (option    standard-option)
+                                &key
+                                if-does-not-exist)
+  (declare (ignore if-does-not-exist))
   (setf (option-value (option-%cell option)) new-value))
 
 (defmethod print-items append ((object standard-option))
