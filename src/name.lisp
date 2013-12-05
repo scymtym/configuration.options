@@ -100,6 +100,14 @@
 
 ;;; Name grammar and parsing
 
+(defvar *parse-wild-allowed* t
+  "Controls whether \"*\" is accepted and interpreted as :wild
+   component when parsing names.")
+
+(defvar *parse-wild-inferiors-allowed* t
+  "Controls whether \"**\" is accepted and interpreted
+   as :wild-inferiors component when parsing names.")
+
 #+later (esrap:defgrammar #:options.option-name
             (:documentation
              ""))
@@ -107,11 +115,13 @@
 
 (esrap:defrule wild-inferiors
     (and #\* #\*)
-  (:constant :wild-inferiors))
+  (:constant :wild-inferiors)
+  (:when *parse-wild-inferiors-allowed*))
 
 (esrap:defrule wild
     #\*
-  (:constant :wild))
+  (:constant :wild)
+  (:when *parse-wild-allowed*))
 
 (esrap:defrule escaped/character
     (and #\\ (or #\" #\\))
@@ -123,7 +133,7 @@
   (:function second))
 
 (esrap:defrule component/stringish
-    (+ (or component/quoted (not (or #\. wild))))
+    (+ (or component/quoted (not (or #\. #\*))))
   (:text t))
 
 (esrap:defrule component
@@ -141,16 +151,30 @@
           components
           (make-instance 'wildcard-name :components components)))))
 
-(defun parse-name (string &key (start 0) end junk-allowed)
+(defun parse-name (string &key
+                          (start 0)
+                          end
+                          junk-allowed
+                          (wild-allowed           *parse-wild-allowed*)
+                          (wild-inferiors-allowed *parse-wild-inferiors-allowed*))
+  "Parse STRING as an option name and return the result.
+
+   START and END, when supplied, select a sub-string of STRING for
+   parsing.
+
+   WILD-ALLOWED and WILD-INFERIORS-ALLOWED control whether \"*\" and
+   \"**\" respectively are accepted as name components in STRING."
   (with-condition-translation
       (((esrap:esrap-error name-parse-error
                            :var           condition
                            :cause-initarg nil)
         :text (esrap:esrap-error-text condition)))
-    (esrap:parse 'name string
-                 :start        start
-                 :end          end
-                 :junk-allowed junk-allowed)))
+    (let ((*parse-wild-allowed*           wild-allowed)
+          (*parse-wild-inferiors-allowed* wild-inferiors-allowed))
+      (esrap:parse 'name string
+                   :start        start
+                   :end          end
+                   :junk-allowed junk-allowed))))
 
 ;;; Utility functions
 

@@ -152,41 +152,52 @@
   "Smoke test for `parse-name' function."
 
   (mapc
-   (lambda+ ((input expected))
+   (lambda+ ((input wild-allowed wild-inferiors-allowed expected))
      (case expected
        (name-parse-error
-        (signals name-parse-error (parse-name input)))
+        (signals name-parse-error
+          (parse-name input
+                      :wild-allowed           wild-allowed
+                      :wild-inferiors-allowed wild-inferiors-allowed)))
        (t
         (is (name-equal (make-name expected) (parse-name input))))))
 
    `(;; Some invalid cases
-     (""      name-parse-error)
-     ("."     name-parse-error)
-     (".."    name-parse-error)
-     ("a."    name-parse-error)
-     (".a"    name-parse-error)
-     ("a..b"  name-parse-error)
+     (""      t   t   name-parse-error)
+     ("."     t   t   name-parse-error)
+     (".."    t   t   name-parse-error)
+     ("a."    t   t   name-parse-error)
+     (".a"    t   t   name-parse-error)
+     ("a..b"  t   t   name-parse-error)
 
-     ("a*"    name-parse-error)
-     ("*a"    name-parse-error)
+     ("a*"    t   t   name-parse-error)
+     ("*a"    t   t   name-parse-error)
 
-     ("a**"   name-parse-error)
-     ("**a"   name-parse-error)
+     ("a**"   t   t   name-parse-error)
+     ("**a"   t   t   name-parse-error)
 
-     ("***"   name-parse-error)
+     ("***"   t   t   name-parse-error)
+
+     ("*"     nil t   name-parse-error)
+     ("a.*"   nil t   name-parse-error)
+     ("*.a"   nil t   name-parse-error)
+
+     ("**"    t   nil name-parse-error)
+     ("a.**"  t   nil name-parse-error)
+     ("**.a"  t   nil name-parse-error)
 
      ;; These are valid
-     ("a"     ("a"))
-     ("a.b"   ("a" "b"))
-     ("a.b.c" ("a" "b" "c"))
+     ("a"     t   t   ("a"))
+     ("a.b"   t   t   ("a" "b"))
+     ("a.b.c" t   t   ("a" "b" "c"))
 
-     ("*"     (:wild))
-     ("a.*"   ("a" :wild))
-     ("*.a"   (:wild "a"))
+     ("*"     t   t   (:wild))
+     ("a.*"   t   t   ("a" :wild))
+     ("*.a"   t   t   (:wild "a"))
 
-     ("**"    (:wild-inferiors))
-     ("a.**"  ("a" :wild-inferiors))
-     ("**.a"  (:wild-inferiors "a")))))
+     ("**"    t   t   (:wild-inferiors))
+     ("a.**"  t   t   ("a" :wild-inferiors))
+     ("**.a"  t   t   (:wild-inferiors "a")))))
 
 (test print-name.smoke
   "Smoke test for `print-name' function."
