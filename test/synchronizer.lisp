@@ -31,7 +31,7 @@
                   queries))
 
           '((((:added     "foo"     nil              :index 1))
-             (("foo" (1))))
+             (("foo" (nil nil))))
 
             (((:new-value "foo"     "3"    :raw? t   :index 1))
              (("foo" (3))))
@@ -50,7 +50,7 @@
               (:new-value "bar"     nil    :raw? nil :index 1))
              (("bar" (t))))
 
-            (((:added     "foo.fez" nil              :index 0))
+            (((:added     "foo.fez" nil              :index 1))
              (("foo.fez" (nil nil))))
 
             (((:new-value "foo.fez" 1      :raw? nil :index 1))

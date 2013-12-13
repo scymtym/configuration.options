@@ -72,9 +72,7 @@
   (let+ ((option    (find-option name (synchronizer-target sink)
                                  :if-does-not-exist :create))
          (cell-hook (event-hook (option-%cell option)))
-         ((&structure option- values schema-item) option)
-         ((&values default default?)
-          (option-default option :if-does-not-exist nil)))
+         ((&structure option- values schema-item) option))
 
     ;; Connect the event hook of OPTION to the event hook of its
     ;; option cell.
@@ -84,24 +82,11 @@
                                 :synchronizer sink
                                 :option       option)))
 
-    ;; Adjust size of VALUES to NUMBER-OF-SOURCES + 1 so OPTION's
-    ;; default value can be stored as final element. Save default
-    ;; value.
+    ;; Adjust size of VALUES to NUMBER-OF-SOURCES.
     (let ((old-length (length values)))
-      (when (> index (- old-length 2))
-        (setf values (adjust-array values (+ index 2)
-                                   :initial-element +no-value+))
-        (when (plusp old-length)
-          (setf (aref values (- (length values) 1))
-                (aref values (- old-length 1))))))
-
-    ;; When OPTION has a default, store it as final element of VALUES.
-    (when default?
-      (setf (aref values (1- (length values)))
-            (list default :source :default))
-
-      (%update-value option schema-item values)))
-
+      (when (> index (- old-length 1))
+        (setf values (adjust-array values (1+ index)
+                                   :initial-element +no-value+)))))
   (values))
 
 (defmethod notify ((sink  standard-synchronizer)

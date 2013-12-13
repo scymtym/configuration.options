@@ -256,6 +256,7 @@
        1. /etc/BASENAME.TYPE
        2. ~/.config/BASENAME.TYPE
        3. ./BASENAME.TYPE
+    4. Default values
 
     where TYPE defaults to \"conf\"."))
 
@@ -294,4 +295,5 @@
                    (:config-file-cascade
                     :config-file       ,pathname
                     :if-does-not-exist nil
-                    ,@(remove-from-plist args :basename :type))))))))
+                    ,@(remove-from-plist args :basename :type))
+                   (:defaults)))))))

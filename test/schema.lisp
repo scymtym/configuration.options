@@ -25,9 +25,17 @@
     ;; Empty schema.
     (test-case (make-instance 'standard-schema) '())
     ;; A few schema items.
-    (let* ((schema   *simple-schema*)
-           (expected (loop :for item :in (options schema)
-                        :collect (list item :container schema :prefix '()))))
+    (let* ((sub-schema *simple-sub-schema*)
+           (schema     *simple-schema*)
+           (expected   (append
+                        (loop :for item :in (options schema)
+                           :collect (list item
+                                          :container schema
+                                          :prefix    '()))
+                        (loop :for item :in (options sub-schema)
+                           :collect (list item
+                                          :container sub-schema
+                                          :prefix    '("sub"))))))
       (test-case schema expected))))
 
 (test find-child.smoke
@@ -87,7 +95,11 @@
   "Smoke test for the `make-configuration' function."
 
   (let ((configuration (make-configuration *simple-schema*)))
-    (is (eq (configuration-schema configuration) *simple-schema*))))
+    ;; SCHEMA should be the `configuration-schema' of the newly
+    ;; created CONFIGURATION.
+    (is (eq (configuration-schema configuration) *simple-schema*))
+    ;; There should be no options in the new configuration.
+    (is (emptyp (options configuration)))))
 
 (test type-list
   "Kind-of integrationtest for schema item with list-of-something

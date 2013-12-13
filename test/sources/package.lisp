@@ -164,12 +164,33 @@
        (process ,source-var ,sink-var)
        ,@body)))
 
+(defun are-expected-sink-calls (calls/expected calls/actual)
+  (and (is (= (length calls/expected) (length calls/actual)))
+       (iter (for call/actual   in calls/actual)
+             (for call/expected in calls/expected)
+             (is (equal call/expected call/actual)))))
+
 (defmacro expecting-sink-calls ((&optional sink-var) &body expected)
   "Check the calls information stored in the `mock-sink' object which
    is the value of SINK-VAR against the elements of EXPECTED."
-  `(let ((calls/expected (list ,@expected))
-         (calls/actual   (sink-calls ,sink-var)))
-     (and (is (= (length calls/expected) (length calls/actual)))
-          (iter (for call/actual   in calls/actual)
-                (for call/expected in calls/expected)
-                (is (equal call/expected call/actual))))))
+  `(are-expected-sink-calls (list ,@expected) (sink-calls ,sink-var)))
+
+(defun expected-notify-calls-for-schema-items (schema &key index)
+  (let ((expected '()))
+    ;; We expect :added and optionally :new-value notifications for
+    ;; the non-wild-named schema-items in SCHEMA.
+    (map-options
+     (lambda (item &key prefix &allow-other-keys)
+       (let+ ((name (merge-names prefix (option-name item)))
+              ((&values default default?)
+               (option-default item :if-does-not-exist nil)))
+         (unless (typep name 'configuration.options::wild-name)
+           (push `(:added ,name nil
+                          ,@(when index `(:index ,index)))
+                 expected)
+           (when default?
+             (push `(:new-value ,name ,default
+                                ,@(when index `(:index ,index)))
+                   expected)))))
+     schema)
+    (nreverse expected)))

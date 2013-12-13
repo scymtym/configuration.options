@@ -80,6 +80,7 @@
                               (:file       "protocol")
 
                               ;; Sources
+                              (:file       "source-defaults")
                               (:file       "source-environment-variables")
                               (:file       "source-commandline")
                               (:file       "source-stream")
@@ -118,6 +119,7 @@
                               (:file       "protocol")
 
                               ;; Sources
+                              (:file       "source-defaults")
                               (:file       "source-environment-variables")
                               (:file       "source-commandline")
                               (:file       "source-stream")

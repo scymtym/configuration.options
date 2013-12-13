@@ -153,7 +153,8 @@
 (test common-cascade-source.smoke
   "Smoke test for `common-cascade-source' class."
 
-  (let ((prefix   (format nil "/tmp/~A/" (make-random-string)))
+  (let ((schema   *simple-schema*)
+        (prefix   (format nil "/tmp/~A/" (make-random-string)))
         (basename (make-random-string))
         (type     "conf")
         (offset   (if (service-provider:find-provider
@@ -170,20 +171,25 @@
                                 :basename basename
                                 :type     type
                                 :syntax   :mock)
+                               :schema   schema
                                :sink-var sink)
-          (expecting-sink-calls (sink)
-            #+sbcl `(:added     ("b" "c") nil :index ,(+ 0 offset))
-            #+sbcl `(:new-value ("b" "c") "1" :index ,(+ 0 offset))
+          (are-expected-sink-calls
+           `(#+sbcl (:added     ("b" "c") nil :index ,(+ 0 offset))
+             #+sbcl (:new-value ("b" "c") "1" :index ,(+ 0 offset))
 
-            `(:added     ("b" "c") nil :index ,(+ 1 offset))
-            `(:new-value ("b" "c") "6" :index ,(+ 1 offset))
+            (:added     ("b" "c") nil :index ,(+ 1 offset))
+            (:new-value ("b" "c") "6" :index ,(+ 1 offset))
 
-            `(:added     ("a")     nil :index ,(+ 2 offset))
-            `(:new-value ("a")     "5" :index ,(+ 2 offset))
+            (:added     ("a")     nil :index ,(+ 2 offset))
+            (:new-value ("a")     "5" :index ,(+ 2 offset))
 
-            `(:added     ("a")     nil :index ,(+ 3 offset))
-            `(:new-value ("a")     "2" :index ,(+ 3 offset))
-            `(:added     ("b" "c") nil :index ,(+ 3 offset))
-            `(:new-value ("b" "c") "3" :index ,(+ 3 offset))
-            `(:added     ("d")     nil :index ,(+ 3 offset))
-            `(:new-value ("d")     "4" :index ,(+ 3 offset))))))))
+            (:added     ("a")     nil :index ,(+ 3 offset))
+            (:new-value ("a")     "2" :index ,(+ 3 offset))
+            (:added     ("b" "c") nil :index ,(+ 3 offset))
+            (:new-value ("b" "c") "3" :index ,(+ 3 offset))
+            (:added     ("d")     nil :index ,(+ 3 offset))
+            (:new-value ("d")     "4" :index ,(+ 3 offset))
+
+            ,@(expected-notify-calls-for-schema-items
+               schema :index (+ 4 offset)))
+           (sink-calls sink)))))))

@@ -34,6 +34,7 @@
    #:mock-sink
    #:sink-calls
 
+   #:*simple-sub-schema*
    #:*simple-schema*
    #:*simple-schema-item*
 
@@ -78,6 +79,11 @@
 
 ;;; Simple schema and schema-item for tests
 
+(define-schema *simple-sub-schema*
+  "Simple schema for inclusion in a parent schema."
+  ("whoop" :type 'string)
+  (:wild :type 'integer))
+
 (define-schema *simple-schema*
   "Simple configuration options for tests."
   ("foo" :type 'integer :default 1
@@ -88,7 +94,8 @@
   ("bar" ("fez" :type 'pathname))
   ("baz" ("foo" :type 'string))
   (:wild :type 'boolean)
-  (("wild" :wild-inferiors) :type 'symbol))
+  (("wild" :wild-inferiors) :type 'symbol)
+  ("sub" *simple-sub-schema*))
 
 (defparameter *simple-schema-item*
   (make-instance 'standard-schema-item
