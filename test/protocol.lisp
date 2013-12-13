@@ -89,6 +89,23 @@
    (lambda (name container)
      (setf (find-option name container) t))))
 
+;; Default behavior
+
+(defun map-options.ensure-function (&rest args)
+  args)
+
+(defclass map-options.ensure-function () ())
+
+(defmethod map-options ((function  function)
+                        (container map-options.ensure-function))
+  function)
+
+(test map-options.ensure-function
+  "Test function coercion performed by `map-options'."
+  (is (eq #'map-options.ensure-function
+          (map-options 'map-options.ensure-function
+                       (make-instance 'map-options.ensure-function)))))
+
 ;;; Schema protocol
 
 ;; Name coercion

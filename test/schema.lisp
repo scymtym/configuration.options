@@ -14,6 +14,22 @@
   "Test suite for the `standard-schema' class.")
 (in-suite standard-schema)
 
+(test map-options.smoke
+  "Smoke test for the `map-options' method."
+
+  (let+ (((&flet set-equal/equal (expected actual)
+            (set-equal expected actual :test #'equal)))
+         ((&flet test-case (container expected-calls)
+            (is (set-equal/equal expected-calls
+                                 (collect-map-options-calls container))))))
+    ;; Empty schema.
+    (test-case (make-instance 'standard-schema) '())
+    ;; A few schema items.
+    (let* ((schema   *simple-schema*)
+           (expected (loop :for item :in (options schema)
+                        :collect (list item :container schema :prefix '()))))
+      (test-case schema expected))))
+
 (test find-child.smoke
   "Smoke test for the `find-child' and (setf find-child) functions."
 

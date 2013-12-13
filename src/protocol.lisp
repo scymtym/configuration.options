@@ -156,6 +156,27 @@
   (:documentation
    "Return a sequence of the options contained in CONTAINER."))
 
+(defgeneric map-options (function container)
+  (:documentation
+   "Call FUNCTION for each option in CONTAINER.
+
+    FUNCTION is called with at least one argument: the option. Keyword
+    arguments may follow.
+
+    If CONTAINER is a schema object, FUNCTION is called with the
+    following keyword arguments:
+
+    :prefix
+
+      Specifies the option name prefix of the child container in which
+      the current option is contained (the prefix is empty for options
+      contained in CONTAINER itself).
+
+    :container
+
+      Specifies the container in which the current option
+      resides (either CONTAINER or child containers thereof)."))
+
 (defgeneric find-options (query container)
   (:documentation
    "Find and return a sequence of options in CONTAINER matching QUERY
@@ -222,6 +243,9 @@
     (apply #'(setf find-option) new-value name container args)))
 
 ;; Default behavior
+
+(defmethod map-options ((function t) (container t))
+  (map-options (ensure-function function) container))
 
 (defmethod find-option :around ((name t) (container t)
                                 &key

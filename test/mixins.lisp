@@ -232,3 +232,17 @@
             option)
       (setf (find-option "foo" container :if-exists :supersede)
             option))))
+
+(test map-options.smoke
+  "Smoke test for the `map-options' method."
+
+  (let+ (((&flet test-case (container expected-calls)
+            (is (equal expected-calls
+                       (collect-map-options-calls container))))))
+    ;; Empty container.
+    (test-case (make-instance 'list-container-mixin) '())
+    ;; One option.
+    (let ((container (make-instance 'list-container-mixin))
+          (option    *simple-option*))
+      (setf (find-option "simple.option" container) option)
+      (test-case container (list option)))))

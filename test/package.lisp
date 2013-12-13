@@ -34,7 +34,10 @@
    #:mock-sink
    #:sink-calls
 
-   #:*simple-schema*)
+   #:*simple-schema*
+   #:*simple-schema-item*
+
+   #:*simple-option*)
 
   (:export
    #:run-tests)
@@ -65,7 +68,14 @@
     (map-into (make-string length)
               (lambda () (code-char (+ base (random 26)))))))
 
-;;; Simple schema for tests
+(defun collect-map-options-calls (container)
+  (let+ ((calls '())
+         ((&flet collect-call (&rest args)
+            (push args calls))))
+    (map-options #'collect-call container)
+    (nreverse calls)))
+
+;;; Simple schema and schema-item for tests
 
 (define-schema *simple-schema*
   "Simple configuration options for tests."
@@ -78,6 +88,20 @@
   ("baz" ("foo" :type 'string))
   (:wild :type 'boolean)
   (("wild" :wild-inferiors) :type 'symbol))
+
+(defparameter *simple-schema-item*
+  (make-instance 'standard-schema-item
+                 :name '("simple" "option")
+                 :type 'integer
+                 :documentation
+                 "A simple option.")
+  "Simple schema-item for tests.")
+
+;;; Simple option for tests
+
+(defparameter *simple-option*
+  (make-option *simple-schema-item* '("simple" "option"))
+  "Simple option for tests.")
 
 ;;; Mock source and sink classes
 

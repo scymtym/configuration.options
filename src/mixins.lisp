@@ -233,6 +233,10 @@
 (defmethod print-items append ((object list-container-mixin))
   `((:count ,(length (options object)) " (~D)")))
 
+(defmethod map-options ((function  function)
+                        (container list-container-mixin))
+  (mapc function (options container)))
+
 (defmethod find-options ((name      t)
                          (container list-container-mixin))
   (remove name (options container)

@@ -13,7 +13,8 @@
                            print-items-mixin)
   ((children :type     list
              :accessor %children
-             :initform nil
+             :reader   schema-children/alist
+             :initform '()
              :documentation
              "Stores named child schemas. Elements are of the form
 
@@ -28,6 +29,19 @@
 (defmethod print-items append ((object standard-schema))
   `((:child-count ,(length (schema-children object)) " (C ~D)"
                   ((:after :count)))))
+
+(defmethod map-options ((function  function)
+                        (container standard-schema))
+  (let+ (((&labels one-schema (schema &optional (prefix '()))
+            (mapc (lambda (option)
+                    (funcall function option
+                             :container schema
+                             :prefix    prefix))
+                  (options schema))
+            (mapc (lambda+ ((name . child))
+                    (one-schema child (merge-names prefix name)))
+                  (schema-children/alist schema)))))
+    (one-schema container)))
 
 (defmethod find-option ((name      t)
                         (container standard-schema)

@@ -89,6 +89,7 @@
   ;; Container protocol
   (:export
    #:options
+   #:map-options
    #:find-options
    #:find-option)
 
