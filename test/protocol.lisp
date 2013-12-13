@@ -20,6 +20,13 @@
 
 (defclass mock-container/name-coercion () ())
 
+(defmethod map-matching-options ((function function)
+                                 (query    t)
+                                 (continer mock-container/name-coercion)
+                                 &key interpret-wildcards?)
+  (declare (ignore interpret-wildcards?))
+  (list query))
+
 (defmethod find-options ((query t) (container mock-container/name-coercion))
   (list query))
 
@@ -139,6 +146,14 @@
 
 ;; Name coercion
 
+(test protocol.map-matching-options.name-coercion
+  "Test name coercion performed by the `map-matching-options' generic
+   function."
+  (call-with-name-coercion-cases
+   (make-instance 'mock-container/name-coercion)
+   (lambda (name container)
+     (map-matching-options #'identity name container))))
+
 (test protocol.find-options.name-coercion
   "Test name coercion performed by the `find-options' generic
    function."
@@ -167,6 +182,14 @@
 
 (defclass map-options.ensure-function () ())
 
+(defmethod map-matching-options ((function  function)
+                                 (query     t)
+                                 (container map-options.ensure-function)
+                                 &key
+                                 interpret-wildcards?)
+  (declare (ignore interpret-wildcards?))
+  function)
+
 (defmethod map-options ((function  function)
                         (container map-options.ensure-function))
   function)
@@ -176,6 +199,14 @@
   (is (eq #'map-options.ensure-function
           (map-options 'map-options.ensure-function
                        (make-instance 'map-options.ensure-function)))))
+
+(test protocol.map-matching-options.ensure-function
+  "Test function coercion performed by `map-matching-options'."
+  (is (eq #'map-options.ensure-function
+          (map-matching-options
+           'map-options.ensure-function
+           "a.b"
+           (make-instance 'map-options.ensure-function)))))
 
 (defclass mock-option/matching ()
   ((name :initarg  :name
@@ -202,10 +233,10 @@
 (macrolet
     ((test-case ((container) &body body)
        `(let+ ((container ,container)
-               ((&flet check-query (query expected)
-                  (check-query query expected container))))
+               ((&flet check-query (query-and-args expected)
+                  (check-query query-and-args expected container))))
           ,@body))
-     (test-cases ()
+     (test-cases (&key interpret-wildcards?-parameter?)
        `(progn
           ;; Empty results.
           (test-case ((make-instance 'mock-container/matching))
@@ -220,10 +251,38 @@
             (check-query "*"   '("*" "foo" "bar"))
             (check-query "**"  '("*" "wild.**" "foo.fez" "foo" "baz.foo"
                                  "bar.fez" "bar"))
+            ,@(when interpret-wildcards?-parameter?
+                `((check-query '("foo" :interpret-wildcards? :container) '("*" "foo"))
+                  (check-query '("*"   :interpret-wildcards? :container) '("*"))
+                  (check-query '("**"  :interpret-wildcards? :container) '("*"))
+                  (check-query '("foo" :interpret-wildcards? nil)        '("foo"))
+                  (check-query '("*"   :interpret-wildcards? nil)        '("*"))
+                  (check-query '("**"  :interpret-wildcards? nil)        '())))
 
             ;; Mixed queries.
             (check-query "**.bar" '("bar"))
-            (check-query "bar.**" '("bar.fez" "bar"))))))
+            (check-query "bar.**" '("bar.fez" "bar"))
+            ,@(when interpret-wildcards?-parameter?
+                `((check-query '("**.bar"   :interpret-wildcards? :container) '())
+                  (check-query '("bar.**"   :interpret-wildcards? :container) '())
+                  (check-query '("wild.foo" :interpret-wildcards? :container) '("wild.**"))
+                  (check-query '("**.bar"   :interpret-wildcards? nil)        '())
+                  (check-query '("bar.**"   :interpret-wildcards? nil)        '())
+                  (check-query '("wild.foo" :interpret-wildcards? nil)        '())))))))
+
+  (test protocol.map-matching-options.smoke
+    "Smoke test for the `map-matching-options' function."
+
+    (let+ (((&flet check-query (query-and-args expected container)
+              (let+ (((query &rest args) (ensure-list query-and-args))
+                     (result '()))
+                (apply #'map-matching-options
+                       (lambda (option &rest args)
+                         (declare (ignore args))
+                         (push (option-name option) result))
+                       query container args)
+                (is (set-equal/name-equal expected result))))))
+      (test-cases :interpret-wildcards?-parameter? t)))
 
   (test protocol.find-options.smoke
     "Smoke test for the `find-options' generic function."

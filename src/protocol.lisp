@@ -284,6 +284,39 @@
       Specifies the container in which the current option
       resides (either CONTAINER or child containers thereof)."))
 
+(defgeneric map-matching-options (function query container
+                                  &key
+                                  interpret-wildcards?)
+  (:documentation
+   "Call FUNCTION for each option matching QUERY in CONTAINER.
+
+    See `map-options' for a description of FUNCTION.
+
+    QUERY has to be a (potentially wildcard) name against which
+    options in CONTAINER are matched.
+
+    INTERPRET-WILDCARDS? controls whether and how wild components in
+    QUERY and in names of items in CONTAINER should be
+    interpreted. The following values are accepted:
+
+    nil
+
+      Wildcards in neither QUERY nor CONTAINER are interpreted. That
+      is, names only match if their components, including wildcard
+      components are identical.
+
+    :query
+
+      Wildcards in QUERY are interpreted, allowing arbitrary name
+      components in corresponding positions in names in CONTAINER to
+      match.
+
+    :container
+
+      Wildcards in names in CONTAINER are interpreted, allowing
+      arbitrary name components in corresponding positions in QUERY to
+      match."))
+
 (defgeneric find-options (query container)
   (:documentation
    "Find and return a sequence of options in CONTAINER matching QUERY
@@ -387,6 +420,14 @@
       `(let+ (((&values ,var ,changed?) (make-name ,var)))
          (if ,changed? ,else ,then)))))
 
+(defmethod map-matching-options :around ((function  function)
+                                         (query     sequence)
+                                         (container t)
+                                         &rest args &key &allow-other-keys)
+  (if-name query
+    (call-next-method)
+    (apply #'map-matching-options function query container args)))
+
 (defmethod find-options :around ((query sequence) (container t))
   (if-name query
     (call-next-method)
@@ -410,6 +451,52 @@
 
 (defmethod map-options ((function t) (container t))
   (map-options (ensure-function function) container))
+
+(defmethod map-matching-options ((function t) (query t) (container t)
+                                 &rest args &key
+                                 interpret-wildcards?)
+  (declare (ignore interpret-wildcards?))
+  (apply #'map-matching-options
+         (ensure-function function) query container args))
+
+(defmethod map-matching-options ((function function) (query t) (container t)
+                                 &key
+                                 (interpret-wildcards? :query))
+  (check-type interpret-wildcards? wildcard-interpretation)
+  (map-options
+   (named-lambda match (option &rest args &key (prefix '()) &allow-other-keys)
+     (let+ ((name (option-name option))
+            ((&flet match-rest (offset)
+               (when (case interpret-wildcards?
+                       ((nil)      (name-equal query name :start1 offset))
+                       (:query     (name-matches query name :start1 offset))
+                       (:container (name-matches name query :start2 offset)))
+                 (apply function option args)
+                 (return-from match)))))
+       (cond
+         ((null prefix)
+          (match-rest 0))
+         ((eq interpret-wildcards? nil)
+          (match-rest (or (nth-value
+                           1 (name-equal query prefix :end1 (length prefix)))
+                          (length prefix))))
+         ((eq interpret-wildcards? :query)
+          (map-query-alignments
+           (lambda (total? end1 end2)
+             (declare (ignore total?))
+             (when (= end2 (length prefix))
+               (match-rest end1)))
+           (name-components query)  0 (length query)
+           (name-components prefix) 0 (length prefix)))
+         (t ; implies (eq interpret-wildcards? :container)
+          (map-query-alignments
+           (lambda (total? end1 end2)
+             (declare (ignore total?))
+             (when (= end1 (length prefix))
+               (match-rest end2)))
+           (name-components prefix) 0 (length prefix)
+           (name-components query)  0 (length query))))))
+   container))
 
 (defmethod find-options ((query t) (container t))
   (let ((result '()))

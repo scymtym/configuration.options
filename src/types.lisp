@@ -6,6 +6,8 @@
 
 (cl:in-package #:configuration.options)
 
+;;; Name-related types
+
 (deftype non-wild-name-component ()
   "Valid components of a non-wild option name."
   'string)
@@ -44,3 +46,8 @@
   '(and #+sbcl sequence
         #-sbcl (or sequence wildcard-name)
         (satisfies %every-element-name-component?)))
+
+;;; Matching-related types
+
+(deftype wildcard-interpretation ()
+  `(member nil :query :container))

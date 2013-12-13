@@ -103,6 +103,7 @@
   (:export
    #:options
    #:map-options
+   #:map-matching-options
    #:find-options
    #:find-option)
 
