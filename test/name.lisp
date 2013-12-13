@@ -204,10 +204,12 @@
 
   (mapc
    (lambda+ ((input colon? at? width expected))
-     (let* ((name   (make-name input))
-            (output (with-output-to-string (stream)
-                      (print-name stream name colon? at? width))))
-       (is (string= expected output))))
+     (flet ((test-one (name)
+              (let ((output (with-output-to-string (stream)
+                              (print-name stream name colon? at? width))))
+                (is (string= expected output)))))
+       (test-one input)
+       (test-one (make-name input))))
 
    `((()      nil nil nil "")
      (()      t   nil nil "<root>")

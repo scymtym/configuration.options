@@ -214,11 +214,7 @@
                                    (:wild           "*")
                                    (:wild-inferiors "**")
                                    (t               component)))
-                         name)))
-    (cond
-      ((and (not components) colon?)
-       (format stream "<root>"))
-      (width
-       (format stream "~V@<~{~A~^.~}~>" width components))
-      (t
-       (format stream "~{~A~^.~}" components)))))
+                         (name-components (make-name name)))))
+    (if (and (not components) colon?)
+        (format stream "~V@<<root>~>"    width)
+        (format stream "~V@<~{~A~^.~}~>" width components))))
