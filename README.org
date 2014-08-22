@@ -38,6 +38,9 @@
 ** TODO Populating a Configuration
 ** TODO Querying a Configuration
 ** TODO Tracking Changes of Option Values
+* TODO Related Work
+  + https://github.com/Shinmera/universal-config/
+  + https://docs.python.org/3/library/configparser.htm
 * Settings                                                         :noexport:
 
 #+OPTIONS: H:2 num:nil toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
