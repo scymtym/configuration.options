@@ -27,12 +27,14 @@ script:
                               :configuration.options-syntax-ini/test
                               :configuration.options-syntax-xml/test
                               :configuration.options-source-commandline/test
-                              :configuration.options-and-mop/test))'
+                              :configuration.options-and-mop/test
+                              :configuration.options-and-service-provider/test))'
       '(or (every (function identity)
                   (mapcar (function funcall)
                           (quote (configuration.options.test:run-tests
                                   configuration.options.sources.syntax-ini.test:run-tests
                                   configuration.options.sources.syntax-xml.test:run-tests
                                   configuration.options.sources.commandline.test:run-tests
-                                  configuration.options.mop.test:run-tests))))
+                                  configuration.options.mop.test:run-tests
+                                  configuration.options.service-provider.test:run-tests))))
            (uiop:quit -1))'
