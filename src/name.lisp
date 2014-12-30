@@ -1,6 +1,6 @@
 ;;;; name.lisp --- Option names.
 ;;;;
-;;;; Copyright (C) 2013 Jan Moringen
+;;;; Copyright (C) 2013, 2015 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -9,7 +9,7 @@
 ;;; `wildcard-name' class
 
 (defclass wildcard-name (standard-object
-                         sequence)
+                         #+sbcl sequence)
   ((components :initarg  :components
                :type     list
                :reader   name-components
@@ -34,10 +34,11 @@
 
 ;; sequence protocol
 
+#+sbcl
 (defmethod sequence:make-sequence-like ((sequence wildcard-name)
                                         (length   integer)
                                         &key
-                                        initial-element
+                                        (initial-element :wild)
                                         initial-contents)
   (make-instance
    'wildcard-name
@@ -45,16 +46,27 @@
                    (make-list length
                               :initial-element initial-element))))
 
+#+sbcl
 (defmethod sequence:length ((sequence wildcard-name))
   (length (name-components sequence)))
 
+#+sbcl
 (defmethod sequence:elt ((sequence wildcard-name) (index integer))
   (nth index (name-components sequence)))
 
+#+sbcl
 (defmethod (setf sequence:elt) ((new-value t)
                                 (sequence  wildcard-name)
                                 (index     integer))
   (setf (nth index (name-components sequence)) new-value))
+
+#+sbcl
+(defmethod sequence:subseq ((sequence wildcard-name)
+                            (start integer) &optional end)
+  (let ((components (subseq (name-components sequence) start end)))
+    (if (typep components 'wild-name)
+        (make-instance 'wildcard-name :components components)
+        components)))
 
 ;; construction protocol
 
@@ -96,7 +108,10 @@
   (and (typep right 'wild-name) (call-next-method)))
 
 (defmethod merge-names ((left t) (right wildcard-name))
-  (concatenate 'wildcard-name left right))
+  #+sbcl (concatenate 'wildcard-name left right)
+  #-sbcl (make-instance 'wildcard-name
+                        :components (append (name-components left)
+                                            (name-components  right))))
 
 ;;; Name grammar and parsing
 

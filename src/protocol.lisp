@@ -1,6 +1,6 @@
 ;;;; protocol.lisp --- Protocol provided by the options system.
 ;;;;
-;;;; Copyright (C) 2011, 2012, 2013 Jan Moringen
+;;;; Copyright (C) 2011, 2012, 2013, 2014, 2015 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -85,10 +85,11 @@
     (recur (name-components left) (name-components right))))
 
 (defmethod merge-names ((left t) (right t))
-  (concatenate (type-of left) left right))
+  #+sbcl (concatenate (type-of left) left right)
+  #-sbcl (append (name-components left) (name-components right)))
 
 (defmethod merge-names ((left (eql nil)) (right t))
-  (concatenate (type-of right) left right))
+  right)
 
 ;;; Value protocol
 
