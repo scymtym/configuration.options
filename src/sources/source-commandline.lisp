@@ -1,14 +1,10 @@
 ;;;; source-commandline.lisp --- Source for commandline options.
 ;;;;
-;;;; Copyright (C) 2011, 2012, 2013 Jan Moringen
+;;;; Copyright (C) 2011, 2012, 2013, 2015 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
 (cl:in-package #:options.sources)
-
-#.(progn
-    (handler-bind ((warning #'muffle-warning)) (require 'com.dvlsoft.clon))
-    '(handler-bind ((warning #'muffle-warning)) (require 'com.dvlsoft.clon)))
 
 (defclass commandline-source ()
   ((prefix    :initarg  :prefix

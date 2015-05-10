@@ -50,7 +50,9 @@
                 (:version :cl-hooks            "0.2") ; TODO
                 (:version :architecture.service-provider "0.1")
 
-                (:version :esrap                         "0.9"))
+                (:version :esrap                         "0.9")
+
+                :com.dvlsoft.clon) ; TODO temp for commandline source
   :encoding    :utf-8
   :components  ((:module     "src"
                  :serial     t
