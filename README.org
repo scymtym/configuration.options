@@ -11,7 +11,7 @@
   handling of changes of option values.
 
   #+ATTR_HTML: :alt "build status image" :title Build Status :align right
-  [[https://travis-ci.org/scymtym/esrap][https://travis-ci.org/scymtym/configuration.options.svg]]
+  [[https://travis-ci.org/scymtym/configuration.options][https://travis-ci.org/scymtym/configuration.options.svg]]
 
 * TODO Tutorial
 ** STARTED Specifying a Schema
