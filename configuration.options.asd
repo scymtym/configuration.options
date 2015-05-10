@@ -1,6 +1,6 @@
 ;;;; configuration.options.asd --- System definition for the configuration.options system.
 ;;;;
-;;;; Copyright (C) 2011, 2012, 2013 Jan Moringen
+;;;; Copyright (C) 2011, 2012, 2013, 2015 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -40,7 +40,7 @@
   :author      "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :maintainer  "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :version     #.(version/string)
-  :license     "LLGPLv3; see COPYING file for details."
+  :license     "LLGPLv3" ; see COPYING file for details.
   :description "A simple options system that supports multiple options sources."
   :depends-on  (:alexandria
                 :split-sequence
@@ -51,6 +51,7 @@
                 (:version :architecture.service-provider "0.1")
 
                 (:version :esrap                         "0.9"))
+  :encoding    :utf-8
   :components  ((:module     "src"
                  :serial     t
                  :components ((:file       "package")
@@ -88,12 +89,13 @@
   :author      "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :maintainer  "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :version     #.(version/string)
-  :license     "LLGPLv3; see COPYING file for details."
+  :license     "LLGPLv3" ; see COPYING file for details.
   :description "Unit tests for the configuration.options system."
   :depends-on  (:alexandria
                 (:version :let-plus "0.2")
 
                 (:version :fiveam   "1.1"))
+  :encoding    :utf-8
   :components  ((:module     "test"
                  :serial     t
                  :components ((:file       "package")

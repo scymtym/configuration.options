@@ -1,6 +1,6 @@
 ;;;; configuration.options-and-parser.ini.asd --- Ini syntax for the options system.
 ;;;;
-;;;; Copyright (C) 2013 Jan Moringen
+;;;; Copyright (C) 2013, 2015 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -15,7 +15,7 @@
   :author      "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :maintainer  "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :version     #.(version/string)
-  :license     "LLGPLv3; see COPYING file for details."
+  :license     "LLGPLv3" ; see COPYING file for details.
   :description "Ini syntax support for options system."
   :depends-on  (:alexandria
                 (:version :let-plus              "0.2")
@@ -23,6 +23,7 @@
                 (:version :configuration.options #.(version/string))
 
                 (:version :parser.ini            "0.1.0"))
+  :encoding    :utf-8
   :components  ((:module     "sources"
                  :pathname   "src/sources"
                  :components ((:file       "syntax-ini"))))
@@ -33,7 +34,7 @@
   :author      "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :maintainer  "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :version     #.(version/string)
-  :license     "LLGPLv3; see COPYING file for details."
+  :license     "LLGPLv3" ; see COPYING file for details.
   :description "Unit tests for ini syntax support of options system."
   :depends-on  (:alexandria
                 (:version :let-plus                             "0.2")
@@ -43,6 +44,7 @@
                 (:version :fiveam                               "1.1")
 
                 (:version :configuration.options-test           #.(version/string)))
+  :encoding    :utf-8
   :components  ((:module     "sources"
                  :pathname   "test/sources"
                  :components ((:file       "syntax-ini")))))
