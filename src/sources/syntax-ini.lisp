@@ -60,10 +60,12 @@
                                    (right    list)
      #+parser.ini.builder-protocol &key)
   (restart-case
-      (let+ (((&plist-r/o (section-name :name)) left)
+      (let+ (((&plist-r/o (section-name :name))
+              left)
              ((&plist-r/o (option-name :name)
                           (value       :value)
-                          (bounds      :bounds)) right)
+                          (bounds      :bounds))
+              right)
              (name (append section-name option-name))
              ((&flet notify (event &optional value)
                 (notify *sink* event name value
