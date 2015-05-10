@@ -1,6 +1,6 @@
 ;;;; package.lisp --- Package definition for unit tests of the options system.
 ;;;;
-;;;; Copyright (C) 2013 Jan Moringen
+;;;; Copyright (C) 2013, 2015 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -49,7 +49,9 @@
   "Root unit test suite for the options system.")
 
 (defun run-tests ()
-  (run! 'options))
+  (let ((results (run 'options)))
+    (explain! results)
+    (results-status results)))
 
 ;;; Utilities
 

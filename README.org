@@ -9,6 +9,10 @@
   The =configuration.options= system provides data structures and
   functions for configuration options, sources of option values and
   handling of changes of option values.
+
+  #+ATTR_HTML: :alt "build status image" :title Build Status :align right
+  [[https://travis-ci.org/scymtym/esrap][https://travis-ci.org/scymtym/configuration.options.svg]]
+
 * TODO Tutorial
 ** STARTED Specifying a Schema
    A schema can be defined in at least three ways:
