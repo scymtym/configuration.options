@@ -1,6 +1,6 @@
 ;;;; syntax-ini.lisp --- Unit tests for the ini syntax.
 ;;;;
-;;;; Copyright (C) 2013 Jan Moringen
+;;;; Copyright (C) 2013, 2015 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -16,7 +16,7 @@
                                    # comment
                                    [a]
                                    c = 3")
-    (let ((parser.ini:*value-terminating-whitespace-expression* :newline))
+    (let ((parser.ini:*value-terminating-whitespace-expression* #\Newline))
       (with-source-and-sink ((:stream :stream stream :syntax :ini)
                              :sink-var sink)
         (expecting-sink-calls (sink)

@@ -1,6 +1,6 @@
 ;;;; syntax-ini.lisp --- Interpret configuration information in "ini" syntax.
 ;;;;
-;;;; Copyright (C) 2012, 2013 Jan Moringen
+;;;; Copyright (C) 2012, 2013, 2015 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -29,20 +29,26 @@
    method implementing the builder protocol of the parser.ini
    system.")
 
-(defmethod parser.ini:make-node ((builder ini-syntax)
-                                 (kind    t)
-                                 &rest args &key &allow-other-keys)
+(defmethod #+parser.ini.builder-protocol architecture.builder-protocol:make-node
+           #-parser.ini.builder-protocol parser.ini:make-node
+    ((builder ini-syntax)
+     (kind    t)
+     &rest args &key &allow-other-keys)
   args)
 
-(defmethod parser.ini:add-child ((builder ini-syntax)
-                                 (parent  list)
-                                 (child   list))
+(defmethod #+parser.ini.builder-protocol architecture.builder-protocol:relate
+           #-parser.ini.builder-protocol parser.ini:add-child
+    (                              (builder  ini-syntax)
+     #+parser.ini.builder-protocol (relation (eql :section-option))
+                                   (left     list)
+                                   (right    list)
+     #+parser.ini.builder-protocol &key)
   (restart-case
-      (let+ (((&plist-r/o (parent-name :name)) parent)
-             ((&plist-r/o (child-name :name)
-                          (value      :value)
-                          (bounds     :bounds)) child)
-             (name (append parent-name child-name))
+      (let+ (((&plist-r/o (section-name :name)) left)
+             ((&plist-r/o (option-name :name)
+                          (value       :value)
+                          (bounds      :bounds)) right)
+             (name (append section-name option-name))
              ((&flet notify (event &optional value)
                 (notify *sink* event name value
                         :source (syntax-source builder)
@@ -53,9 +59,9 @@
       :report (lambda (stream)
                 (format stream "~@<Do not process ~S and ~
                                 continue.~@:>"
-                        child))
+                        right))
       (declare (ignore condition))))
-  parent)
+  left)
 
 (defmethod process-content ((syntax ini-syntax)
                             (source stream)
