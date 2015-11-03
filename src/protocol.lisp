@@ -572,7 +572,16 @@
 (defgeneric option-values (option)
   (:documentation
    "Return the (potentially empty) sequence of values from which the
-    effective value of OPTION has been constructed via merging."))
+    effective value of OPTION has been constructed via merging.
+
+    Entries are of the form
+
+      (VALUE &rest PLIST)
+
+    where VALUE is a parsed value and PLIST contains at least the
+    property :source holding the source object from which VALUE
+    originated. Additional properties may describe the origin of VALUE
+    in more detail."))
 
 ;; Default behavior
 
