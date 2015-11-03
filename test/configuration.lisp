@@ -47,6 +47,43 @@
 
       (mapc #'test-case '("foo" "bar" "foo.fez" "bar.fez" "baz.foo")))))
 
+(test standard-configuration.describe-object
+  "Smoke test for the `describe-object' method for the
+   `standard-configuration' class."
+
+  (is (string= (format nil "<root>~@
+                            ├─bar~@
+                            │ │ Type    BOOLEAN~@
+                            │ │ Default <no default>~@
+                            │ │ Value   <no value>~@
+                            │ └─fez~@
+                            │     Type    PATHNAME~@
+                            │     Default <no default>~@
+                            │     Value   <no value>~@
+                            ├─baz~@
+                            │ └─foo~@
+                            │     Type    STRING~@
+                            │     Default <no default>~@
+                            │     Value   <no value>~@
+                            ├─foo~@
+                            │ │ Type    INTEGER~@
+                            │ │ Default 1~@
+                            │ │ Value   1~@
+                            │ │ Sources DEFAULT:~@
+                            │ │           1~@
+                            │ │ This option controls foo.~@
+                            │ └─fez~@
+                            │     Type    INTEGER~@
+                            │     Default <no default>~@
+                            │     Value   <no value>~@
+                            └─sub~@
+                            ~0@T  └─whoop~@
+                            ~0@T      Type    STRING~@
+                            ~0@T      Default <no default>~@
+                            ~0@T      Value   <no value>")
+               (with-output-to-string (stream)
+                 (describe-object *simple-configuration* stream)))))
+
 (def-suite standard-option
   :in options
   :description
@@ -92,3 +129,14 @@
 
      ((:name ("a" :wild-inferiors) :type string)          ("a" "b")
       ("a" "b") string nil nil nil))))
+
+(test standard-option.describe-object
+  "Smoke test for the `describe-object' method for the
+   `standard-option' class."
+
+  (is (string= (format nil "Type    INTEGER~@
+                            Default <no default>~@
+                            Value   <no value>~@
+                            A simple option.")
+               (with-output-to-string (stream)
+                 (describe-object *simple-option* stream)))))

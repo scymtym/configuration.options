@@ -163,3 +163,65 @@
      (("1:2" "3:")  ((1 2) (3 :inherit))          (1 2))
      (("1:2:" "3")  ((1 2 :inherit) (3))          (1 2 3))
      (("1:2:" "3:") ((1 2 :inherit) (3 :inherit)) (1 2 3)))))
+
+(test standard-schema.describe-object
+  "Smoke test for the `describe-object' method for the
+   `standard-schema' class."
+
+  (is (string= (format nil "<root>~@
+                            │ Simple configuration options for tests.~@
+                            │ ~@
+                            │~@
+                            │   Second paragraph.~@
+                            ├─*~@
+                            │   Type    BOOLEAN~@
+                            │   Default <no default>~@
+                            ├─bar~@
+                            │ │ Type    BOOLEAN~@
+                            │ │ Default <no default>~@
+                            │ └─fez~@
+                            │     Type    PATHNAME~@
+                            │     Default <no default>~@
+                            ├─baz~@
+                            │ └─foo~@
+                            │     Type    STRING~@
+                            │     Default <no default>~@
+                            ├─foo~@
+                            │ │ Type    INTEGER~@
+                            │ │ Default 1~@
+                            │ │ This option controls foo.~@
+                            │ └─fez~@
+                            │     Type    INTEGER~@
+                            │     Default <no default>~@
+                            ├─sub~@
+                            │ │ Simple schema for inclusion in a parent schema.~@
+                            │ ├─whoop~@
+                            │ │   Type    STRING~@
+                            │ │   Default <no default>~@
+                            │ └─*~@
+                            │     Type    INTEGER~@
+                            │     Default <no default>~@
+                            └─wild~@
+                            ~0@T  └─**~@
+                            ~0@T      Type    SYMBOL~@
+                            ~0@T      Default <no default>")
+               (with-output-to-string (stream)
+                 (describe-object *simple-schema* stream)))))
+
+;;; `standard-schema-item' class
+
+(def-suite standard-schema-item
+  :in options
+  :description
+  "Test suite for the `standard-schema-item' class.")
+(in-suite standard-schema-item)
+
+(test standard-schema-item.describe-object
+  "Smoke test for the `describe-object' method for the
+   `standard-schema-item' class."
+
+  (is (string= (format nil "Type    INTEGER~@
+                            Default <no default>~@
+                            A simple option.")
+               (with-output-to-string (stream)
+                 (describe-object *simple-schema-item* stream)))))

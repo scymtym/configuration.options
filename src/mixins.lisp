@@ -271,3 +271,60 @@
 
   (hooks:run-hook
    (event-hook container) (if new-value :added :removed) name new-value))
+
+;;; `describe-via-map-options-mixin'
+
+(defclass describe-via-map-options-mixin ()
+  ()
+  (:documentation
+   "This class is intended to be mixed into option container classes
+    that need a method on `describe-opbject'."))
+
+(defmethod describe-object ((object describe-via-map-options-mixin) stream)
+  ;; We build a hash table which maps parents to children and then
+  ;; perform a tree traversal.
+  (let+ ((tree (make-hash-table :test #'equal))
+         ((&labels add-item (name &optional item)
+            (ensure-gethash
+             name tree
+             (let* ((node        (list name item '()))
+                    (parent-name (butlast name))
+                    (parent-node (when name
+                                   (add-item parent-name))))
+               (when parent-node
+                 (push node (third parent-node)))
+               node))))
+         ((&labels+ print-first-line (stream &ign (name item &ign))
+            (print-name stream (last name) t)
+            item))
+         ((&labels+ print-rest (stream &ign (&ign item &ign))
+            (typecase item
+              (standard-schema
+               (when-let ((documentation (option-documentation item)))
+                 (print-documentation stream documentation)))
+              (t
+               (describe-object item stream)))))
+         ((&flet+ child< ((left-name  &ign  left-children)
+                          (right-name &ign right-children))
+            (cond
+              ((and (not left-children) right-children)
+               t)
+              ((and left-children (not right-children))
+               nil)
+              ((name< left-name right-name)
+               t))))
+         ((&labels+ node-children ((&ign &ign children))
+            (sort (copy-list children) #'child<))))
+    (map-options
+     (lambda (option &key prefix container &allow-other-keys)
+       (let ((name (name-components
+                    (merge-names prefix (option-name option)))))
+         (add-item prefix container)
+         (add-item name   option)))
+     object)
+    (when-let ((root (gethash '() tree)))
+      (let ((*print-circle* nil))
+        (utilities.print-tree:print-tree
+         stream root
+         (utilities.print-tree:make-node-printer
+          #'print-first-line #'print-rest #'node-children))))))

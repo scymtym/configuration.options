@@ -9,6 +9,7 @@
 ;;; `standard-configuration' class
 
 (defclass standard-configuration (list-container-mixin
+                                  describe-via-map-options-mixin
                                   print-items-mixin)
   ((schema :initarg  :schema
            :reader   configuration-schema
@@ -165,6 +166,33 @@
   (:documentation
    "Instances of this class associate an option name to an schema item
     and potentially an option value."))
+
+(defmethod describe-object ((object standard-option) stream)
+  (let+ (((&structure-r/o option- type documentation values) object)
+         ((&values value value?)
+          (option-value object :if-does-not-exist nil))
+         ((&values default default?)
+          (option-default object :if-does-not-exist nil))
+         ((&flet prepare-value (entry)
+            (when (consp entry)
+              `(,(getf (rest entry) :source)
+                 ,(first entry)
+                 ,(remove-from-plist (rest entry) :source))))))
+    (format stream "Type    ~A~%~
+                    Default ~:[<no default>~*~:;~<~@;~S~:>~]~%~
+                    Value   ~:[<no value>~*~:;~<~@;~S~:>~]~
+                    ~@[~%Sources ~<~@;~{~{~
+                      ~A:~%~
+                      ~2@T~S~
+                      ~@[~%~2@T~S~]~
+                    ~}~^~%~}~:>~]~
+                    ~@[~%~/configuration.options::print-documentation/~]"
+            type default? (list default) value? (list value)
+            ;; See documentation strings of `option-values' generic
+            ;; function and the `values' slot of `option-cell' class.
+            (when value?
+              (list (remove nil (map 'list #'prepare-value values))))
+            documentation)))
 
 (macrolet
     ((define-delegation (name &optional setf?)

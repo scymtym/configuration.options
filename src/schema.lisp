@@ -9,6 +9,7 @@
 ;;; `standard-schema' class
 
 (defclass standard-schema (list-container-mixin
+                           describe-via-map-options-mixin
                            documentation-mixin
                            print-items-mixin)
   ((children :type     list
@@ -148,6 +149,15 @@
                                      (default nil default-supplied?))
   (when default-supplied?
     (setf (option-%default instance) default)))
+
+(defmethod describe-object ((object standard-schema-item) stream)
+  (let+ (((&structure-r/o option- type documentation) object)
+         ((&values default default?)
+          (option-default object :if-does-not-exist nil)))
+    (format stream "Type    ~A~%~
+                    Default ~:[<no default>~*~:;~<~@;~S~:>~]~@[~%~
+                    ~/configuration.options::print-documentation/~]"
+            type default? (list default) documentation)))
 
 (defmethod print-items append ((object standard-schema-item))
   (let+ ((type (option-type object))

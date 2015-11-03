@@ -38,7 +38,7 @@
    #:empty-schema                               #:*simple-schema*
                          #:simple-schema-item   #:*simple-schema-item*
 
-   #:empty-configuration
+   #:empty-configuration #:simple-configuraiton #:*simple-configuration*
                          #:simple-option        #:*simple-option*)
 
   (:export
@@ -90,7 +90,9 @@
   (make-instance 'standard-schema))
 
 (define-schema *simple-schema*
-  "Simple configuration options for tests."
+  "Simple configuration options for tests.
+
+   Second paragraph."
   ("foo" :type 'integer :default 1
          :documentation
          "This option controls foo.")
@@ -112,11 +114,24 @@
 (defparameter *simple-schema-item* (simple-schema-item)
   "Simple schema-item for tests.")
 
-;;; Simple option for tests
+;;; Simple configuration and option for tests
 
 (defun empty-configuration ()
   "Empty configuration for tests."
   (make-configuration *simple-schema*))
+
+(defun simple-configuration (&key (schema *simple-schema*) )
+  "Simple configuration for tests."
+  (let* ((configuration (make-configuration schema))
+         (synchronizer  (make-instance 'standard-synchronizer
+                                       :target configuration))
+         (source        (configuration.options.sources:make-source :defaults)))
+    (configuration.options.sources:initialize source schema)
+    (configuration.options.sources:process source synchronizer)
+    configuration))
+
+(defparameter *simple-configuration* (simple-configuration)
+  "Simple configuration for tests.")
 
 (defun simple-option (&key (name '("simple" "option") name-supplied?))
   (let ((schema-item (if name-supplied?
