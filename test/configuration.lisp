@@ -6,7 +6,11 @@
 
 (cl:in-package #:options.test)
 
-(in-suite options)
+(def-suite standard-configuration
+  :in options
+  :description
+  "Test suite for the `standard-configuration' class.")
+(in-suite standard-configuration)
 
 (test standard-configuration.smoke
   "Smoke test for the `standard-configuration' class."
@@ -23,6 +27,12 @@
    ;; schema-initargs        expected-documentation
    '((()                     nil)
      ((:documentation "foo") "foo"))))
+
+(def-suite standard-option
+  :in options
+  :description
+  "Test suite for the `standard-option' class.")
+(in-suite standard-option)
 
 (test standard-option.smoke
   "Smoke test for the `standard-option' class."

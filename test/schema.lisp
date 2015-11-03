@@ -1,12 +1,18 @@
 ;;;; schema.lisp --- Unit tests for schema-related stuff.
 ;;;;
-;;;; Copyright (C) 2013 Jan Moringen
+;;;; Copyright (C) 2013, 2015 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
 (cl:in-package #:options.test)
 
-(in-suite options)
+;;; `standard-schema' class
+
+(def-suite standard-schema
+  :in options
+  :description
+  "Test suite for the `standard-schema' class.")
+(in-suite standard-schema)
 
 (test find-child.smoke
   "Smoke test for the `find-child' and (setf find-child) functions."
