@@ -62,7 +62,7 @@
             (when (typep (option-name schema-item) 'options::wild-name)
               (setf seen-wild? t)
               (return-from do-option
-                (list (com.dvlsoft.clon:make-text
+                (list (net.didierverna.clon:make-text
                        :contents (format nil "~@[~A~]~{~A~^-~}"
                                          (source-prefix source)
                                          (name-components
@@ -96,25 +96,25 @@
                   (options (mapcan #'do-option (options schema))))
               (when (or options root?)
                 (list
-                 (apply #'com.dvlsoft.clon:make-group
+                 (apply #'net.didierverna.clon:make-group
                         :header (or (option-documentation schema)
                                     "Accepted options")
                         (mappend
                          (curry #'list :item)
                          (append
                           (when root?
-                            (list (com.dvlsoft.clon:make-flag :long-name "help")))
+                            (list (net.didierverna.clon:make-flag :long-name "help")))
                           options
                           (mapcan (rcurry #'do-schema '("foo")) ; TODO
                                   (schema-children schema)))))))))))
 
     ;; Create synopsis and context based on SCHEMA. Wildcard options
     ;; may required use of "postfix" syntax.
-    (setf synopsis (com.dvlsoft.clon:make-synopsis
+    (setf synopsis (net.didierverna.clon:make-synopsis
                     :item         (first (do-schema schema))
                     :postfix      (when seen-wild? "[WILDCARD-OPTIONS]")
                     :make-default global?)
-          context  (apply #'com.dvlsoft.clon:make-context
+          context  (apply #'net.didierverna.clon:make-context
                           :synopsis     synopsis
                           :make-current global?
                           (unless (eq arguments t)
@@ -142,15 +142,15 @@
      source option (first type)
      :inner-type (append (rest type) (ensure-list inner-type))))
   (define-make-option-using-type-method (eql 'member)
-    (values #'com.dvlsoft.clon:make-enum (list :enum inner-type)))
+    (values #'net.didierverna.clon:make-enum (list :enum inner-type)))
   (define-make-option-using-type-method (eql 'boolean)
-    #'com.dvlsoft.clon:make-switch)
+    #'net.didierverna.clon:make-switch)
   (define-make-option-using-type-method (eql 'string)
-    #'com.dvlsoft.clon:make-stropt)
+    #'net.didierverna.clon:make-stropt)
   (define-make-option-using-type-method (eql 'pathname)
-    (values #'com.dvlsoft.clon:make-path (list :type :file)))
+    (values #'net.didierverna.clon:make-path (list :type :file)))
   (define-make-option-using-type-method t
-    (values #'com.dvlsoft.clon:make-lispobj
+    (values #'net.didierverna.clon:make-lispobj
             (list :typespec (list* type inner-type)))))
 
 (defmethod process ((source commandline-source)
@@ -169,7 +169,7 @@
     (iter (for (option . name) in mapping)
           (restart-case
               (let+ (((&values value source)
-                      (com.dvlsoft.clon:getopt :option  option
+                      (net.didierverna.clon:getopt :option  option
                                                :context context)))
                 (when (and source (not (eq source :default)))
                   (notify name value option)))
@@ -183,7 +183,7 @@
     ;; to wildcard commandline options.
     (let* ((prefix/dashes (concatenate 'string "--" prefix))
            (strip-start   (length prefix/dashes)))
-      (iter (generate option in (com.dvlsoft.clon:remainder
+      (iter (generate option in (net.didierverna.clon:remainder
                                  :context context))
             (let+ ((name-and-value (next option))
                    (index)

@@ -52,7 +52,7 @@
 
                 (:version :esrap                         "0.9")
 
-                :com.dvlsoft.clon) ; TODO temp for commandline source
+                :net.didierverna.clon) ; TODO temp for commandline source
   :encoding    :utf-8
   :components  ((:module     "src"
                  :serial     t
