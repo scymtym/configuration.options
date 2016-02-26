@@ -43,6 +43,9 @@
                                &key &allow-other-keys)
   (list name))
 
+(defmethod sub-configuration ((query t) (container mock-container/name-coercion))
+  (list query))
+
 (defmethod find-child ((name t) (container mock-container/name-coercion)
                        &key &allow-other-keys)
   (when *mock-container/name-coercion-testing-find-child*
@@ -176,6 +179,13 @@
    (make-instance 'mock-container/name-coercion)
    (lambda (name container)
      (setf (find-option name container) t))))
+
+(test protocol.sub-configuration.name-coercion
+  "Test name coercion performed by the `sub-configuration' generic
+   function."
+
+  (call-with-name-coercion-cases
+   (make-instance 'mock-container/name-coercion) #'sub-configuration))
 
 ;; Default behavior
 
@@ -354,6 +364,34 @@
      (t   warn  :keep      :existing)
      (t   warn  error      option-exists-error)
      (t   warn  warn       option-exists-warning))))
+
+(test protocol.sub-configuration.smoke
+  "Smoke test for the `sub-configuration' generic function."
+
+  (mapc (lambda+ ((query expected))
+          (flet ((do-it ()
+                   (sub-configuration query *simple-configuration*)))
+            (case expected
+              (option-exists-error
+               (signals option-exists-error (do-it)))
+              (error
+               (signals error (do-it)))
+              (t
+               (is (set-equal/name-equal
+                    expected (mapcar #'option-name (options (do-it)))))))))
+
+        '(;; Invalid queries
+          (()          error)
+          ("foo"       error)
+          ("*"         error)
+
+          ;; Valid but problematic queries
+          ("*.fez"     option-exists-error)
+          ("foo.**"    ("fez"))
+
+          ;; Good queries
+          ("no-such.*" ())
+          ("bar.*"     ("fez")))))
 
 ;;; Schema protocol
 

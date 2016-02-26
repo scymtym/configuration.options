@@ -1,6 +1,6 @@
 ;;;; protocol.lisp --- Protocol provided by the options system.
 ;;;;
-;;;; Copyright (C) 2011-2016 Jan Moringen
+;;;; Copyright (C) 2011-2017 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -410,6 +410,39 @@
       indicating that an option named NAME already exists in
       CONTAINER."))
 
+(defgeneric sub-configuration (query container)
+  (:documentation
+   "Return a sub-configuration of CONTAINER using QUERY to select options.
+
+    QUERY should generally be a name consisting of non-empty prefix of
+    non-wild components followed by one `:wild' or `:wild-inferiors'
+    components, for example:
+
+      foo.bar.**
+
+    Queries not following this structure, such as
+
+      foo.*.bar.*
+
+    are also accepted, but can cause errors due to collisions of names
+    in CONTAINER after stripping the prefix:
+
+      foo.a.bar.baz -> baz
+      foo.b.bar.baz -> baz
+
+    The returned configuration is an instance of the class of
+    CONTAINER.
+
+    Options in CONTAINER matching QUERY are copied and stored in the
+    returned configuration as follows:
+
+    * Copied options are instances of the classes of the respective source options
+
+    * The prefix mentioned above is stripped from the names of copied options
+
+    * Copied options share the \"option cell\", i.e. schema link,
+      value storage and hooks with their respective source options."))
+
 ;; when using (setf find-option) to add an option to a configuration,
 ;; consult the schema to check whether the option is valid:
 ;; * options are allowed in that particular subtree
@@ -453,6 +486,11 @@
   (if-name name
     (call-next-method)
     (apply #'(setf find-option) new-value name container args)))
+
+(defmethod sub-configuration :around ((query sequence) (container t))
+  (if-name query
+    (call-next-method)
+    (sub-configuration query container)))
 
 ;; Default behavior
 
@@ -590,6 +628,28 @@
            :report (lambda (stream)
                      (format stream "~@<Keep existing option ~A.~@:>"
                              existing))))))))
+
+(defmethod sub-configuration ((query t) (container t))
+  (let ((length (length (#+sbcl progn #-sbcl name-components query))))
+    (when (<= length 1)
+      (error "~@<Queries used to construct sub-configurations must ~
+               have at least two components, ~A has ~D.~@:>"
+             query length))
+
+    (let ((result (make-instance (class-of container)
+                                 :schema (configuration-schema container))))
+      (map-matching-options
+       (lambda (option &rest args)
+         (declare (ignore args))
+         (let* ((name/old (option-name option))
+                (name/new (subseq name/old (1- length))))
+           (unless (emptyp name/new)
+             (setf (find-option name/new result)
+                   (make-instance (class-of option)
+                                  :name name/new
+                                  :cell (option-%cell option))))))
+       query container)
+      result)))
 
 ;;; Schema protocol
 

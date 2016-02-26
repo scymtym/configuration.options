@@ -1,6 +1,6 @@
 ;;;; package.lisp --- Package definition for cl-options system.
 ;;;;
-;;;; Copyright (C) 2011-2016 Jan Moringen
+;;;; Copyright (C) 2011-2017 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -105,7 +105,8 @@
    #:map-options
    #:map-matching-options
    #:find-options
-   #:find-option)
+   #:find-option
+   #:sub-configuration)
 
   ;; Schema protocol
   (:export
