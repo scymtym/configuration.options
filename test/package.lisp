@@ -34,11 +34,11 @@
    #:mock-sink
    #:sink-calls
 
-   #:*simple-sub-schema*
-   #:*simple-schema*
-   #:*simple-schema-item*
+                        #:*simple-sub-schema*
+                        #:*simple-schema*
+   #:simple-schema-item #:*simple-schema-item*
 
-   #:*simple-option*)
+   #:simple-option      #:*simple-option*)
 
   (:export
    #:run-tests)
@@ -97,18 +97,25 @@
   (("wild" :wild-inferiors) :type 'symbol)
   ("sub" *simple-sub-schema*))
 
-(defparameter *simple-schema-item*
+(defun simple-schema-item (&key (name '("simple" "option")))
   (make-instance 'standard-schema-item
-                 :name '("simple" "option")
+                 :name name
                  :type 'integer
                  :documentation
-                 "A simple option.")
+                 "A simple option."))
+
+(defparameter *simple-schema-item* (simple-schema-item)
   "Simple schema-item for tests.")
 
 ;;; Simple option for tests
 
-(defparameter *simple-option*
-  (make-option *simple-schema-item* '("simple" "option"))
+(defun simple-option (&key (name '("simple" "option") name-supplied?))
+  (let ((schema-item (if name-supplied?
+                         (simple-schema-item :name name)
+                         *simple-schema-item*)))
+    (make-option schema-item (option-name schema-item))))
+
+(defparameter *simple-option* (simple-option)
   "Simple option for tests.")
 
 ;;; Mock source and sink classes

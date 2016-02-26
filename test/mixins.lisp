@@ -188,6 +188,41 @@
   :in options)
 (in-suite options.list-container-mixin)
 
+(test find-options.smoke
+  "Smoke test for the `find-options' method."
+
+  (macrolet
+      ((test-case (&body body)
+         `(let+ ((container (make-instance 'list-container-mixin))
+                 ((&flet check-query (expected query)
+                    (let ((result (find-options query container)))
+                      (is (equal expected (mapcar #'option-name result)))))))
+            ,@body)))
+
+    ;; Empty results.
+    (test-case
+     (check-query '() "no.such.option")
+     (check-query '() '("no" "such" "option")))
+
+    ;; [Wild-]inferiors queries.
+    (test-case
+     (setf (find-option "option" container) (simple-option :name "option"))
+     (check-query '(("option")) '(:wild))
+     (check-query '(("option")) "**"))
+
+    (test-case
+     (setf (find-option "simple.option" container) (simple-option))
+     (check-query '()                    '(:wild))
+     (check-query '(("simple" "option")) "**"))
+
+    (test-case
+     (setf (find-option "option" container)
+           (simple-option :name "option")
+           (find-option "simple.option" container)
+           (simple-option :name "simple.option"))
+     (check-query '(("option"))                     '(:wild))
+     (check-query '(("option") ("simple" "option")) "**"))))
+
 (test find-option.smoke
   "Smoke test for the `find-option' and setf find-option functions."
 

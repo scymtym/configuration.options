@@ -180,7 +180,14 @@
 (defgeneric find-options (query container)
   (:documentation
    "Find and return a sequence of options in CONTAINER matching QUERY
-    which can be a name with wildcard components."))
+    which can be a name with wildcard components.
+
+    Matching options can appear in any order in the returned
+    sequence.
+
+    If CONTAINER has child containers (as can be the case for schema
+    objects), matching options in ancestor containers (i.e. transitive
+    children) are also found and returned."))
 
 (defgeneric find-option (name container
                          &key
@@ -246,6 +253,15 @@
 
 (defmethod map-options ((function t) (container t))
   (map-options (ensure-function function) container))
+
+(defmethod find-options ((query t) (container t))
+  (let ((result '()))
+    (map-options (lambda (option &key (prefix '()) &allow-other-keys)
+                   (let ((name (merge-names prefix (option-name option))))
+                     (when (name-matches query name)
+                       (push option result))))
+                 container)
+    result))
 
 (defmethod find-option :around ((name t) (container t)
                                 &key

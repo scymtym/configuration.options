@@ -23,6 +23,12 @@
 (defmethod option-documentation ((option standard-configuration))
   (option-documentation (configuration-schema option)))
 
+(defmethod find-options ((name      t)
+                         (container standard-configuration))
+  (remove name (options container)
+          :key  #'option-name
+          :test (complement #'name-matches)))
+
 (defmethod find-option :around ((name      t)
                                 (container standard-configuration)
                                 &key

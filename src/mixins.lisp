@@ -237,12 +237,6 @@
                         (container list-container-mixin))
   (mapc function (options container)))
 
-(defmethod find-options ((name      t)
-                         (container list-container-mixin))
-  (remove name (options container)
-          :key  #'option-name
-          :test (complement #'name-matches)))
-
 (defmethod find-option ((name      t)
                         (container list-container-mixin)
                         &key &allow-other-keys)

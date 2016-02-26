@@ -38,6 +38,39 @@
                                           :prefix    '("sub"))))))
       (test-case schema expected))))
 
+(test find-options.smoke
+  "Smoke test for the `find-options' method."
+
+  (macrolet
+      ((test-case ((&optional (container '(make-instance 'standard-schema)))
+                   &body body)
+         `(let+ ((container ,container)
+                 ((&flet check-query (expected query)
+                    (let ((result (find-options query container)))
+                      (is (equal expected (mapcar (compose #'name-components
+                                                           #'option-name)
+                                                  result)))))))
+            ,@body)))
+
+    ;; Empty results.
+    (test-case ()
+     (check-query '() "no.such.option")
+     (check-query '() '("no" "such" "option")))
+
+    ;; [Wild-]inferiors queries.
+    (test-case (*simple-schema*)
+     (check-query '((:wild) ("foo") ("bar")) '(:wild))
+     (check-query '((:wild) ("whoop") (:wild) ("wild" :wild-inferiors)
+                    ("foo" "fez") ("foo") ("baz" "foo") ("bar" "fez")
+                    ("bar"))
+                  "**"))
+
+    ;; Complex queries.
+    (test-case (*simple-schema*)
+      (check-query '(("bar"))               "**.bar")
+      (check-query '(("bar" "fez") ("bar")) "bar.**")
+      (check-query '((:wild) ("whoop"))     "sub.*"))))
+
 (test find-child.smoke
   "Smoke test for the `find-child' and (setf find-child) functions."
 
