@@ -232,7 +232,9 @@
   (:documentation
    "Store the option NEW-VALUE under the name NAME in container.
 
-    IF-DOES-NOT-EXIST is accepted for parity with `find-option'.
+    IF-DOES-NOT-EXIST acts similarly to what is described for
+    `find-option' w.r.t. signaling conditions, but does not influence
+    the return value.
 
     IF-EXISTS controls the behavior in case an option named NAME is
     already stored in CONTAINER:
@@ -339,6 +341,19 @@
                                  name container))
                value))))))
 
+(defmethod (setf find-option) :around ((new-value (eql nil))
+                                       (name      t)
+                                       (container t)
+                                       &key
+                                       if-does-not-exist
+                                       (if-exists        :supersede))
+  ;; For IF-DOES-NOT-EXIST, on the values NIL, #'error and #'warn are
+  ;; interesting since we return NEW-VALUE in any case (unless we
+  ;; signal an error).
+  (when if-does-not-exist
+    (find-option name container :if-does-not-exist if-does-not-exist))
+  (call-next-method new-value name container :if-exists if-exists))
+
 (defmethod (setf find-option) :around ((new-value t)
                                        (name      t)
                                        (container t)
@@ -422,7 +437,9 @@
   (:documentation
    "Store the child schema NEW-VALUE under the name NAME in SCHEMA.
 
-    IF-DOES-NOT-EXIST is accepted for parity with `find-child'.
+    IF-DOES-NOT-EXIST acts similarly to what is described for
+    `find-child' w.r.t. signaling conditions, but does not influence
+    the return value.
 
     IF-EXISTS controls the behavior in case a child schema name is
     already stored in SCHEMA:
@@ -499,6 +516,19 @@
                                          named ~A in ~A.~@:>"
                                  name schema))
                value))))))
+
+(defmethod (setf find-child) :around ((new-value (eql nil))
+                                      (name      t)
+                                      (schema    t)
+                                      &key
+                                      if-does-not-exist
+                                      (if-exists        :supersede))
+  ;; For IF-DOES-NOT-EXIST, only the values nil, #'error and #'warn
+  ;; are interesting since we return NEW-VALUE in any case (unless we
+  ;; signal an error).
+  (when if-does-not-exist
+    (find-child name schema :if-does-not-exist if-does-not-exist))
+  (call-next-method new-value name schema :if-exists if-exists))
 
 (defmethod (setf find-child) :around ((new-value t)
                                       (name      t)

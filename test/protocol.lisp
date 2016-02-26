@@ -106,6 +106,58 @@
           (map-options 'map-options.ensure-function
                        (make-instance 'map-options.ensure-function)))))
 
+(test protocol.find-option.remove
+  "Test removing options via setf `find-option'."
+
+  (mapc
+   (lambda+ ((exists? if-does-not-exist if-exists expected))
+     (let+ ((container (empty-configuration))
+            (option    (simple-option))
+            (name      (option-name option))
+            (existing  (when exists?
+                         (setf (find-option name container) option)))
+            ((&flet do-it ()
+               (setf (find-option name container
+                                  :if-does-not-exist if-does-not-exist
+                                  :if-exists         if-exists)
+                     nil))))
+       (ecase expected
+         ((nil)                  (is (eq nil (do-it))))
+         (:existing              (is (eq existing (do-it))))
+         (option-missing-warning (signals option-missing-warning (do-it)))
+         (option-missing-error   (signals option-missing-error (do-it)))
+         (option-exists-warning  (signals option-exists-warning (do-it)))
+         (option-exists-error    (signals option-exists-error (do-it))))))
+   '((nil nil   :supersede nil)
+     (nil nil   :keep      nil)
+     (nil nil   error      nil)
+     (nil nil   warn       nil)
+
+     (nil error :supersede option-missing-error)
+     (nil error :keep      option-missing-error)
+     (nil error error      option-missing-error)
+     (nil error warn       option-missing-error)
+
+     (nil warn  :supersede option-missing-warning)
+     (nil warn  :keep      option-missing-warning)
+     (nil warn  error      option-missing-warning)
+     (nil warn  warn       option-missing-warning)
+
+     (t   nil   :supersede nil)
+     (t   nil   :keep      :existing)
+     (t   nil   error      option-exists-error)
+     (t   nil   warn       option-exists-warning)
+
+     (t   error :supersede nil)
+     (t   error :keep      :existing)
+     (t   error error      option-exists-error)
+     (t   error warn       option-exists-warning)
+
+     (t   warn  :supersede nil)
+     (t   warn  :keep      :existing)
+     (t   warn  error      option-exists-error)
+     (t   warn  warn       option-exists-warning))))
+
 ;;; Schema protocol
 
 ;; Name coercion
@@ -125,6 +177,59 @@
    (make-instance 'mock-container/name-coercion)
    (lambda (name container)
      (setf (find-child name container) t))))
+
+;; Default behavior
+
+(test protocol.find-child.remove
+  "Test removing options via setf `find-option'."
+
+  (mapc
+   (lambda+ ((exists? if-does-not-exist if-exists expected))
+     (let+ ((container (empty-schema))
+            (name      "child")
+            (existing  (when exists?
+                         (setf (find-child name container) (empty-schema))))
+            ((&flet do-it ()
+               (setf (find-child name container
+                                 :if-does-not-exist if-does-not-exist
+                                 :if-exists         if-exists)
+                     nil))))
+       (ecase expected
+         ((nil)                 (is (eq nil (do-it))))
+         (:existing             (is (eq existing (do-it))))
+         (child-missing-warning (signals child-missing-warning (do-it)))
+         (child-missing-error   (signals child-missing-error (do-it)))
+         (child-exists-warning  (signals child-exists-warning (do-it)))
+         (child-exists-error    (signals child-exists-error (do-it))))))
+   '((nil nil   :supersede nil)
+     (nil nil   :keep      nil)
+     (nil nil   error      nil)
+     (nil nil   warn       nil)
+
+     (nil error :supersede child-missing-error)
+     (nil error :keep      child-missing-error)
+     (nil error error      child-missing-error)
+     (nil error warn       child-missing-error)
+
+     (nil warn  :supersede child-missing-warning)
+     (nil warn  :keep      child-missing-warning)
+     (nil warn  error      child-missing-warning)
+     (nil warn  warn       child-missing-warning)
+
+     (t   nil   :supersede nil)
+     (t   nil   :keep      :existing)
+     (t   nil   error      child-exists-error)
+     (t   nil   warn       child-exists-warning)
+
+     (t   error :supersede nil)
+     (t   error :keep      :existing)
+     (t   error error      child-exists-error)
+     (t   error warn       child-exists-warning)
+
+     (t   warn  :supersede nil)
+     (t   warn  :keep      :existing)
+     (t   warn  error      child-exists-error)
+     (t   warn  warn       child-exists-warning))))
 
 ;;; Option-like protocol
 

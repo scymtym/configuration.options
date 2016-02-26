@@ -99,7 +99,8 @@
                               &key &allow-other-keys)
   (let+ (((&accessors (children %children)) schema))
     (setf children (delete key children :key #'car :test #'name-equal))
-    (push (cons key new-value) children))
+    (when new-value
+      (push (cons key new-value) children)))
   new-value)
 
 (defmethod (setf find-child) :after ((new-value t)

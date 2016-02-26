@@ -34,11 +34,12 @@
    #:mock-sink
    #:sink-calls
 
-                        #:*simple-sub-schema*
-                        #:*simple-schema*
-   #:simple-schema-item #:*simple-schema-item*
+                                                #:*simple-sub-schema*
+   #:empty-schema                               #:*simple-schema*
+                         #:simple-schema-item   #:*simple-schema-item*
 
-   #:simple-option      #:*simple-option*)
+   #:empty-configuration
+                         #:simple-option        #:*simple-option*)
 
   (:export
    #:run-tests)
@@ -84,6 +85,10 @@
   ("whoop" :type 'string)
   (:wild :type 'integer))
 
+(defun empty-schema ()
+  "Empty schema for tests."
+  (make-instance 'standard-schema))
+
 (define-schema *simple-schema*
   "Simple configuration options for tests."
   ("foo" :type 'integer :default 1
@@ -108,6 +113,10 @@
   "Simple schema-item for tests.")
 
 ;;; Simple option for tests
+
+(defun empty-configuration ()
+  "Empty configuration for tests."
+  (make-configuration *simple-schema*))
 
 (defun simple-option (&key (name '("simple" "option") name-supplied?))
   (let ((schema-item (if name-supplied?
