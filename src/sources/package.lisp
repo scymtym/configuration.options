@@ -16,6 +16,9 @@
 
    #:options)
 
+  (:import-from #:options
+   #:wild-name)
+
   ;; Condition
   (:export
    #:source-condition

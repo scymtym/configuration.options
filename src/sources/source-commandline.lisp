@@ -59,7 +59,7 @@
             ;; Cannot create concrete commandline options for wildcard
             ;; schema items. Return a textual description of the
             ;; option instead.
-            (when (typep (option-name schema-item) 'options::wild-name)
+            (when (typep (option-name schema-item) 'wild-name)
               (setf seen-wild? t)
               (return-from do-option
                 (list (net.didierverna.clon:make-text
