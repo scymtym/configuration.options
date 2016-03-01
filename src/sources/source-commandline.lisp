@@ -1,10 +1,10 @@
 ;;;; source-commandline.lisp --- Source for commandline options.
 ;;;;
-;;;; Copyright (C) 2011, 2012, 2013, 2015 Jan Moringen
+;;;; Copyright (C) 2011-2016 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
-(cl:in-package #:options.sources)
+(cl:in-package #:configuration.options.sources)
 
 (defclass commandline-source ()
   ((prefix    :initarg  :prefix

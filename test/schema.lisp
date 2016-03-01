@@ -1,10 +1,10 @@
 ;;;; schema.lisp --- Unit tests for schema-related stuff.
 ;;;;
-;;;; Copyright (C) 2013, 2015 Jan Moringen
+;;;; Copyright (C) 2013, 2015, 2016 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
-(cl:in-package #:options.test)
+(cl:in-package #:configuration.options.test)
 
 ;;; `standard-schema' class
 

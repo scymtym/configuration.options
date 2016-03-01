@@ -1,10 +1,13 @@
 ;;;; package.lisp --- Package definition for sources module.
 ;;;;
-;;;; Copyright (C) 2011, 2012, 2013 Jan Moringen
+;;;; Copyright (C) 2011-2016 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
-(cl:defpackage #:options.sources
+(cl:defpackage #:configuration.options.sources
+  (:nicknames
+   #:options.sources)
+
   (:use
    #:cl
    #:alexandria
@@ -14,9 +17,9 @@
    #:more-conditions
    #:print-items
 
-   #:options)
+   #:configuration.options)
 
-  (:import-from #:options
+  (:import-from #:configuration.options
    #:wild-name)
 
   ;; Condition

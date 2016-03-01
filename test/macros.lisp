@@ -1,10 +1,10 @@
 ;;;; macros.lisp --- Test for the macros provided by the options system.
 ;;;;
-;;;; Copyright (C) 2013 Jan Moringen
+;;;; Copyright (C) 2013, 2016 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
-(cl:in-package #:options.test)
+(cl:in-package #:configuration.options.test)
 
 (define-schema *child-schema* ; used in next test
   ("b" :type 'string))

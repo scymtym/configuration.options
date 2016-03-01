@@ -1,10 +1,10 @@
 ;;;; macros.lisp --- Macros provided by the options system.
 ;;;;
-;;;; Copyright (C) 2012, 2013 Jan Moringen
+;;;; Copyright (C) 2012, 2013, 2016 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
-(cl:in-package #:options)
+(cl:in-package #:configuration.options)
 
 (defun map-schema-spec (function spec)
   "Call FUNCTION for each specification item in SPEC and return

@@ -1,10 +1,10 @@
 ;;;; protocol.lisp --- Test for the protocol functions of the options system.
 ;;;;
-;;;; Copyright (C) 2013 Jan Moringen
+;;;; Copyright (C) 2013, 2016 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
-(cl:in-package #:options.test)
+(cl:in-package #:configuration.options.test)
 
 (def-suite standard-configuration
   :in options

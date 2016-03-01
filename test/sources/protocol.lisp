@@ -1,10 +1,10 @@
 ;;;; protocol.lisp --- Tests for protocol functions of the sources module.
 ;;;;
-;;;; Copyright (C) 2013 Jan Moringen
+;;;; Copyright (C) 2013, 2016 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
-(cl:in-package #:options.sources.test)
+(cl:in-package #:configuration.options.sources.test)
 
 (in-suite options.sources)
 

@@ -4,7 +4,7 @@
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
-(cl:in-package #:options.test)
+(cl:in-package #:configuration.options.test)
 
 (defclass mock-typed-schema-item ()
   ((type :initarg  :type

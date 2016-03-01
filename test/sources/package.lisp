@@ -1,10 +1,10 @@
 ;;;; package.lisp --- Package definition for unit tests of the sources module.
 ;;;;
-;;;; Copyright (C) 2013 Jan Moringen
+;;;; Copyright (C) 2013, 2016 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
-(cl:defpackage #:options.sources.test
+(cl:defpackage #:configuration.options.sources.test
   (:use
    #:cl
    #:alexandria
@@ -15,15 +15,15 @@
 
    #:fiveam
 
-   #:options
-   #:options.sources
+   #:configuration.options
+   #:configuration.options.sources
 
-   #:options.test)
+   #:configuration.options.test)
 
   (:documentation
    "This package contains unit tests for the sources module"))
 
-(cl:in-package #:options.sources.test)
+(cl:in-package #:configuration.options.sources.test)
 
 ;;; Test suite
 
@@ -37,7 +37,7 @@
 (defclass mock-syntax () ())
 
 (service-provider:register-provider/class
- 'options.sources::syntax :mock :class 'mock-syntax)
+ 'configuration.options.sources::syntax :mock :class 'mock-syntax)
 
 (defmethod shared-initialize :after ((instance   mock-syntax)
                                      (slot-names t)

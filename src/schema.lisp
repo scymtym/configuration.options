@@ -1,10 +1,10 @@
 ;;;; schema.lisp --- Schema item and schema classes.
 ;;;;
-;;;; Copyright (C) 2011, 2013 Jan Moringen
+;;;; Copyright (C) 2011-2016 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
-(cl:in-package #:options)
+(cl:in-package #:configuration.options)
 
 ;;; `standard-schema' class
 

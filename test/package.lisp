@@ -1,10 +1,10 @@
 ;;;; package.lisp --- Package definition for unit tests of the options system.
 ;;;;
-;;;; Copyright (C) 2013, 2015 Jan Moringen
+;;;; Copyright (C) 2013, 2015, 2016 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
-(cl:defpackage #:options.test
+(cl:defpackage #:configuration.options.test
   (:use
    #:cl
    #:alexandria
@@ -12,9 +12,9 @@
 
    #:fiveam
 
-   #:options)
+   #:configuration.options)
 
-  (:import-from #:options
+  (:import-from #:configuration.options
    #:name
    #:wild-name
 
@@ -23,7 +23,7 @@
    #:type-based-conversion-mixin
    #:list-container-mixin)
 
-  (:import-from #:options.sources
+  (:import-from #:configuration.options.sources
    #:initialize)
 
   (:export
@@ -40,7 +40,7 @@
   (:documentation
    "This package contains unit tests for the options system."))
 
-(cl:in-package #:options.test)
+(cl:in-package #:configuration.options.test)
 
 ;;; Test suite
 

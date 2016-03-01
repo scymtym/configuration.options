@@ -1,10 +1,10 @@
 ;;;; name.lisp --- Option names.
 ;;;;
-;;;; Copyright (C) 2013, 2015 Jan Moringen
+;;;; Copyright (C) 2013, 2015, 2016 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
-(cl:in-package #:options)
+(cl:in-package #:configuration.options)
 
 ;;; `wildcard-name' class
 
@@ -30,7 +30,7 @@
 
 (defmethod print-object ((object wildcard-name) stream)
   (print-unreadable-object (object stream :type t :identity t)
-    (format stream "~/options:print-name/" object)))
+    (format stream "~/configuration.options:print-name/" object)))
 
 ;; sequence protocol
 
@@ -124,14 +124,14 @@
    as :wild-inferiors component when parsing names.")
 
 #+esrap.grammar-class
-(esrap:defgrammar #:options.option-name
+(esrap:defgrammar #:configuration.options.option-name
   (:documentation
    "This grammar contains rules for parsing option names consisting of
     multiple string components separated by \".\". Wildcards of the
     form \"*\" (\"wild\") and \"**\" (\"wild inferiors\") are also
     supported."))
 #+esrap.grammar-class
-(esrap:in-grammar #:options.option-name)
+(esrap:in-grammar #:configuration.options.option-name)
 
 (esrap:defrule wild-inferiors
     (and #\* #\*)
@@ -193,7 +193,7 @@
           (*parse-wild-inferiors-allowed* wild-inferiors-allowed))
       (esrap:parse 'name string
                    #+esrap.grammar-class :grammar
-                   #+esrap.grammar-class '#:options.option-name
+                   #+esrap.grammar-class '#:configuration.options.option-name
                    :start        start
                    :end          end
                    :junk-allowed junk-allowed))))

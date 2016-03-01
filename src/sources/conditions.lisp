@@ -1,10 +1,10 @@
 ;;;; conditions.lisp --- Conditions used by the sources module.
 ;;;;
-;;;; Copyright (C) 2013 Jan Moringen
+;;;; Copyright (C) 2013, 2016 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
-(cl:in-package #:options.sources)
+(cl:in-package #:configuration.options.sources)
 
 (define-condition source-condition (condition)
   ((source :initarg  :source

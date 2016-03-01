@@ -1,6 +1,6 @@
 ;;;; configuration.options.asd --- System definition for the configuration.options system.
 ;;;;
-;;;; Copyright (C) 2011, 2012, 2013, 2015 Jan Moringen
+;;;; Copyright (C) 2011-2016 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -125,4 +125,4 @@
 
 (defmethod perform ((op     test-op)
                     (system (eql (find-system :configuration.options-test))))
-  (funcall (find-symbol "RUN-TESTS" :options.test)))
+  (funcall (find-symbol "RUN-TESTS" :configuration.options.test)))

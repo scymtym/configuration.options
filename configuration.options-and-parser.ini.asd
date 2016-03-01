@@ -1,6 +1,6 @@
 ;;;; configuration.options-and-parser.ini.asd --- Ini syntax for the options system.
 ;;;;
-;;;; Copyright (C) 2013, 2015 Jan Moringen
+;;;; Copyright (C) 2013, 2015, 2016 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -51,4 +51,4 @@
 
 (defmethod perform ((operation test-op)
                     (component (eql (find-system :configuration.options-and-parser.ini-test))))
-  (funcall (find-symbol "RUN-TESTS" :options.test)))
+  (funcall (find-symbol "RUN-TESTS" :configuration.options.test)))

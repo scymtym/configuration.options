@@ -1,10 +1,10 @@
 ;;;; protocol.lisp --- Protocol provided by the options system.
 ;;;;
-;;;; Copyright (C) 2011, 2012, 2013, 2014, 2015 Jan Moringen
+;;;; Copyright (C) 2011-2016 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
-(cl:in-package #:options)
+(cl:in-package #:configuration.options)
 
 ;;; Name protocol
 ;;;

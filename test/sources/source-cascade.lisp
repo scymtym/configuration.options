@@ -1,10 +1,10 @@
 ;;;; source-cascade.lisp --- Unit tests for the cascade source.
 ;;;;
-;;;; Copyright (C) 2013 Jan Moringen
+;;;; Copyright (C) 2013, 2016 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
-(cl:in-package #:options.sources.test)
+(cl:in-package #:configuration.options.sources.test)
 
 (in-suite options.sources)
 
@@ -157,7 +157,7 @@
         (basename (make-random-string))
         (type     "conf")
         (offset   (if (service-provider:find-provider
-                       'options.sources::source :commandline
+                       'configuration.options.sources::source :commandline
                        :if-does-not-exist nil)
                       1 0)))
     (with-environment-variable ((format nil "~A_B_C" basename) "1")

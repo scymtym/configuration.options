@@ -1,10 +1,10 @@
 ;;;; syntax-xml.lisp --- Use XML documents as configuration sources.
 ;;;;
-;;;; Copyright (C) 2012, 2013, 2015 Jan Moringen
+;;;; Copyright (C) 2012, 2013, 2015, 2016 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
-(cl:in-package #:options.sources)
+(cl:in-package #:configuration.options.sources)
 
 (defclass xml-syntax ()
   ;; TODO this slot is duplicated in `ini-syntax'

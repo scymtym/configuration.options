@@ -1,10 +1,10 @@
 ;;;; conditions.lisp --- Conditions used in the options system.
 ;;;;
-;;;; Copyright (C) 2011, 2012, 2013 Jan Moringen
+;;;; Copyright (C) 2011-2016 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
-(cl:in-package #:options)
+(cl:in-package #:configuration.options)
 
 ;;; Name-related conditions
 
@@ -38,8 +38,8 @@
                option could not be found."))
   (:report
    (lambda (condition stream)
-     (format stream "~@<No option named ~/options:print-name/ in ~
-                     ~A.~@:>"
+     (format stream "~@<No option named ~
+                     ~/configuration.options:print-name/ in ~A.~@:>"
              (no-such-option-name      condition)
              (no-such-option-container condition))))
   (:documentation
@@ -170,8 +170,8 @@
   (:report
    (lambda (condition stream)
      (format stream "~@<When notifying sink ~A of ~S option ~
-                     ~/options:print-name/~@[ with value ~S~]~@[ by ~
-                     source ~A~]~
+                     ~/configuration.options:print-name/~@[ with value ~
+                     ~S~]~@[ by source ~A~]~
                      ~/more-conditions:maybe-print-cause/~@:>"
              (notification-error-sink   condition)
              (notification-error-event  condition)
