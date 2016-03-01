@@ -26,11 +26,13 @@ script:
       -e '(ql:quickload (list :configuration.options/test
                               :configuration.options-syntax-ini/test
                               :configuration.options-syntax-xml/test
-                              :configuration.options-source-commandline/test))'
+                              :configuration.options-source-commandline/test
+                              :configuration.options-and-mop/test))'
       '(or (every (function identity)
                   (mapcar (function funcall)
                           (quote (configuration.options.test:run-tests
                                   configuration.options.sources.syntax-ini.test:run-tests
                                   configuration.options.sources.syntax-xml.test:run-tests
-                                  configuration.options.sources.commandline.test:run-tests))))
+                                  configuration.options.sources.commandline.test:run-tests
+                                  configuration.options.mop.test:run-tests))))
            (uiop:quit -1))'
