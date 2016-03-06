@@ -92,14 +92,6 @@
   (when value-supplied?
     (setf (option-value instance) value)))
 
-(defmethod print-items append ((object option-cell))
-  (let+ ((type (option-type object))
-         ((&values value value?)
-          (option-value object :if-does-not-exist nil))
-         (value (list (if value? (list 1 value) (list 0)))))
-    `((:type  ,type  ": ~A" ((:before :value)))
-      (:value ,value " ~:{~[<no value>~;= ~S~]~}"))))
-
 (macrolet
     ((define-delegation (name)
        `(defmethod ,name ((option option-cell))
