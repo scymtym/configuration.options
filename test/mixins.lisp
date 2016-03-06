@@ -31,7 +31,7 @@
             ((&flet do-it (&key (if-invalid nil))
                (validate-value schema-item value :if-invalid if-invalid))))
        (is (eq expected (do-it))
-           "~S is~:[ not~:;~] supposed to be of type ~S"
+           "~S is~:[ not~;~] supposed to be of type ~S"
            value expected type)
        (when (not expected)
          (signals option-value-error (do-it :if-invalid #'error)))))

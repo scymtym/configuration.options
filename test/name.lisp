@@ -106,7 +106,7 @@
   (mapc
    (lambda+ ((left right expected))
      (is (eq expected (name< (make-name left) (make-name right)))
-         "expected ~S to~:[ not~:;~] be ~S ~S."
+         "expected ~S to~:[ not~;~] be ~S ~S."
          left expected 'name< right))
 
    `((()   ()   nil) (()   "a"  t)   (()   "b"  t)
