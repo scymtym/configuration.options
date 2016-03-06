@@ -24,6 +24,9 @@
 
   ;; Condition
   (:export
+   #:schema-condition
+   #:schema-condition-schema
+
    #:source-condition
    #:source-condition-source
 

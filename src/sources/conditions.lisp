@@ -6,6 +6,19 @@
 
 (cl:in-package #:configuration.options.sources)
 
+(define-condition schema-condition (condition)
+  ((schema :initarg  :schema
+           :reader   schema-condition-schema
+           :documentation
+           "Stores the schema involved in the operation for which the
+            condition is signaled."))
+  (:default-initargs
+   :schema (missing-required-initarg 'schema-condition :schema))
+  (:documentation
+   "Instances of subclasses of this condition are signaled when an
+    unexpected condition is encountered during an operation involving
+    a schema."))
+
 (define-condition source-condition (condition)
   ((source :initarg  :source
            :reader   source-condition-source
@@ -21,13 +34,16 @@
 
 (define-condition initialization-error (error
                                         chainable-condition
-                                        source-condition)
+                                        source-condition
+                                        schema-condition)
   ()
   (:report
    (lambda (condition stream)
-     (format stream "~@<Could not initialize configuration source ~
-                     ~A~/more-conditions:maybe-print-cause/~@:>"
+     (format stream "~@<Could not initialize configuration source ~A ~
+                     according to schema ~A~
+                     ~/more-conditions:maybe-print-cause/~@:>"
              (source-condition-source condition)
+             (schema-condition-schema condition)
              condition)))
   (:documentation
    "This error is signaled when initializing a configuration source
