@@ -11,11 +11,11 @@
 (test initialize.default-behavior
   "Test for default behavior of `initialize' function."
 
-  (let ((sink (make-instance 'mock-sink)))
+  (let ((source (make-instance 'mock-source)))
     ;; An arbitrary error signaled by a sink during `initialize'
     ;; should be wrapped in a `initialization-error'.
     (signals initialization-error
-      (initialize sink :intentional-error))))
+      (initialize source :intentional-error))))
 
 (test notify.default-behavior
   "Test for default behavior of `notify' function."

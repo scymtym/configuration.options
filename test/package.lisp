@@ -29,6 +29,8 @@
   (:export
    #:make-random-string
 
+   #:mock-source
+
    #:mock-sink
    #:sink-calls
 
@@ -75,16 +77,19 @@
   ("bar" ("fez" :type 'pathname))
   ("baz" ("foo" :type 'string)))
 
-;;; Mock sink class
+;;; Mock source and sink classes
+
+(defclass mock-source ()
+  ())
+
+(defmethod initialize ((sink   mock-source)
+                       (schema (eql :intentional-error)))
+  (error "~@<Intentional error.~@:>"))
 
 (defclass mock-sink ()
   ((calls :type     list
           :accessor sink-calls
           :initform '())))
-
-(defmethod initialize ((sink   mock-sink)
-                       (schema (eql :intentional-error)))
-  (error "~@<Intentional error.~@:>"))
 
 (defmethod notify ((sink  mock-sink)
                    (event t)
