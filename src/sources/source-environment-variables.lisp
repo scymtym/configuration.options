@@ -41,7 +41,8 @@
               (when name
                 (notify sink :added     name nil   :source source)
                 (notify sink :new-value name value :source source))))))
-    (iter (for entry in (sb-impl::posix-environ))
+    (iter (for entry in #+sbcl (sb-ext:posix-environ)
+                        #-sbcl '())
           (restart-case
               (variable->option entry)
             (continue (&optional condition)

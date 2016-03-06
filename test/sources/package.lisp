@@ -94,9 +94,9 @@
   (once-only (name)
     `(unwind-protect
           (progn
-            (sb-posix:setenv ,name ,value 1)
+            (setf (uiop:getenv ,name) ,value)
             ,@body)
-       (sb-posix:unsetenv ,name))))
+       #+sbcl (sb-posix:unsetenv ,name))))
 
 (defmacro with-file ((name content) &body body)
   "Execute BODY with the file named NAME created and populated with
