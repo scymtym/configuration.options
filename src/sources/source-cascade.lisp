@@ -127,7 +127,7 @@
      (prefix      "/"  prefix-supplied?)
      (paths       `("./"
                     ,(merge-pathnames
-                      ".config/" (make-pathname :directory '(:absolute :home)))
+                      ".config/" (user-homedir-pathname))
                     ,(merge-pathnames "etc/" prefix))
                       paths-supplied?)
      (config-file nil config-file-supplied?)
