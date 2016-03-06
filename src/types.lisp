@@ -20,12 +20,20 @@
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defun %every-element-name-component? (thing)
-    (when (typep thing 'sequence)
-      (every (of-type 'name-component) thing)))
+    (cond
+      ((typep thing 'sequence)
+       (every (of-type 'name-component) thing))
+      #-sbcl
+      ((typep thing 'wildcard-name)
+       (every (of-type 'name-component) (name-components thing)))))
 
   (defun %has-wild-component? (thing)
-    (when (typep thing 'sequence)
-      (some (of-type 'wild-name-component) thing))))
+    (cond
+      ((typep thing 'sequence)
+       (some (of-type 'wild-name-component) thing))
+      #-sbcl
+      ((typep thing 'wildcard-name)
+       (some (of-type 'wild-name-component) (name-components thing))))))
 
 (deftype wild-name ()
   "A `name' which has at least one wild component."
@@ -33,4 +41,6 @@
 
 (deftype name ()
   "A sequence of name components some of which may be wild."
-  '(and sequence (satisfies %every-element-name-component?)))
+  '(and #+sbcl sequence
+        #-sbcl (or sequence wildcard-name)
+        (satisfies %every-element-name-component?)))

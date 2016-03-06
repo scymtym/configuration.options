@@ -111,7 +111,13 @@
   #+sbcl (concatenate 'wildcard-name left right)
   #-sbcl (make-instance 'wildcard-name
                         :components (append (name-components left)
-                                            (name-components  right))))
+                                            (name-components right))))
+
+#-sbcl
+(defmethod merge-names ((left wildcard-name) (right t))
+  (make-instance 'wildcard-name
+                 :components (append (name-components left)
+                                     (name-components right))))
 
 ;;; Name grammar and parsing
 
