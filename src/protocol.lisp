@@ -150,39 +150,59 @@
                    not bound to a configuration object?~@:>"
                   context '*configuration*))))
 
-  (defmethod value ((option-or-name t)
-                    &key
-                    (configuration     *configuration*)
-                    (if-does-not-exist #'error)
-                    (if-no-value       if-does-not-exist))
+;; Name coercion
 
-    (let ((option (if (typep option-or-name 'sequence)
-                      (progn
-                        (check-configuration 'value configuration)
-                        (find-option option-or-name configuration
-                                     :if-does-not-exist if-does-not-exist))
-                      option-or-name)))
+  (defmethod value :around ((option-or-name sequence)
+                            &key
+                            (configuration     *configuration*)
+                            (if-does-not-exist #'error)
+                            (if-no-value       if-does-not-exist))
+    (check-configuration 'value configuration)
+
+    (let ((option (find-option option-or-name configuration
+                               :if-does-not-exist if-does-not-exist)))
       (if (eq option if-does-not-exist)
           option
-          (option-value option :if-does-not-exist if-no-value))))
+          (value option
+                 :configuration configuration
+                 :if-no-value   if-no-value))))
+
+  (defmethod (setf value) :around ((new-value      t)
+                                   (option-or-name sequence)
+                                   &key
+                                   (configuration     *configuration*)
+                                   (if-does-not-exist #'error)
+                                   if-no-value)
+    (declare (ignore if-no-value))
+    (check-configuration '(setf value) configuration)
+
+    (let ((option (find-option option-or-name configuration
+                               :if-does-not-exist if-does-not-exist)))
+      (if (eq option if-does-not-exist)
+          option
+          (setf (value option :configuration configuration)
+                new-value))))
+
+;; Default behavior
+
+  (defmethod value ((option-or-name t)
+                    &key
+                    configuration
+                    if-does-not-exist
+                    (if-no-value      #'error))
+    (declare (ignore configuration if-does-not-exist))
+    (option-value option-or-name :if-does-not-exist if-no-value))
 
   (defmethod (setf value) ((new-value      t)
                            (option-or-name t)
                            &key
-                           (configuration     *configuration*)
-                           (if-does-not-exist #'error)
+                           configuration
+                           if-does-not-exist
                            if-no-value)
-    (declare (ignore if-no-value))
+    (declare (ignore configuration if-does-not-exist if-no-value))
+    (setf (option-value option-or-name) new-value))
 
-    (let ((option (if (typep option-or-name 'sequence)
-                      (progn
-                        (check-configuration '(setf value) configuration)
-                        (find-option option-or-name configuration
-                                     :if-does-not-exist if-does-not-exist))
-                      option-or-name)))
-      (if (eq option if-does-not-exist)
-          new-value
-          (setf (option-value option) new-value)))))
+) ; flet
 
 ;;; Event hook protocol
 ;;;

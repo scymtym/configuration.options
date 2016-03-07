@@ -66,6 +66,49 @@
 
 ;;; Value protocol
 
+;; Name coercion
+
+(defun value-name-coercion-test-cases (thunk)
+  (let ((configuration *simple-configuration*))
+    ;; :configuration is not supplied and `*configuration*' is not
+    ;; bound to a configuration.
+    (signals error (funcall thunk "foo"))
+    (signals error (funcall thunk "does-not-exist"))
+    (signals error (funcall thunk "does-not-exist" :if-does-not-exist nil))
+
+    ;; :configuration is supplied.
+    (is-true (nth-value
+              1 (funcall thunk "foo" :configuration configuration)))
+    (signals option-missing-error
+      (funcall thunk "does-not-exist" :configuration configuration))
+    (is-false (nth-value
+               1 (funcall thunk "does-not-exist"
+                          :configuration     configuration
+                          :if-does-not-exist nil)))
+
+    ;; `*configuration*' is bound.
+    (let ((*configuration* configuration))
+      (is-true (nth-value 1 (funcall thunk "foo")))
+      (signals option-missing-error
+        (funcall thunk "does-not-exist"))
+      (is-false (nth-value
+                 1 (funcall thunk "does-not-exist"
+                            :if-does-not-exist nil))))))
+
+(test protocol.value.name-coercion
+  "Test name coercion performed by the `value' generic function."
+
+  (value-name-coercion-test-cases
+   (lambda (name &rest args)
+     (apply #'value name args))))
+
+(test protocol.setf-value.name-coercion
+  "Test name coercion performed by the `value' generic function."
+
+  (value-name-coercion-test-cases
+   (lambda (name &rest args)
+     (apply #'(setf value) 1 name args))))
+
 ;; Default behavior
 
 (test protocol.value.smoke
