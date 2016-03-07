@@ -34,7 +34,7 @@
    #:mock-sink
    #:sink-calls
 
-   #:+simple-schema+)
+   #:*simple-schema*)
 
   (:export
    #:run-tests)
@@ -67,7 +67,7 @@
 
 ;;; Simple schema for tests
 
-(define-schema +simple-schema+
+(define-schema *simple-schema*
   "Simple configuration options for tests."
   ("foo" :type 'integer :default 1
          :documentation
@@ -75,7 +75,9 @@
   ("bar" :type 'boolean)
   ("foo" ("fez" :type 'integer))
   ("bar" ("fez" :type 'pathname))
-  ("baz" ("foo" :type 'string)))
+  ("baz" ("foo" :type 'string))
+  (:wild :type 'boolean)
+  (("wild" :wild-inferiors) :type 'symbol))
 
 ;;; Mock source and sink classes
 

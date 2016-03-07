@@ -11,7 +11,7 @@
 (test standard-synchronizer.smoke
   "Smoke test for the `standard-synchronizer' class."
 
-  (let* ((schema        +simple-schema+)
+  (let* ((schema        *simple-schema*)
          (configuration (make-configuration schema))
          (synchronizer  (make-instance 'standard-synchronizer
                                        :target configuration)))

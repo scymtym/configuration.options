@@ -147,7 +147,7 @@
 
 (defmacro with-source-and-sink ((source-and-options
                                  &key
-                                 (schema     '+simple-schema+)
+                                 (schema     '*simple-schema*)
                                  (source-var 'source)
                                  (sink-var   'sink))
                                 &body body)

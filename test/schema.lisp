@@ -54,7 +54,7 @@
   "Smoke test for the `make-option' function."
 
   ;; Attempt to make an option with an unrelated name.
-  (let ((item (first (options +simple-schema+))))
+  (let ((item (first (options *simple-schema*))))
     (signals error (make-option item "completely.unrelated")))
 
   ;; Make some options. Expect errors when attempting to make options
@@ -65,13 +65,13 @@
                 (signals error (make-option item name))
                 (let ((option (make-option item name)))
                   (is (eq item (option-schema-item option)))))))
-        (options +simple-schema+)))
+        (options *simple-schema*)))
 
 (test make-configuration.smoke
   "Smoke test for the `make-configuration' function."
 
-  (let ((configuration (make-configuration +simple-schema+)))
-    (is (eq (configuration-schema configuration) +simple-schema+))))
+  (let ((configuration (make-configuration *simple-schema*)))
+    (is (eq (configuration-schema configuration) *simple-schema*))))
 
 (test type-list
   "Kind-of integrationtest for schema item with list-of-something

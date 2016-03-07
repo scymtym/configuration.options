@@ -22,7 +22,7 @@
     (with-source-and-sink ((:commandline :prefix    prefix
                                          :arguments arguments)
                            :sink-var sink
-                           :schema   +simple-schema+)
+                           :schema   *simple-schema*)
       (expecting-sink-calls (sink)
         '(:added     ("foo" "fez") nil)
         '(:new-value ("foo" "fez") 5)

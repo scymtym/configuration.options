@@ -31,7 +31,7 @@
 (test find-option.create
   "Test :if-does-not-exist :create for `find-option'."
 
-  (let ((configuration (make-configuration +simple-schema+)))
+  (let ((configuration (make-configuration *simple-schema*)))
     ;; Option is not in schema
     (signals no-such-option
       (find-option "no.such.option" configuration
