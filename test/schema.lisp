@@ -53,7 +53,18 @@
 (test make-option.smoke
   "Smoke test for the `make-option' function."
 
-  (mapc (lambda (item) (make-option item (option-name item)))
+  ;; Attempt to make an option with an unrelated name.
+  (let ((item (first (options +simple-schema+))))
+    (signals error (make-option item "completely.unrelated")))
+
+  ;; Make some options. Expect errors when attempting to make options
+  ;; with wild names.
+  (mapc (lambda (item)
+          (let ((name (option-name item)))
+            (if (typep name 'wild-name)
+                (signals error (make-option item name))
+                (let ((option (make-option item name)))
+                  (is (eq item (option-schema-item option)))))))
         (options +simple-schema+)))
 
 (test make-configuration.smoke

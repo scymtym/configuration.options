@@ -155,12 +155,16 @@
 
 (defmethod make-option ((schema-item standard-schema-item)
                         (name        sequence))
+  (when (typep name 'wild-name) ; TODO proper conditions
+    (error "~@<~A cannot make an option with wild name ~
+            ~/options:print-name/.~@:>"
+           schema-item name))
   (unless (name-matches
            (merge-names (make-name "**") (option-name schema-item))
-            name)
-    (error "~@<Schema item with name ~/options:print-name/ cannot make ~
+           name)
+    (error "~@<~A with name ~/options:print-name/ cannot make an ~
             option with name ~/options:print-name/.~@:>"
-           (option-name schema-item) name))
+           schema-item (option-name schema-item) name))
 
   ;; TODO(jmoringe, 2013-03-01): use `option-class' for cell instead of option?
   (let ((cell (make-instance 'option-cell
