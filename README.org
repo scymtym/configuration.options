@@ -13,29 +13,108 @@
   #+ATTR_HTML: :alt "build status image" :title Build Status :align right
   [[https://travis-ci.org/scymtym/configuration.options][https://travis-ci.org/scymtym/configuration.options.svg]]
 
-* TODO Tutorial
+* STARTED Tutorial
+  Implementing configuration processing using the
+  =configuration.options= system involves at least three steps
+  1. Specifying a schema
+  2. Constructing and population a configuration based on the schema
+  3. Querying options in the constructed configuration
+** TODO Names
+
 ** STARTED Specifying a Schema
    A schema can be defined in at least three ways:
 
    1. "Manually" via multiple function and method calls
-   2. Declaratively using ~options:eval-schema-spec~
-   3. Declaratively using ~options:define-schema~
+   2. Declaratively using ~configuration.options:eval-schema-spec~
+   3. Declaratively using ~configuration.options:define-schema~
 
    Since the second and third options use the same syntax, it is
-   sufficient to discuss ~options:define-schema~. Here is an example:
-   #+BEGIN_SRC lisp
-   (options:define-schema *my-schema*
-     ("logging"
-       ("level" :type    '(member :info :warning :error)
-                :default :warning
-                :documentation
-                "Default log level.")))
+   sufficient to discuss ~configuration.options:define-schema~. Here
+   is an example:
+   #+BEGIN_SRC lisp :results silent :exports both
+     (configuration.options:define-schema *my-schema*
+       "Configuration schema for my program."
+       ("logging"
+        ("appender"                :type '(member :file :standard-output)
+                                   :default :standard-output
+                                   :documentation
+                                   "Appender to use.")
+        ((:wild-inferiors "level") :type    '(member :info :warning :error)
+                                   :default :warning
+                                   :documentation
+                                   "Package/module/component log level.")))
    #+END_SRC
    The above code creates a schema object and stores it in the
    parameter ~*my-schema*~. The schema consists of one item named
    =logging.level= with allowed values =:info=, =:warning= and
-   =:error= and default value =:warning=.
+   =:error= and default value =:warning=:
+   #+BEGIN_SRC lisp :results output :exports both
+     (describe *my-schema*)
+   #+END_SRC
+
+   #+RESULTS:
+   #+begin_example
+   <root>
+   │ Configuration schema for my program.
+   └─logging
+     ├─appender
+     │   Type    (MEMBER FILE STANDARD-OUTPUT)
+     │   Default :STANDARD-OUTPUT
+     │   Appender to use.
+     └─**
+       └─level
+           Type    (MEMBER INFO WARNING ERROR)
+           Default :WARNING
+           Package/module/component log level.
+#+end_example
+
 ** TODO Populating a Configuration
+   Configurations are created from schemata by first creating an empty
+   configuration object and then populating it with options objects
+   corresponding to the non-wild-named schema-item objects in the
+   schema:
+   #+BEGIN_SRC lisp :results silent :exports both
+     (defparameter *my-configuration* (configuration.options:make-configuration *my-schema*))
+   #+END_SRC
+
+   #+BEGIN_SRC lisp :results output :exports both
+   (describe *my-configuration*)
+   (format t "^ empty configuration (no output)~%")
+   #+END_SRC
+
+   #+RESULTS:
+   : ^ empty configuration (no output)
+
+   Other options, for example corresponding to schema-items with wild
+   names, can be created using =make-option=:
+   #+BEGIN_SRC lisp :exports both
+     (setf (configuration.options:find-option
+            "logging.mypackage.myparser.level" *my-configuration*)
+           (configuration.options:make-option
+            (configuration.options:find-option
+             "logging.mypackage.myparser.level" *my-schema*
+             :match-wildcards? t)
+            "logging.mypackage.myparser.level"))
+   #+END_SRC
+
+   #+RESULTS:
+   : #<STANDARD-OPTION  logging.mypackage.myparser.level: (MEMBER INFO WARNING ERROR) <no value> {100BFABCB3}>
+
+   #+BEGIN_SRC lisp :results output :exports both
+     (describe *my-configuration*)
+   #+END_SRC
+
+   #+RESULTS:
+   : <root>
+   : └─logging
+   :   └─mypackage
+   :     └─myparser
+   :       └─level
+   :           Type    (MEMBER INFO WARNING ERROR)
+   :           Default :WARNING
+   :           Value   <no value>
+   :           Package/module/component log level.
+
 ** TODO Querying a Configuration
 ** TODO Tracking Changes of Option Values
 * TODO Related Work
