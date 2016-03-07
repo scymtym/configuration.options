@@ -133,11 +133,16 @@
 (defparameter *simple-configuration* (simple-configuration)
   "Simple configuration for tests.")
 
-(defun simple-option (&key (name '("simple" "option") name-supplied?))
-  (let ((schema-item (if name-supplied?
-                         (simple-schema-item :name name)
-                         *simple-schema-item*)))
-    (make-option schema-item (option-name schema-item))))
+(defun simple-option (&key
+                      (name '("simple" "option") name-supplied?)
+                      (value nil                 value-supplied?)  )
+  (let* ((schema-item (if name-supplied?
+                          (simple-schema-item :name name)
+                          *simple-schema-item*))
+         (option      (make-option schema-item (option-name schema-item))))
+    (when value-supplied?
+      (setf (option-value option) value))
+    option))
 
 (defparameter *simple-option* (simple-option)
   "Simple option for tests.")

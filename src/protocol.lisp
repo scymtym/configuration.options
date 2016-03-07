@@ -144,21 +144,45 @@
 
 ;; Default behavior
 
-(defmethod value ((option-or-name t)
-                  &key
-                  (configuration     *configuration*)
-                  (if-does-not-exist #'error)
-                  (if-no-value       if-does-not-exist))
-  (unless configuration
-    (error "~@<No configuration object supplied to ~S. Is ~S not ~
-              bound to a configuration object?~@:>"
-           'value '*configuration*))
+(flet ((check-configuration (context configuration)
+         (unless configuration
+           (error "~@<No configuration object supplied to ~S. Is ~S ~
+                   not bound to a configuration object?~@:>"
+                  context '*configuration*))))
 
-  (let ((option (find-option option-or-name configuration
-                             :if-does-not-exist if-does-not-exist)))
-    (if (eq option if-does-not-exist)
-        option
-        (option-value option :if-does-not-exist if-no-value))))
+  (defmethod value ((option-or-name t)
+                    &key
+                    (configuration     *configuration*)
+                    (if-does-not-exist #'error)
+                    (if-no-value       if-does-not-exist))
+
+    (let ((option (if (typep option-or-name 'sequence)
+                      (progn
+                        (check-configuration 'value configuration)
+                        (find-option option-or-name configuration
+                                     :if-does-not-exist if-does-not-exist))
+                      option-or-name)))
+      (if (eq option if-does-not-exist)
+          option
+          (option-value option :if-does-not-exist if-no-value))))
+
+  (defmethod (setf value) ((new-value      t)
+                           (option-or-name t)
+                           &key
+                           (configuration     *configuration*)
+                           (if-does-not-exist #'error)
+                           if-no-value)
+    (declare (ignore if-no-value))
+
+    (let ((option (if (typep option-or-name 'sequence)
+                      (progn
+                        (check-configuration '(setf value) configuration)
+                        (find-option option-or-name configuration
+                                     :if-does-not-exist if-does-not-exist))
+                      option-or-name)))
+      (if (eq option if-does-not-exist)
+          new-value
+          (setf (option-value option) new-value)))))
 
 ;;; Event hook protocol
 ;;;

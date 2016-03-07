@@ -64,6 +64,30 @@
                         ("*"       t)
                         ("**"      t)))))
 
+;;; Value protocol
+
+;; Default behavior
+
+(test protocol.value.smoke
+  "Smoke test for the `value' generic function."
+
+  ;; Missing value.
+  (let ((option (simple-option)))
+    (signals value-missing-error (value option))
+    (is-false (nth-value 1 (value option :if-no-value nil)))
+    (is-false (nth-value 1 (value option :if-no-value :foo))))
+
+  ;; Value.
+  (let ((option (simple-option :value 1)))
+    (is (equal '(1 t) (multiple-value-list (value option))))))
+
+(test protocol.setf-value.smoke
+  "Smoke test for the setf `value' generic function."
+
+  (let ((option (simple-option)))
+    (setf (value option) 5)
+    (is (equal '(5 t) (multiple-value-list (value option))))))
+
 ;;; Option container protocol
 
 ;; Name coercion
