@@ -27,6 +27,9 @@
   (:export
    #:retry)
 
+  (:export
+   #:*configuration*)
+
   ;; Conditions
   (:export
    #:name-parse-error

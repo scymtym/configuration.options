@@ -58,6 +58,7 @@
                  :serial     t
                  :components ((:file       "package")
                               (:file       "types")
+                              (:file       "variables")
                               (:file       "conditions")
                               (:file       "protocol")
                               (:file       "mixins")

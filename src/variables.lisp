@@ -1,4 +1,4 @@
-;;;; variables.lisp ---
+;;;; variables.lisp --- Variables provided by the configuration.options system.
 ;;;;
 ;;;; Copyright (C) 2011-2016 Jan Moringen
 ;;;;
@@ -6,12 +6,6 @@
 
 (cl:in-package #:configuration.options)
 
-(declaim (special *schema*))
-
-(defvar *schema* nil
-  "TODO(jmoringe): document")
-
-(declaim (special *configuration*))
-
 (defvar *configuration* nil
-  "TODO(jmoringe): document")
+  "When bound to a configuration object, provides the default
+   configuration for the `value' and setf `value' functions. ")

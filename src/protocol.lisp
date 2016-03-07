@@ -124,13 +124,18 @@
 (defmethod value ((option-or-name t)
                   &key
                   (configuration     *configuration*)
-                  (if-does-not-exist #'error))
-  (let ((option-or-value
-          (find-option option-or-name configuration
-                       :if-does-not-exist if-does-not-exist)))
-    (if (eq option-or-value if-does-not-exist)
-        option-or-value
-        (option-value option-or-value))))
+                  (if-does-not-exist #'error)
+                  (if-no-value       if-does-not-exist))
+  (unless configuration
+    (error "~@<No configuration object supplied to ~S. Is ~S not ~
+              bound to a configuration object?~@:>"
+           'value '*configuration*))
+
+  (let ((option (find-option option-or-name configuration
+                             :if-does-not-exist if-does-not-exist)))
+    (if (eq option if-does-not-exist)
+        option
+        (option-value option :if-does-not-exist if-no-value))))
 
 ;;; Event hook protocol
 ;;;
