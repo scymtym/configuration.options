@@ -21,6 +21,7 @@
                    (:version :utilities.print-tree          "0.1")
                    (:version :cl-hooks            "0.2") ; TODO
                    (:version :architecture.service-provider "0.1")
+                   :log4cl
 
                    (:version :esrap                         "0.9")
 
