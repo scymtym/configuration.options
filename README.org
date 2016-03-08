@@ -28,7 +28,7 @@
    2. Declaratively using ~configuration.options:eval-schema-spec~
    3. Declaratively using ~configuration.options:define-schema~
 
-   Since the second and third options use the same syntax, it is
+   Since the second and third methods use the same syntax, it is
    sufficient to discuss ~configuration.options:define-schema~. Here
    is an example:
    #+BEGIN_SRC lisp :results silent :exports both
@@ -40,14 +40,18 @@
                                    :documentation
                                    "Appender to use.")
         ((:wild-inferiors "level") :type    '(member :info :warning :error)
-                                   :default :warning
                                    :documentation
                                    "Package/module/component log level.")))
    #+END_SRC
    The above code creates a schema object and stores it in the
-   parameter ~*my-schema*~. The schema consists of one item named
-   =logging.level= with allowed values =:info=, =:warning= and
-   =:error= and default value =:warning=:
+   parameter ~*my-schema*~. The schema consists of two items:
+
+   1. ~logging.appender~ with allowed values ~:file~ and
+      ~:standard-output~ with default value ~:standard-output~
+
+   2. a "template" option named =logging.**.level= with allowed values
+      ~:info~, ~:warning~ and ~:error~ and without a default value
+
    #+BEGIN_SRC lisp :results output :exports both
      (describe *my-schema*)
    #+END_SRC
@@ -64,18 +68,22 @@
      └─**
        └─level
            Type    (MEMBER INFO WARNING ERROR)
-           Default :WARNING
+           Default <no default>
            Package/module/component log level.
 #+end_example
 
-** TODO Populating a Configuration
+*** TODO Sub-schemata
+
+** Populating a Configuration
    Configurations are created from schemata by first creating an empty
-   configuration object and then populating it with options objects
-   corresponding to the non-wild-named schema-item objects in the
-   schema:
+   configuration object and then populating it with option objects
+   corresponding to schema item objects in the schema:
+
    #+BEGIN_SRC lisp :results silent :exports both
      (defparameter *my-configuration* (configuration.options:make-configuration *my-schema*))
    #+END_SRC
+
+   The created configuration is empty:
 
    #+BEGIN_SRC lisp :results output :exports both
    (describe *my-configuration*)
@@ -85,42 +93,112 @@
    #+RESULTS:
    : ^ empty configuration (no output)
 
-   Other options, for example corresponding to schema-items with wild
-   names, can be created using =make-option=:
-   #+BEGIN_SRC lisp :exports both
-     (setf (configuration.options:find-option
-            "logging.mypackage.myparser.level" *my-configuration*)
-           (configuration.options:make-option
-            (configuration.options:find-option
-             "logging.mypackage.myparser.level" *my-schema*
-             :match-wildcards? t)
-            "logging.mypackage.myparser.level"))
-   #+END_SRC
+   There are several ways to create option objects from schema item
+   objects:
 
-   #+RESULTS:
-   : #<STANDARD-OPTION  logging.mypackage.myparser.level: (MEMBER INFO WARNING ERROR) <no value> {100BFABCB3}>
+   1. "Manually", options can be created using the ~make-option~
+      generic function (this also works if the corresponding to schema
+      items have wild names):
+
+      #+BEGIN_SRC lisp :exports both
+        (let* ((name        "logging.mypackage.myparser.level")
+               (schema-item (configuration.options:find-option
+                             name *my-schema* :match-wildcards? t)))
+          (setf (configuration.options:find-option name *my-configuration*)
+                (configuration.options:make-option schema-item name)))
+      #+END_SRC
+
+      #+RESULTS:
+      : #<STANDARD-OPTION  logging.mypackage.myparser.level: (MEMBER INFO WARNING ERROR) <no value> {100B8A4FE3}>
+
+      Note that the schema item named =logging.**.level= matches the
+      requested name because of its ~:wild-inferiors~ name
+      component. Also note that creating an option object does not
+      automatically assign a value to it (even if the schema item
+      specifies a default value).
+
+      The schema item lookup and ~make-option~ call in the above code
+      can be done automatically, shortening the example to:
+
+      #+BEGIN_SRC lisp :exports both
+        (configuration.options:find-option
+         "logging.mypackage.mylexer.level" *my-configuration*
+         :if-does-not-exist :create)
+      #+END_SRC
+
+      #+RESULTS:
+      : #<STANDARD-OPTION  logging.mypackage.mylexer.level: (MEMBER INFO WARNING ERROR) <no value> {100B8DD5C3}>
+
+   2. Using a "synchronizer" which integrates data from sources such
+      as configuration files into configuration objects:
+
+      #+BEGIN_SRC lisp :results silent :exports both
+        (let ((synchronizer (make-instance 'configuration.options:standard-synchronizer
+                                           :target *my-configuration*))
+              (source       (configuration.options.sources:make-source :defaults)))
+          (configuration.options.sources:initialize source *my-schema*)
+          (configuration.options.sources:process source synchronizer))
+      #+END_SRC
+
+      The above example uses the simple "default values" source which
+      instantiates option objects for all schema items with non-wild
+      names and sets their values to the respective default values (if
+      any) stored in corresponding schema items.
+
+   After creating these option objects, the configuration looks like
+   this:
 
    #+BEGIN_SRC lisp :results output :exports both
      (describe *my-configuration*)
    #+END_SRC
 
    #+RESULTS:
-   : <root>
-   : └─logging
-   :   └─mypackage
-   :     └─myparser
-   :       └─level
-   :           Type    (MEMBER INFO WARNING ERROR)
-   :           Default :WARNING
-   :           Value   <no value>
-   :           Package/module/component log level.
+   #+begin_example
+   <root>
+   └─logging
+     ├─appender
+     │   Type    (MEMBER FILE STANDARD-OUTPUT)
+     │   Default :STANDARD-OUTPUT
+     │   Value   :STANDARD-OUTPUT
+     │   Sources DEFAULT:
+     │             :STANDARD-OUTPUT
+     │   Appender to use.
+     └─mypackage
+       ├─mylexer
+       │ └─level
+       │     Type    (MEMBER INFO WARNING ERROR)
+       │     Default <no default>
+       │     Value   <no value>
+       │     Package/module/component log level.
+       └─myparser
+         └─level
+             Type    (MEMBER INFO WARNING ERROR)
+             Default <no default>
+             Value   <no value>
+             Package/module/component log level.
+#+end_example
+
+   In a more realistic setting, populating the configuration would be
+   done exclusively using a synchronizer but with a "cascade" of
+   sources [fn:1] instead of just the "default values" source.
 
 ** TODO Querying a Configuration
 ** TODO Tracking Changes of Option Values
 * TODO Related Work
   + https://github.com/Shinmera/universal-config/
+  + https://github.com/Shinmera/ubiquitous
   + https://docs.python.org/3/library/configparser.htm
+  + cl-config
 * Settings                                                         :noexport:
 
 #+OPTIONS: H:2 num:nil toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
 #+OPTIONS: TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
+
+* Footnotes
+
+[fn:1] Typically something like (from lowest to highest priority)
+
+       1. Default values
+       2. Configuration file(s) and directories
+       3. Environment variables
+       4. Commandline options
