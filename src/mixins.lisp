@@ -1,4 +1,4 @@
-;;;; container.lisp ---
+;;;; mixins.lisp --- Mixins for configuration and schema classes.
 ;;;;
 ;;;; Copyright (C) 2012, 2013, 2016 Jan Moringen
 ;;;;
