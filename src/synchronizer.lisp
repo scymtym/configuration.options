@@ -72,8 +72,7 @@
   (let+ ((option    (find-option name (synchronizer-target sink)
                                  :if-does-not-exist :create))
          (cell-hook (event-hook (option-%cell option)))
-         ((&accessors (values      option-values)
-                      (schema-item option-schema-item)) option)
+         ((&structure option- values schema-item) option)
          ((&values default default?)
           (option-default option :if-does-not-exist nil)))
 
@@ -81,10 +80,9 @@
     ;; option cell.
     (unless (find-if (handler-of sink) (hooks:hook-handlers cell-hook))
       (hooks:add-to-hook
-       (event-hook (option-%cell option))
-       (make-instance 'synchronizer-handler
-                      :synchronizer sink
-                      :option       option)))
+       cell-hook (make-instance 'synchronizer-handler
+                                :synchronizer sink
+                                :option       option)))
 
     ;; Adjust size of VALUES to NUMBER-OF-SOURCES + 1 so OPTION's
     ;; default value can be stored as final element. Save default
@@ -111,7 +109,7 @@
                    (name  t)
                    (value t)
                    &key &allow-other-keys)
-  (let+ (((&accessors-r/o (target synchronizer-target)) sink)
+  (let+ (((&structure-r/o synchronizer- target) sink)
          (option (find-option name target))
          (cell-hook (event-hook (option-%cell option))))
 
@@ -135,8 +133,7 @@
                    (raw?  t)
                    &allow-other-keys)
   (let+ ((option       (find-option name (synchronizer-target sink)))
-         ((&accessors-r/o (values      option-values)
-                          (schema-item option-schema-item)) option)
+         ((&structure-r/o option- values schema-item) option)
          (value/parsed (if raw?
                            (string->value schema-item value)
                            value))

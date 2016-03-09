@@ -81,9 +81,7 @@
       (declare (ignore condition))))
   left)
 
-(defmethod process-content ((syntax ini-syntax)
-                            (source stream)
-                            (sink   t))
+(defmethod process-content ((syntax ini-syntax) (source stream) (sink t))
   (let ((ini-syntax (syntax-syntax syntax))
         (content    (read-stream-content-into-string source))
         (*sink*     sink))

@@ -50,9 +50,9 @@
  'source :commandline :class 'commandline-source)
 
 (defmethod initialize ((source commandline-source) (schema t))
-  (let+ (((&accessors (arguments source-arguments)
-                      (context   source-%context)
-                      (synopsis  source-%synopsis)) source)
+  (let+ (((&structure
+           source- arguments (context %context) (synopsis %synopsis))
+          source)
          (global? t) ; TODO
          (seen-wild? nil)
          ((&labels do-option (schema-item)
@@ -70,9 +70,7 @@
 
             ;; Non-wildcard schema item => create an appropriate
             ;; command option.
-            (let+ (((&accessors-r/o (name          option-name)
-                                    (type          option-type)
-                                    (documentation option-documentation))
+            (let+ (((&structure-r/o option- name type documentation)
                     schema-item)
                    ((&values default default?)
                     (option-default schema-item :if-does-not-exist nil))
@@ -153,12 +151,9 @@
     (values #'net.didierverna.clon:make-lispobj
             (list :typespec (list* type inner-type)))))
 
-(defmethod process ((source commandline-source)
-                    (sink   t))
-  "Obtain configuration options from environment variables."
-  (let+ (((&accessors-r/o (prefix  source-prefix)
-                          (context source-context)
-                          (mapping source-%mapping)) source)
+(defmethod process ((source commandline-source) (sink t))
+  ;; Obtain configuration options from commandline options.
+  (let+ (((&structure-r/o source- prefix context (mapping %mapping)) source)
          ((&flet notify (name value option &key (raw? nil))
             (notify sink :added     name nil
                     :source source :option option)

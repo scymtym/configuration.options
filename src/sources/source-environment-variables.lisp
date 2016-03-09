@@ -22,10 +22,9 @@
 (service-provider:register-provider/class
  'source :environment-variables :class 'environment-variables-source)
 
-(defmethod process ((source environment-variables-source)
-                    (sink   t))
-  "Obtain configuration options from environment variables."
-  (let+ (((&accessors-r/o (prefix source-prefix)) source)
+(defmethod process ((source environment-variables-source) (sink t))
+  ;; Obtain configuration options from environment variables.
+  (let+ (((&structure-r/o source- prefix) source)
          ((&flet name->option-name (name)
             (when (or (null prefix) (starts-with-subseq prefix name))
               (split-sequence #\_ (string-downcase name)

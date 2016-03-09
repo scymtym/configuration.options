@@ -44,12 +44,9 @@
 (defmethod print-items append ((object file-source))
   `((:pathname ,(source-pathname object) " ~A")))
 
-(defmethod process ((source file-source)
-                    (sink   t))
-  (let+ (((&accessors-r/o
-           (pathname          source-pathname)
-           (element-type      source-element-type)
-           (if-does-not-exist source-if-does-not-exist)) source))
+(defmethod process ((source file-source) (sink t))
+  (let+ (((&structure-r/o source- pathname element-type if-does-not-exist)
+          source))
     (with-input-from-file (stream pathname
                                   :element-type      element-type
                                   :if-does-not-exist if-does-not-exist)

@@ -62,8 +62,7 @@
                        (schema t))
   (mapc (rcurry #'initialize schema) (source-%sources source)))
 
-(defmethod process ((source cascade-source)
-                    (sink   t))
+(defmethod process ((source cascade-source) (sink t))
   (let+ (((&labels count1 (source)
             (if (source-sources source)
                 (reduce #'+ (source-sources source)

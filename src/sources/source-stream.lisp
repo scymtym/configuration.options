@@ -44,6 +44,5 @@
 (defmethod print-items append ((object stream-source))
   `((:syntax ,(class-name (class-of (source-syntax object))) " ~A")))
 
-(defmethod process ((source stream-source)
-                    (sink   t))
+(defmethod process ((source stream-source) (sink t))
   (process-content (source-syntax source) (source-stream source) sink))
