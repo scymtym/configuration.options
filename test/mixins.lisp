@@ -188,7 +188,21 @@
   :in options)
 (in-suite options.list-container-mixin)
 
-(test find-options.smoke
+(test map-options.smoke
+  "Smoke test for the `map-options' method."
+
+  (let+ (((&flet test-case (container expected-calls)
+            (is (equal expected-calls
+                       (collect-map-options-calls container))))))
+    ;; Empty container.
+    (test-case (make-instance 'list-container-mixin) '())
+    ;; One option.
+    (let ((container (make-instance 'list-container-mixin))
+          (option    *simple-option*))
+      (setf (find-option "simple.option" container) option)
+      (test-case container `((,option))))))
+
+(test list-container.find-options.smoke
   "Smoke test for the `find-options' method."
 
   (macrolet
@@ -221,7 +235,7 @@
            (find-option "simple.option" container)
            (simple-option :name "simple.option"))
      (check-query '(("option"))                     '(:wild))
-     (check-query '(("option") ("simple" "option")) "**"))))
+     (check-query '(("simple" "option") ("option")) "**"))))
 
 (test find-option.smoke
   "Smoke test for the `find-option' and setf find-option functions."
@@ -267,17 +281,3 @@
             option)
       (setf (find-option "foo" container :if-exists :supersede)
             option))))
-
-(test map-options.smoke
-  "Smoke test for the `map-options' method."
-
-  (let+ (((&flet test-case (container expected-calls)
-            (is (equal expected-calls
-                       (collect-map-options-calls container))))))
-    ;; Empty container.
-    (test-case (make-instance 'list-container-mixin) '())
-    ;; One option.
-    (let ((container (make-instance 'list-container-mixin))
-          (option    *simple-option*))
-      (setf (find-option "simple.option" container) option)
-      (test-case container (list option)))))
