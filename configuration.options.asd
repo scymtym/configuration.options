@@ -61,6 +61,7 @@
                               (:file       "variables")
                               (:file       "conditions")
                               (:file       "protocol")
+                              (:file       "util")
                               (:file       "mixins")
                               (:file       "name")
                               (:file       "schema")
