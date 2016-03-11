@@ -20,7 +20,7 @@
                                                   type-based-validation-mixin)
   ())
 
-(test smoke
+(test type-based-validation-mixin.smoke
   "Smoke test for methods on `validate-value' and
    `validate-value-using-type' for `type-based-validation-mixin'."
   (mapc
@@ -76,7 +76,7 @@
                                                type-based-merging-mixin)
   ())
 
-(test smoke
+(test type-based-merging-mixin.smoke
   "Smoke test for methods on `merge-values' and
    `merge-values-using-type' for `type-based-merging-mixin'."
   (mapc
@@ -122,7 +122,7 @@
                                                   type-based-conversion-mixin)
   ())
 
-(test smoke
+(test type-based-conversion-mixin.smoke
   "Smoke test for methods on `value->string', `string->value',
    `value->string-using-type' and `string->value-using-type' for
    `type-based-conversion-mixin'."
@@ -188,7 +188,7 @@
   :in options)
 (in-suite options.list-container-mixin)
 
-(test map-options.smoke
+(test list-container.map-options.smoke
   "Smoke test for the `map-options' method."
 
   (let+ (((&flet test-case (container expected-calls)
@@ -237,7 +237,7 @@
      (check-query '(("option"))                     '(:wild))
      (check-query '(("simple" "option") ("option")) "**"))))
 
-(test find-option.smoke
+(test list-container.find-option.smoke
   "Smoke test for the `find-option' and setf find-option functions."
 
   (macrolet

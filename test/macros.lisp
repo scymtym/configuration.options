@@ -6,10 +6,16 @@
 
 (cl:in-package #:configuration.options.test)
 
+(def-suite macros
+    :in options
+    :description
+    "Test suite for macros provided by the options system.")
+(in-suite macros)
+
 (define-schema *child-schema* ; used in next test
   ("b" :type 'string))
 
-(test eval-schema-spec.smoke
+(test macros.eval-schema-spec.smoke
   "Smoke test for the `eval-schema-spec' function."
 
   (mapc (lambda+ ((input expected))
@@ -77,7 +83,7 @@
           (((() ("a" *child-schema*)))
            (nil (("a.b" string)))))))
 
-(test define-schema.smoke
+(test macros.define-schema.smoke
   "Smoke test for the `define-schema' macro."
 
   ;; Incomplete specification

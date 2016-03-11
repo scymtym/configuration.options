@@ -68,20 +68,20 @@
 
 ;; Name coercion
 
-(test find-options.name-coercion
+(test protocol.find-options.name-coercion
   "Test name coercion performed by the `find-options' generic
    function."
   (call-with-name-coercion-cases
    (make-instance 'mock-container/name-coercion) #'find-options))
 
-(test find-option.name-coercion
+(test protocol.find-option.name-coercion
   "Test name coercion performed by the `find-option' generic
    function."
   (let ((*mock-container/name-coercion-testing-find-option* t))
     (call-with-name-coercion-cases
      (make-instance 'mock-container/name-coercion) #'find-option)))
 
-(test setf-find-options.name-coercion
+(test protocol.setf-find-options.name-coercion
   "Test name coercion performed by the setf `find-option' generic
    function."
   (call-with-name-coercion-cases
@@ -100,7 +100,7 @@
                         (container map-options.ensure-function))
   function)
 
-(test map-options.ensure-function
+(test protocol.map-options.ensure-function
   "Test function coercion performed by `map-options'."
   (is (eq #'map-options.ensure-function
           (map-options 'map-options.ensure-function
@@ -110,7 +110,7 @@
 
 ;; Name coercion
 
-(test find-child.name-coercion
+(test protocol.find-child.name-coercion
   "Test name coercion performed by the `find-child' generic
    function."
   (let ((*mock-container/name-coercion-testing-find-child* t))
@@ -118,7 +118,7 @@
      (make-instance 'mock-container/name-coercion)
      #'find-child)))
 
-(test setf-find-childs.name-coercion
+(test protocol.setf-find-child.name-coercion
   "Test name coercion performed by the setf `find-child' generic
    function."
   (call-with-name-coercion-cases
@@ -178,7 +178,7 @@
     '((1)    1              t)
     '((nil)  nil            t)))
 
-(test setf-option-value.if-does-not-exist
+(test protocol.setf-option-value.if-does-not-exist
   "Test that setf `option-value' accepts the :if-does-not-exist
    option (despite ignoring it)."
 
@@ -187,7 +187,7 @@
          (option (make-option item '("a"))))
     (setf (option-value option :if-does-not-exist #'error) 1)))
 
-(test validate-value.default-behavior
+(test protocol.validate-value.default-behavior
   "Smoke test for the default behavior of the `validate-value'
    function."
 
@@ -203,7 +203,7 @@
 
 ;; Name coercion
 
-(test make-option.name-coercion
+(test protocol.make-option.name-coercion
   "Test name coercion performed by the `make-option' generic
    function."
 

@@ -28,7 +28,7 @@
    '((()                     nil)
      ((:documentation "foo") "foo"))))
 
-(test find-option.create
+(test standard-configuration.find-option.create
   "Test :if-does-not-exist :create for `find-option'."
 
   (let ((configuration (make-configuration *simple-schema*)))

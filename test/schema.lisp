@@ -14,7 +14,7 @@
   "Test suite for the `standard-schema' class.")
 (in-suite standard-schema)
 
-(test map-options.smoke
+(test standard-schema.map-options.smoke
   "Smoke test for the `map-options' method."
 
   (let+ (((&flet set-equal/equal (expected actual)
@@ -38,7 +38,7 @@
                                           :prefix    '("sub"))))))
       (test-case schema expected))))
 
-(test find-options.smoke
+(test standard-schema.find-options.smoke
   "Smoke test for the `find-options' method."
 
   (macrolet
@@ -71,7 +71,7 @@
       (check-query '(("bar" "fez") ("bar")) "bar.**")
       (check-query '((:wild) ("whoop"))     "sub.*"))))
 
-(test find-child.smoke
+(test standard-schema.find-child.smoke
   "Smoke test for the `find-child' and (setf find-child) functions."
 
   (macrolet
@@ -107,7 +107,7 @@
       (setf (find-child "child" schema :if-exists :supersede)
             child))))
 
-(test make-option.smoke
+(test standard-schema.make-option.smoke
   "Smoke test for the `make-option' function."
 
   ;; Attempt to make an option with an unrelated name.
@@ -124,7 +124,7 @@
                   (is (eq item (option-schema-item option)))))))
         (options *simple-schema*)))
 
-(test make-configuration.smoke
+(test standard-schema.make-configuration.smoke
   "Smoke test for the `make-configuration' function."
 
   (let ((configuration (make-configuration *simple-schema*)))
@@ -134,7 +134,7 @@
     ;; There should be no options in the new configuration.
     (is (emptyp (options configuration)))))
 
-(test type-list
+(test standard-schema.type-list
   "Kind-of integrationtest for schema item with list-of-something
    type."
 
