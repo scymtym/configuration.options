@@ -55,4 +55,9 @@
    #:make-syntax)
 
   (:documentation
-   "TODO"))
+   "This package contains configuration options sources.
+
+    Sources such as configuration files, environment variables and
+    commandline options provide option discovery and option value
+    events to sinks (usually a synchronizer) which usually integrate
+    the information into a configuration object."))

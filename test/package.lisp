@@ -43,7 +43,8 @@
    #:run-tests)
 
   (:documentation
-   "This package contains unit tests for the options system."))
+   "This package contains unit tests for the configuration.options
+    system."))
 
 (cl:in-package #:configuration.options.test)
 

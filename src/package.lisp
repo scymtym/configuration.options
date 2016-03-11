@@ -165,17 +165,18 @@
 
   (:documentation
    "This package contains, options and option containers which are
-either parts of a configuration or of a schema. Thus, the basic
-structure is as follows:
+    either parts of a configuration or of a schema. Thus, the basic
+    structure is as follows:
 
-Concept           | Protocol                   | Class(es)     |
-------------------+----------------------------+---------------+
-+ container-like  | container protocol         |               |
-  + schema        | schema protocol            |               |
-  + configuration | configuration protocol     |               |
-+ option-like     | option protocol            |               |
-  + schema-item   | schema item protocol class | `schema-item' |
-  + option        | option value protocol      |               |
+    Concept           | Protocol                   | Class(es)                |
+    ------------------+----------------------------+--------------------------+
+    + container-like  | container protocol         |                          |
+      + schema        | schema protocol            | `standard-schema'        |
+      + configuration | configuration protocol     | `standard-configuration' |
+    + option-like     | option protocol            |                          |
+      + schema-item   | schema item protocol class | `standard-schema-item'   |
+      + option        | option value protocol      | `standard-option'        |
 
-Population of configuration options with actual values is handled by
-functions and classes in the `options.sources' package."))
+    Population of configuration options with actual values is handled
+    by functions and classes in the `configuration.options.sources'
+    package."))
