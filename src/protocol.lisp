@@ -111,14 +111,6 @@
   (:documentation
    "TODO(jmoringe): document"))
 
-(defgeneric value-using-configuration (option configuration)
-  (:documentation
-   "TODO(jmoringe): document"))
-
-(defgeneric (setf value-using-configuration) (new-value option configuration)
-  (:documentation
-   "TODO(jmoringe): document"))
-
 ;; Default behavior
 
 (defmethod value ((option-or-name t)

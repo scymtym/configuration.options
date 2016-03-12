@@ -100,8 +100,7 @@
 
   ;; Value protocol
   (:export
-   #:value
-   #:value-using-configuration)
+   #:value)
 
   ;; Container protocol
   (:export
