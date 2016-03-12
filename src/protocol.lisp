@@ -103,7 +103,23 @@
                    if-does-not-exist
                    if-no-value)
   (:documentation
-   "TODO(jmoringe): document"))
+   "Return the value of OPTION-OR-NAME in CONFIGURATION.
+
+    OPTION-OR-NAME is either an option object or an option name
+    designating an option in CONFIGURATION.
+
+    If CONFIGURATION is not supplied, the value of *CONFIGURATION* is
+    used. An error is signaled if CONFIGURATION is null.
+
+    IF-DOES-NOT-EXIST controls the behavior in case OPTION-OR-NAME is
+    an option name (not an option object) and does not designate an
+    option in CONFIGURATION. For a description of return values,
+    signaled conditions and IF-DOES-NOT-EXIST, see `find-option'.
+
+    IF-NO-VALUE controls the behavior in case OPTION-OR-NAME does not
+    have a value. For a description of returns values, signaled
+    conditions and IF-NO-VALUE, see IF-DOES-NOT-EXIST in the
+    description of `option-value'."))
 
 (defgeneric (setf value) (new-value option-or-name
                           &key
@@ -111,7 +127,20 @@
                           if-does-not-exist
                           if-no-value)
   (:documentation
-   "TODO(jmoringe): document"))
+   "Set value of OPTION-OR-NAME in CONFIGURATION to NEW-VALUE.
+
+    OPTION-OR-NAME is either an option object or an option name
+    designating an option in CONFIGURATION.
+
+    If CONFIGURATION is not supplied, the value of *CONFIGURATION* is
+    used. An error is signaled if CONFIGURATION is null.
+
+    IF-DOES-NOT-EXIST controls the behavior in case OPTION-OR-NAME is
+    an option name (not an option object) and does not designate an
+    option in CONFIGURATION. For a description of return values,
+    signaled conditions and IF-DOES-NOT-EXIST, see `find-option'.
+
+    IF-NO-VALUE is accepted for parity with `value'."))
 
 ;; Default behavior
 
