@@ -92,7 +92,13 @@
      (is (eq (handler-bind ((no-such-option
                               (lambda (condition)
                                 (declare (ignore condition))
-                                (invoke-restart 'use-value :foo))))
+                                (let ((restart (find-restart 'retry)))
+                                  (is-true restart)
+                                  (is (not (emptyp (princ-to-string restart)))))
+                                (let ((restart (find-restart 'use-value)))
+                                  (is-true restart)
+                                  (is (not (emptyp (princ-to-string restart))))
+                                  (invoke-restart restart :foo)))))
                (find-child "no.such.child" schema))
              :foo)))
 

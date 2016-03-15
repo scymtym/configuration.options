@@ -278,14 +278,14 @@
              (retry ()
                :report (lambda (stream)
                          (format stream "~@<Retry finding an item ~
-                                         named ~A in ~A~@:>"
+                                         named ~A in ~A.~@:>"
                                  name container))
                (go :start))
              (use-value (value)
                :report (lambda (stream)
                          (format stream "~@<Use a particular value ~
                                          instead of the missing item ~
-                                         named ~A in ~A~@:>"
+                                         named ~A in ~A.~@:>"
                                  name container))
                value))))))
 
@@ -390,8 +390,17 @@
                                           :name      name
                                           :container schema))
              (retry ()
+               :report (lambda (stream)
+                         (format stream "~@<Retry finding a child ~
+                                         named ~A in ~A.~@:>"
+                                 name schema))
                (go :start))
              (use-value (value)
+               :report (lambda (stream)
+                         (format stream "~@<Use a particular value ~
+                                         instead of the missing child ~
+                                         named ~A in ~A.~@:>"
+                                 name schema))
                value))))))
 
 (defmethod (setf find-child) :around ((new-value t)
