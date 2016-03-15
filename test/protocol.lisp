@@ -148,9 +148,9 @@
                  (is (equal expected-value  value))
                  (is (eq    expected-value? value?)))
                (when (not expected-value?)
-                 (signals no-such-value-error (do-it))
+                 (signals value-missing-error (do-it))
                  (is (equal :foo (handler-bind
-                                     ((no-such-value-error
+                                     ((value-missing-error
                                        (lambda (condition)
                                          (declare (ignore condition))
                                          (let ((restart (find-restart 'retry)))

@@ -83,13 +83,13 @@
 
     ;; Reader
     (test-case
-     (signals no-such-option
+     (signals child-missing-error
        (find-child "no.such.child" schema)))
     (test-case
      (is (not (find-child "no.such.child" schema
                           :if-does-not-exist nil))))
     (test-case
-     (is (eq (handler-bind ((no-such-option
+     (is (eq (handler-bind ((child-missing-error
                               (lambda (condition)
                                 (declare (ignore condition))
                                 (let ((restart (find-restart 'retry)))

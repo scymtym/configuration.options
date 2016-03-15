@@ -25,28 +25,85 @@
 
 ;;; Option locating conditions
 
-(define-condition no-such-option (error)
+(define-condition binding-condition (condition)
   ((name      :initarg  :name
-              :reader   no-such-option-name
+              :reader   binding-condition-name
               :documentation
-              "Stores the name of the option which could not be
-               found.")
+              "Stores the name of the item which could not be found.")
    (container :initarg  :container
-              :reader   no-such-option-container
+              :reader   binding-condition-container
               :documentation
-              "Stores the container object in which the requested
-               option could not be found."))
+              "Stores the container object in which the requested item
+               could not be found."))
+  (:default-initargs
+   :name      (missing-required-initarg 'binding-condition :name)
+   :container (missing-required-initarg 'binding-condition :container))
+  (:documentation
+   "Instance of subclasses of this condition class are signaled in
+    situations involving a named binding in a container."))
+
+(define-condition binding-missing-condition (binding-condition)
+  ()
   (:report
    (lambda (condition stream)
-     (format stream "~@<No option named ~
-                     ~/configuration.options:print-name/ in ~A.~@:>"
-             (no-such-option-name      condition)
-             (no-such-option-container condition))))
+     (format stream "~@<No item named ~
+                     \"~/configuration.options:print-name/\" in ~
+                     ~A.~@:>"
+             (binding-condition-name      condition)
+             (binding-condition-container condition))))
   (:documentation
-   "This error is signaled when a requested option-like object cannot
-    be found."))
+   "Instances of subclasses of this condition class are signaled when
+    a requested item object cannot be found in a container."))
 
-;;;
+(define-condition binding-exists-condition (binding-condition)
+  ((existing :initarg  :existing
+             :reader   binding-exists-condition-existing
+             :documentation
+             "Stores the object already stored under the name in
+              question."))
+  (:default-initargs
+   :existing (missing-required-initarg 'binding-exists-condition :existing))
+  (:report
+   (lambda (condition stream)
+     (format stream "~@<The name ~
+                     \"~/configuration.options:print-name/\" is ~
+                     already associated with ~A in ~A.~@:>"
+             (binding-condition-name            condition)
+             (binding-exists-condition-existing condition)
+             (binding-condition-container       condition))))
+  (:documentation
+   "Instances of subclasses of this condition class are signaled when
+    an attempt is made to store an item in a container under a name
+    for which an item is already stored."))
+
+(macrolet
+    ((define-binding-conditions (prefix)
+       `(progn
+          (define-condition ,(symbolicate prefix '#:-missing-error)
+              (binding-missing-condition
+               error)
+            ()
+            (:documentation
+             ,(format nil "~@<This error is signaled when a requested ~
+                           ~(~A~) cannot be found in a ~
+                           container.~@:>"
+                      prefix)))
+
+          (define-condition ,(symbolicate prefix '#:-exists-error)
+              (binding-exists-condition
+               error)
+            ()
+            (:documentation
+             ,(format nil "~@<This error is signaled when an attempt ~
+                           is made to store a ~(~A~) in a container ~
+                           under a name for which a ~:*~(~A~) is ~
+                           already stored.~@:>"
+                      prefix))))))
+
+  (define-binding-conditions option)
+  (define-binding-conditions child))
+
+;;; Option conditions
 
 (define-condition option-condition (condition)
   ((option :initarg  :option
@@ -59,6 +116,27 @@
    "Subclasses of this condition class are signaled when a problem
     involving an option is encountered."))
 
+(define-condition value-missing-condition (option-condition)
+  ((which :initarg  :which
+          :type     symbol
+          :reader   value-missing-condition-which
+          :initform :value
+          :documentation
+          "Stores a symbol describing the option value which was
+           requested but did not exist."))
+  (:report
+   (lambda (condition stream)
+     (format stream "~@<The option ~A does not have a ~A.~@:>"
+             (option-condition-option       condition)
+             (value-missing-condition-which condition))))
+  (:documentation
+   "Instances of subclasses of this condition class are signaled when
+    an option value is requested which does not exist."))
+
+(define-condition value-missing-error (value-missing-condition
+                                       error)
+  ())
+
 (define-condition value-condition (condition)
   ((value :initarg  :value
           :reader   value-condition-value
@@ -69,24 +147,6 @@
   (:documentation
    "Subclasses of this condition class are signaled when a problem
     regarding an option value is encountered."))
-
-(define-condition no-such-value-error (error
-                                       option-condition)
-  ((which :initarg  :which
-          :type     symbol
-          :reader   no-such-value-error-which
-          :initform :value
-          :documentation
-          "Stores a symbol describing the option value which was
-           requested but did not exist."))
-  (:report
-   (lambda (condition stream)
-     (format stream "~@<The option ~A does not have a ~A.~@:>"
-             (option-condition-option   condition)
-             (no-such-value-error-which condition))))
-  (:documentation
-   "This error is signaled when a option value is requested which does
-    not exist."))
 
 (define-condition option-value-error (error
                                       option-condition
@@ -170,8 +230,8 @@
   (:report
    (lambda (condition stream)
      (format stream "~@<When notifying sink ~A of ~S option ~
-                     ~/configuration.options:print-name/~@[ with value ~
-                     ~S~]~@[ by source ~A~]~
+                     \"~/configuration.options:print-name/\" ~
+                     ~@[ with value ~S~]~@[ by source ~A~]~
                      ~/more-conditions:maybe-print-cause/~@:>"
              (notification-error-sink   condition)
              (notification-error-event  condition)

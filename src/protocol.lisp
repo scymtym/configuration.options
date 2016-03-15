@@ -209,13 +209,14 @@
 
     'error, #'error
 
-      Signal a `no-such-option' error indicating that an option named
+      Signal an `option-missing-error' indicating that an option named
       NAME does not exist in CONTAINER.
 
     a function
 
-      Call the function with an `no-such-option' error indicating that
-      an option named NAME does not exist in CONTAINER.
+      Call the function with an `option-missing-error' instance
+      indicating that an option named NAME does not exist in
+      CONTAINER.
 
     IF-EXISTS is accepted for parity with `(setf find-option)'."))
 
@@ -243,13 +244,14 @@
 
     'error, #'error
 
-      Signal an error indicating that an option named NAME already
-      exists in CONTAINER.
+      Signal an `option-exists-error' indicating that an option named
+      NAME already exists in CONTAINER.
 
     a function
 
-      Call the function with an error indicating that an option named
-      NAME already exists in CONTAINER."))
+      Call the function with an `option-exists-error' instance
+      indicating that an option named NAME already exists in
+      CONTAINER."))
 
 ;; when using (setf find-option) to add an option to a configuration,
 ;; consult the schema to check whether the option is valid:
@@ -308,7 +310,7 @@
      (return-from find-option
        (or (call-next-method)
            (error-behavior-restart-case (if-does-not-exist
-                                         (no-such-option
+                                         (option-missing-error
                                           :name      name
                                           :container container))
              (retry ()
@@ -343,11 +345,10 @@
        existing)
       (t
        (error-behavior-restart-case
-           (if-exists (simple-error ; TODO condition
-                       :format-control   "~@<Name ~/options:print-name/ ~
-                                          is already associated with ~
-                                          ~A in ~A.~@:>"
-                       :format-arguments (list name existing container)))
+           (if-exists (option-exists-error
+                       :name      name
+                       :existing  existing
+                       :container container))
          (continue (&optional condition)
            :report (lambda (stream)
                      (format stream "~@<Replace existing option ~A ~
@@ -386,13 +387,13 @@
 
     'error, #'error
 
-      Signal a `no-such-option' error indicating that a child named
+      Signal a `child-missing-error' indicating that a child named
       NAME does not exist in SCHEMA.
 
     a function
 
-      Call the function with an `no-such-option' error indicating that
-      a child NAME NAME does not exist in SCHEMA.
+      Call the function with a `child-missing-error' instance
+      indicating that a child NAME NAME does not exist in SCHEMA.
 
     IF-EXISTS is accepted for parity with `(setf find-child)'."))
 
@@ -419,13 +420,13 @@
 
     'error, #'error
 
-      Signal an error indicating that a child named NAME already
-      exists in SCHEMA.
+      Signal a `child-exists-error' indicating that a child named NAME
+      already exists in SCHEMA.
 
     a function
 
-      Call the function with an error indicating that a child named
-      NAME already exists in SCHEMA."))
+      Call the function with a `child-exists-error' indicating that a
+      child named NAME already exists in SCHEMA."))
 
 (defgeneric make-configuration (schema)
   (:documentation
@@ -457,7 +458,7 @@
      (return-from find-child
        (or (call-next-method)
            (error-behavior-restart-case (if-does-not-exist
-                                         (no-such-option ; TODO condition
+                                         (child-missing-error
                                           :name      name
                                           :container schema))
              (retry ()
@@ -492,11 +493,10 @@
        existing)
       (t
        (error-behavior-restart-case
-           (if-exists (simple-error ; TODO condition
-                       :format-control   "~@<Name ~/options:print-name/ ~
-                                          is already associated with ~
-                                          ~A in ~A.~@:>"
-                       :format-arguments (list name existing schema)))
+           (if-exists (child-exists-error
+                       :name      name
+                       :existing  existing
+                       :container schema))
          (continue (&optional condition)
            :report (lambda (stream)
                      (format stream "~@<Replace existing child ~A with ~
@@ -547,13 +547,13 @@
 
     'error, #'error
 
-      Signal a `no-such-value-error' error indicating that OPTION does
-      not have a default value.
+      Signal a `value-missing-error' indicating that OPTION does not
+      have a default value.
 
     a function
 
-      Call the function with a `no-such-value-error' object indicating
-      that OPTION does not have a default value."))
+      Call the function with a `value-missing-error' instance
+      indicating that OPTION does not have a default value."))
 
 (defgeneric option-documentation (option)
   (:documentation
@@ -571,7 +571,7 @@
              (when default?
                (return-from option-default (values default default?))))
            (error-behavior-restart-case (if-does-not-exist
-                                         (no-such-value-error
+                                         (value-missing-error
                                           :option option
                                           :which :default))
              (retry ()
@@ -742,13 +742,13 @@
 
     'error, #'error
 
-      Signal a `no-such-value-error' error indicating that OPTION does
-      not have a value.
+      Signal a `value-missing-error' indicating that OPTION does not
+      have a value.
 
     a function
 
-      Call the function with a `no-such-value-error' object indicating
-      that OPTION does not have a value."))
+      Call the function with a `value-missing-error' instance
+      indicating that OPTION does not have a value."))
 
 ;;; TODO(jmoringe, 2012-02-22): always supported?
 (defgeneric (setf option-value) (new-value option
@@ -783,7 +783,7 @@
              (when value?
                (return-from option-value (values value value?))))
            (error-behavior-restart-case (if-does-not-exist
-                                         (no-such-value-error
+                                         (value-missing-error
                                           :option option
                                           :which :value))
              (retry ()

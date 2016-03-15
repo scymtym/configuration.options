@@ -35,16 +35,28 @@
    #:name-parse-error
    #:name-parse-error-text
 
-   #:no-such-option
-   #:no-such-option-name
-   #:no-such-option-container
+   #:binding-condition
+   #:binding-condition-name
+   #:binding-condition-container
+
+   #:binding-missing-condition
+
+   #:binding-exists-condition
+   #:binding-exists-condition-existing
+
+   #:option-missing-error
+   #:option-exists-error
+
+   #:child-missing-error
+   #:child-exists-error
 
    #:option-condition-option
 
    #:value-condition-value
 
-   #:no-such-value-error
-   #:no-such-value-error-which
+   #:value-missing-condition
+   #:value-missing-condition-which
+   #:value-missing-error
 
    #:option-value-error
 

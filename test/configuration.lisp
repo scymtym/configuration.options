@@ -33,7 +33,7 @@
 
   (let ((configuration (make-configuration *simple-schema*)))
     ;; Option is not in schema
-    (signals no-such-option
+    (signals option-missing-error
       (find-option "no.such.option" configuration
                    :if-does-not-exist :create))
 

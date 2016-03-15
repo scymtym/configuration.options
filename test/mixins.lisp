@@ -252,13 +252,13 @@
 
     ;; Reader
     (test-case
-     (signals no-such-option
+     (signals option-missing-error
        (find-option "no.such.option" container)))
     (test-case
      (is (not (find-option "no.such.option" container
                            :if-does-not-exist nil))))
     (test-case
-     (is (eq (handler-bind ((no-such-option
+     (is (eq (handler-bind ((option-missing-error
                               (lambda (condition)
                                 (declare (ignore condition))
                                 (let ((restart (find-restart 'retry)))
