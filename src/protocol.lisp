@@ -207,6 +207,11 @@
 
       Return IF-DOES-NOT-EXIST.
 
+    'warn, #'warn
+
+      Signal a `option-missing-warning' indicating that an option
+      named NAME does not exist in CONTAINER and return nil.
+
     'error, #'error
 
       Signal an `option-missing-error' indicating that an option named
@@ -241,6 +246,11 @@
 
       Do not store NEW-VALUE and keep the option currently associated
       to NAME in CONTAINER.
+
+    'warn, #'warn
+
+      Signal a `option-exists-warning' indicating that an option named
+      NAME already exists in CONTAINER.
 
     'error, #'error
 
@@ -309,10 +319,12 @@
    :start
      (return-from find-option
        (or (call-next-method)
-           (error-behavior-restart-case (if-does-not-exist
-                                         (option-missing-error
-                                          :name      name
-                                          :container container))
+           (error-behavior-restart-case
+               (if-does-not-exist
+                (option-missing-error
+                 :name      name
+                 :container container)
+                :warning-condition option-missing-warning)
              (retry ()
                :report (lambda (stream)
                          (format stream "~@<Retry finding an item ~
@@ -348,7 +360,8 @@
            (if-exists (option-exists-error
                        :name      name
                        :existing  existing
-                       :container container))
+                       :container container)
+                      :warning-condition option-exists-warning)
          (continue (&optional condition)
            :report (lambda (stream)
                      (format stream "~@<Replace existing option ~A ~
@@ -385,6 +398,11 @@
 
       Return IF-DOES-NOT-EXIST.
 
+    'warn, #'warn
+
+      Signal a `child-missing-warning' indicating that a child named
+      NAME does not exist in SCHEMA and return nil.
+
     'error, #'error
 
       Signal a `child-missing-error' indicating that a child named
@@ -417,6 +435,11 @@
 
       Do not store NEW-VALUE and keep the child currently associated
       to NAME in SCHEMA.
+
+    'warn, #'warn
+
+      Signal a `child-exists-warning' indicating that a child named
+      NAME already exists in SCHEMA.
 
     'error, #'error
 
@@ -457,10 +480,12 @@
    :start
      (return-from find-child
        (or (call-next-method)
-           (error-behavior-restart-case (if-does-not-exist
-                                         (child-missing-error
-                                          :name      name
-                                          :container schema))
+           (error-behavior-restart-case
+               (if-does-not-exist
+                (child-missing-error
+                 :name      name
+                 :container schema)
+                :warning-condition child-missing-warning)
              (retry ()
                :report (lambda (stream)
                          (format stream "~@<Retry finding a child ~
@@ -496,7 +521,8 @@
            (if-exists (child-exists-error
                        :name      name
                        :existing  existing
-                       :container schema))
+                       :container schema)
+                      :warning-condition child-exists-warning)
          (continue (&optional condition)
            :report (lambda (stream)
                      (format stream "~@<Replace existing child ~A with ~
@@ -545,6 +571,11 @@
 
       Return the two values IF-DOES-NOT-EXIST, nil.
 
+    'warn, #'warn
+
+      Signal a `value-missing-warning' indicating that OPTION does not
+      have a default value and return the two values nil, nil.
+
     'error, #'error
 
       Signal a `value-missing-error' indicating that OPTION does not
@@ -570,10 +601,12 @@
        (or (let+ (((&values default default?) (call-next-method)))
              (when default?
                (return-from option-default (values default default?))))
-           (error-behavior-restart-case (if-does-not-exist
-                                         (value-missing-error
-                                          :option option
-                                          :which :default))
+           (error-behavior-restart-case
+               (if-does-not-exist
+                (value-missing-error
+                 :option option
+                 :which :default)
+                :warning-condition value-missing-warning)
              (retry ()
                :report (lambda (stream)
                          (format stream "~@<Retry obtaining the ~
@@ -740,6 +773,11 @@
 
       Return the two values IF-DOES-NOT-EXIST, nil.
 
+    'warn, #'warn
+
+      Signal a `value-missing-warning' indicating that OPTION does not
+      have a default value and return the two values nil, nil.
+
     'error, #'error
 
       Signal a `value-missing-error' indicating that OPTION does not
@@ -782,10 +820,12 @@
        (or (let+ (((&values value value?) (call-next-method)))
              (when value?
                (return-from option-value (values value value?))))
-           (error-behavior-restart-case (if-does-not-exist
-                                         (value-missing-error
-                                          :option option
-                                          :which :value))
+           (error-behavior-restart-case
+               (if-does-not-exist
+                (value-missing-error
+                 :option option
+                 :which :value)
+                :warning-condition value-missing-warning)
              (retry ()
                :report (lambda (stream)
                          (format stream "~@<Retry obtaining the value ~

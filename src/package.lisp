@@ -44,10 +44,14 @@
    #:binding-exists-condition
    #:binding-exists-condition-existing
 
+   #:option-missing-warning
    #:option-missing-error
+   #:option-exists-warning
    #:option-exists-error
 
+   #:child-missing-warning
    #:child-missing-error
+   #:child-exists-warning
    #:child-exists-error
 
    #:option-condition-option
@@ -56,6 +60,7 @@
 
    #:value-missing-condition
    #:value-missing-condition-which
+   #:value-missing-warning
    #:value-missing-error
 
    #:option-value-error

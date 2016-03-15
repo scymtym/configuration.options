@@ -78,27 +78,34 @@
 
 (macrolet
     ((define-binding-conditions (prefix)
-       `(progn
-          (define-condition ,(symbolicate prefix '#:-missing-error)
-              (binding-missing-condition
-               error)
-            ()
-            (:documentation
-             ,(format nil "~@<This error is signaled when a requested ~
-                           ~(~A~) cannot be found in a ~
-                           container.~@:>"
-                      prefix)))
+       (flet ((missing-condition (kind)
+                `(define-condition ,(symbolicate prefix '#:-missing- kind)
+                     (binding-missing-condition
+                      ,kind)
+                   ()
+                   (:documentation
+                    ,(format nil "~@<This ~(~A~) is signaled when a ~
+                                  requested ~(~A~) cannot be found in ~
+                                  a container.~@:>"
+                             kind prefix))))
 
-          (define-condition ,(symbolicate prefix '#:-exists-error)
-              (binding-exists-condition
-               error)
-            ()
-            (:documentation
-             ,(format nil "~@<This error is signaled when an attempt ~
-                           is made to store a ~(~A~) in a container ~
-                           under a name for which a ~:*~(~A~) is ~
-                           already stored.~@:>"
-                      prefix))))))
+              (exists-condition (kind)
+                `(define-condition ,(symbolicate prefix '#:-exists- kind)
+                     (binding-exists-condition
+                      ,kind)
+                   ()
+                   (:documentation
+                    ,(format nil "~@<This ~(~A~) is signaled when an ~
+                                  attempt is made to store a ~(~A~) in ~
+                                  a container under a name for which a ~
+                                  ~:*~(~A~) is already stored.~@:>"
+                             kind prefix)))))
+         `(progn
+            ,(missing-condition 'warning)
+            ,(missing-condition 'error)
+
+            ,(exists-condition 'warning)
+            ,(exists-condition 'error)))))
 
   (define-binding-conditions option)
   (define-binding-conditions child))
@@ -132,6 +139,10 @@
   (:documentation
    "Instances of subclasses of this condition class are signaled when
     an option value is requested which does not exist."))
+
+(define-condition value-missing-warning (value-missing-condition
+                                         warning)
+  ())
 
 (define-condition value-missing-error (value-missing-condition
                                        error)
