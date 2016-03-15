@@ -197,8 +197,25 @@
    "Find and return the option named NAME in CONTAINER.
 
     IF-DOES-NOT-EXIST controls the behavior in case there is no option
-    named NAME. Acceptable values are functions accepting a condition
-    object and nil.
+    named NAME:
+
+    nil
+
+      Return nil.
+
+    other value (but not one of the following)
+
+      Return IF-DOES-NOT-EXIST.
+
+    'error, #'error
+
+      Signal a `no-such-option' error indicating that an option named
+      NAME does not exist in CONTAINER.
+
+    a function
+
+      Call the function with an `no-such-option' error indicating that
+      an option named NAME does not exist in CONTAINER.
 
     IF-EXISTS is accepted for parity with `(setf find-option)'."))
 
@@ -212,8 +229,27 @@
     IF-DOES-NOT-EXIST is accepted for parity with `find-option'.
 
     IF-EXISTS controls the behavior in case an option named NAME is
-    already stored in CONTAINER. Acceptable values are :supersede
-    and :keep."))
+    already stored in CONTAINER:
+
+    :supersede
+
+      Replace the existing option named NAME in container with
+      NEW-VALUE.
+
+    :keep
+
+      Do not store NEW-VALUE and keep the option currently associated
+      to NAME in CONTAINER.
+
+    'error, #'error
+
+      Signal an error indicating that an option named NAME already
+      exists in CONTAINER.
+
+    a function
+
+      Call the function with an error indicating that an option named
+      NAME already exists in CONTAINER."))
 
 ;; when using (setf find-option) to add an option to a configuration,
 ;; consult the schema to check whether the option is valid:
@@ -338,8 +374,25 @@
    "Find and return the child schema stored under NAME in SCHEMA.
 
     IF-DOES-NOT-EXIST controls the behavior in case there is no child
-    schema named NAME in SCHEMA. Acceptable values are functions
-    accepting a condition object and nil.
+    schema named NAME in SCHEMA:
+
+    nil
+
+      Return nil.
+
+    other value (but not one of the following)
+
+      Return IF-DOES-NOT-EXIST.
+
+    'error, #'error
+
+      Signal a `no-such-option' error indicating that a child named
+      NAME does not exist in SCHEMA.
+
+    a function
+
+      Call the function with an `no-such-option' error indicating that
+      a child NAME NAME does not exist in SCHEMA.
 
     IF-EXISTS is accepted for parity with `(setf find-child)'."))
 
@@ -353,8 +406,26 @@
     IF-DOES-NOT-EXIST is accepted for parity with `find-child'.
 
     IF-EXISTS controls the behavior in case a child schema name is
-    already stored in SCHEMA. Acceptable values are :supersede
-    and :keep."))
+    already stored in SCHEMA:
+
+    :supersede
+
+      Replace the existing child named NAME in SCHEMA with NEW-VALUE.
+
+    :keep
+
+      Do not store NEW-VALUE and keep the child currently associated
+      to NAME in SCHEMA.
+
+    'error, #'error
+
+      Signal an error indicating that a child named NAME already
+      exists in SCHEMA.
+
+    a function
+
+      Call the function with an error indicating that a child named
+      NAME already exists in SCHEMA."))
 
 (defgeneric make-configuration (schema)
   (:documentation
@@ -469,6 +540,10 @@
     nil
 
       Return the two values nil, nil.
+
+    other value (but not one of the following)
+
+      Return the two values IF-DOES-NOT-EXIST, nil.
 
     'error, #'error
 
@@ -660,6 +735,10 @@
     nil
 
       Return the two values nil, nil.
+
+    other value (but not one of the following)
+
+      Return the two values IF-DOES-NOT-EXIST, nil.
 
     'error, #'error
 
