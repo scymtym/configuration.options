@@ -500,8 +500,17 @@
                                           :option option
                                           :which :default))
              (retry ()
+               :report (lambda (stream)
+                         (format stream "~@<Retry obtaining the ~
+                                         default value of ~A.~@:>"
+                                 option))
                (go :start))
              (use-value (value)
+               :report (lambda (stream)
+                         (format stream "~@<Use a particular value ~
+                                         instead of the missing ~
+                                         default value of ~A.~@:>"
+                                 option))
                value))))))
 
 ;;; Schema item protocol
@@ -699,8 +708,17 @@
                                           :option option
                                           :which :value))
              (retry ()
+               :report (lambda (stream)
+                         (format stream "~@<Retry obtaining the value ~
+                                         of ~A.~@:>"
+                                 option))
                (go :start))
              (use-value (value)
+               :report (lambda (stream)
+                         (format stream "~@<Use a particular value ~
+                                         instead of the missing ~
+                                         value of ~A.~@:>"
+                                 option))
                value))))))
 
 ;;; Sink protocol

@@ -132,7 +132,7 @@
     ((define-value-function-test ((name &key (value-var 'value))
                                   construction-expression
                                   &body cases)
-       `(test ,name
+       `(test ,(symbolicate '#:protocol. name)
           ,(format nil "Test default behavior of `~(~A~)' function."
                    name)
           (mapc
@@ -150,9 +150,16 @@
                (when (not expected-value?)
                  (signals no-such-value-error (do-it))
                  (is (equal :foo (handler-bind
-                                     ((no-such-value-error (lambda (c)
-                                                             (declare (ignore c))
-                                                             (use-value :foo))))
+                                     ((no-such-value-error
+                                       (lambda (condition)
+                                         (declare (ignore condition))
+                                         (let ((restart (find-restart 'retry)))
+                                           (is-true restart)
+                                           (is (not (emptyp (princ-to-string restart)))))
+                                         (let ((restart (find-restart 'use-value)))
+                                           (is-true restart)
+                                           (is (not (emptyp (princ-to-string restart))))
+                                           (invoke-restart restart :foo)))))
                                    (do-it)))))))
            (list ,@cases)))))
 
