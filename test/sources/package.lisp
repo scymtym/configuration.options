@@ -20,6 +20,10 @@
 
    #:configuration.options.test)
 
+  (:import-from #:configuration.options.sources ; TODO until alexandria provides these
+   #:read-stream-content-into-byte-vector
+   #:read-stream-content-into-string)
+
   (:documentation
    "This package contains unit tests for the sources module"))
 
