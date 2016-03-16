@@ -93,7 +93,7 @@
                               (lambda (condition)
                                 (declare (ignore condition))
                                 (invoke-restart 'use-value :foo))))
-               (find-option "no.such.child" schema))
+               (find-child "no.such.child" schema))
              :foo)))
 
     ;; Writer
