@@ -11,7 +11,7 @@
 (test file-source.smoke
   "Smoke test for `file-source' class."
 
-  (let ((name (format nil "/tmp/~A/.conf" (make-random-string))))
+  (let ((name (format nil "/tmp/~A.conf" (make-random-string))))
     (with-file (name "a=1 b.c=2")
       (with-source-and-sink ((:file :syntax :mock :pathname name)
                              :sink-var sink)
