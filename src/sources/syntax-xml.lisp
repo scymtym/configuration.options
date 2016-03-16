@@ -89,9 +89,12 @@
                 (xloc:with-locations-r/o ((name  name-pattern)
                                           (value value-pattern))
                     option
-                  (let ((name (parse-name name :wild-allowed nil)))
-                    (notify sink :added     name nil)
-                    (notify sink :new-value name value :raw? t)))
+                  (let+ ((name (parse-name name :wild-allowed nil))
+                         ((&flet notify (event &optional value)
+                            (notify sink event name value
+                                    :source (syntax-source syntax)))))
+                    (notify :added)
+                    (notify :new-value value)))
               (continue (&optional condition)
                 :report (lambda (stream)
                           (format stream "~@<Ignore option ~A.~@:>" option))
