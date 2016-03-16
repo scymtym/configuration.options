@@ -323,7 +323,8 @@
          (add-item name   option)))
      object)
     (when-let ((root (gethash '() tree)))
-      (let ((*print-circle* nil))
+      (let ((*print-pretty* t)
+            (*print-circle* nil))
         (utilities.print-tree:print-tree
          stream root
          (utilities.print-tree:make-node-printer
