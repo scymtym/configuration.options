@@ -83,13 +83,13 @@
          (document (cxml:parse source (stp:make-builder))))
     (xloc:with-locations-r/o (((:loc options) option-pattern
                                :if-multiple-matches :all))
-      document
+        document
       (iter (for option in options)
             (restart-case
                 (xloc:with-locations-r/o ((name  name-pattern)
                                           (value value-pattern))
-                  option
-                  (let ((name (parse-name name))) ; TODO only non-wild
+                    option
+                  (let ((name (parse-name name :wild-allowed nil)))
                     (notify sink :added     name nil)
                     (notify sink :new-value name value :raw? t)))
               (continue (&optional condition)
