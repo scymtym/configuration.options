@@ -4,23 +4,16 @@
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
-(load (merge-pathnames "configuration.options.asd"
-                       (or *load-truename* *compile-file-truename*)))
-
-(cl:in-package #:configuration.options-system)
-
-;;; System definition
-
 (defsystem :configuration.options-xml
   :author      "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :maintainer  "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
-  :version     #.(version/string)
+  :version     (:read-file-form "version-string.sexp")
   :license     "LLGPLv3" ; see COPYING file for details.
   :description "XML-based configuration source."
   :depends-on  (:alexandria
                 (:version :let-plus              "0.2")
 
-                (:version :configuration.options #.(version/string))
+                (:version :configuration.options (:read-file-form "version-string.sexp"))
 
                 (:version :xml.location          "0.2.0"))
   :components  ((:module     "sources"
@@ -32,16 +25,16 @@
 (defsystem :configuration.options-xml-test
   :author      "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :maintainer  "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
-  :version     #.(version/string)
+  :version     (:read-file-form "version-string.sexp")
   :license     "LLGPLv3" ; see COPYING file for details.
   :description "Unit tests for the options-and-xml.location system."
   :depends-on  (:alexandria
                 (:version :let-plus                   "0.2")
 
-                (:version :configuration.options-xml  #.(version/string))
+                (:version :configuration.options-xml  (:read-file-form "version-string.sexp"))
 
                 (:version :fiveam                     "1.1")
-                (:version :configuration.options-test #.(version/string)))
+                (:version :configuration.options-test (:read-file-form "version-string.sexp")))
   :components  ((:module     "sources"
                  :pathname   "test/sources"
                  :components ((:file       "syntax-xml")))))

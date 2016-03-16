@@ -4,42 +4,10 @@
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
-(cl:defpackage #:configuration.options-system
-  (:use
-   #:cl
-   #:asdf)
-
-  (:export
-   #:version/list
-   #:version/string))
-
-(cl:in-package #:configuration.options-system)
-
-;;; Version stuff
-
-(defparameter +version-major+ 0
-  "Major component of version number.")
-
-(defparameter +version-minor+ 1
-  "Minor component of version number.")
-
-(defparameter +version-revision+ 0
-  "Revision component of version number.")
-
-(defun version/list ()
-  "Return a version of the form (MAJOR MINOR REVISION)."
-  (list +version-major+ +version-minor+ +version-revision+))
-
-(defun version/string ()
-  "Return a version string of the form \"MAJOR.MINOR.REVISION\"."
-  (format nil "~{~A.~A.~A~}" (version/list)))
-
-;;; System definition
-
 (defsystem :configuration.options
   :author      "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :maintainer  "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
-  :version     #.(version/string)
+  :version     (:read-file-form "version-string.sexp")
   :license     "LLGPLv3" ; see COPYING file for details.
   :description "A simple options system that supports multiple options sources."
   :depends-on  (:alexandria
@@ -94,13 +62,15 @@
 (defsystem :configuration.options-test
   :author      "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :maintainer  "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
-  :version     #.(version/string)
+  :version     (:read-file-form "version-string.sexp")
   :license     "LLGPLv3" ; see COPYING file for details.
   :description "Unit tests for the configuration.options system."
   :depends-on  (:alexandria
-                (:version :let-plus "0.2")
+                (:version :let-plus              "0.2")
 
-                (:version :fiveam   "1.1"))
+                (:version :configuration.options (:read-file-form "version-string.sexp"))
+
+                (:version :fiveam                "1.1"))
   :encoding    :utf-8
   :components  ((:module     "test"
                  :serial     t

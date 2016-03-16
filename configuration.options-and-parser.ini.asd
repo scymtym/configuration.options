@@ -4,23 +4,16 @@
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
-(load (merge-pathnames "configuration.options.asd"
-                       (or *load-truename* *compile-file-truename*)))
-
-(cl:in-package #:configuration.options-system)
-
-;;; System definition
-
 (defsystem :configuration.options-and-parser.ini
   :author      "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :maintainer  "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
-  :version     #.(version/string)
+  :version     (:read-file-form "version-string.sexp")
   :license     "LLGPLv3" ; see COPYING file for details.
   :description "Ini syntax support for options system."
   :depends-on  (:alexandria
                 (:version :let-plus              "0.2")
 
-                (:version :configuration.options #.(version/string))
+                (:version :configuration.options (:read-file-form "version-string.sexp"))
 
                 (:version :parser.ini            "0.1.0"))
   :encoding    :utf-8
@@ -33,17 +26,17 @@
 (defsystem :configuration.options-and-parser.ini-test
   :author      "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :maintainer  "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
-  :version     #.(version/string)
+  :version     (:read-file-form "version-string.sexp")
   :license     "LLGPLv3" ; see COPYING file for details.
   :description "Unit tests for ini syntax support of options system."
   :depends-on  (:alexandria
                 (:version :let-plus                             "0.2")
 
-                (:version :configuration.options-and-parser.ini #.(version/string))
+                (:version :configuration.options-and-parser.ini (:read-file-form "version-string.sexp"))
 
                 (:version :fiveam                               "1.1")
 
-                (:version :configuration.options-test           #.(version/string)))
+                (:version :configuration.options-test           (:read-file-form "version-string.sexp")))
   :encoding    :utf-8
   :components  ((:module     "sources"
                  :pathname   "test/sources"
