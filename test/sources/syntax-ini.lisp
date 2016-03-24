@@ -4,9 +4,35 @@
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
-(cl:in-package #:configuration.options.sources.test)
+(cl:defpackage #:configuration.options.sources.syntax-ini.test
+  (:use
+   #:cl
+   #:fiveam
 
-(in-suite options.sources)
+   #:configuration.options.sources.test)
+
+  (:export
+   #:run-tests)
+
+  (:documentation
+   "This package contains unit tests for the syntax-ini module."))
+
+(cl:in-package #:configuration.options.sources.syntax-ini.test)
+
+;;; Test suite
+
+(def-suite options.sources.syntax-ini
+  :description
+  "Root test suite for the syntax-ini module.")
+
+(defun run-tests ()
+  (let ((results (run 'options.sources.syntax-ini)))
+    (explain! results)
+    (results-status results)))
+
+;;; Tests
+
+(in-suite options.sources.syntax-ini)
 
 (test ini-syntax.smoke
   "Smoke test for `ini-syntax' class."

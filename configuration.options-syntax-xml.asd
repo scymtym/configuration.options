@@ -41,4 +41,4 @@
 
 (defmethod perform ((operation test-op)
                     (component (eql (find-system :configuration.options-syntax-xml-test))))
-  (funcall (find-symbol "RUN-TESTS" :configuration.options.test)))
+  (funcall (find-symbol "RUN-TESTS" :configuration.options.sources.syntax-xml.test)))

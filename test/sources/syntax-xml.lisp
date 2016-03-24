@@ -1,12 +1,38 @@
-;;;; syntax-xml.lisp --- Unit tests for the ini syntax.
+;;;; syntax-xml.lisp --- Unit tests for the xml syntax.
 ;;;;
 ;;;; Copyright (C) 2013, 2016 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
-(cl:in-package #:configuration.options.sources.test)
+(cl:defpackage #:configuration.options.sources.syntax-xml.test
+  (:use
+   #:cl
+   #:fiveam
 
-(in-suite options.sources)
+   #:configuration.options.sources.test)
+
+  (:export
+   #:run-tests)
+
+  (:documentation
+   "This package contains unit tests for the syntax-xml module."))
+
+(cl:in-package #:configuration.options.sources.syntax-xml.test)
+
+;;; Test suite
+
+(def-suite options.sources.syntax-xml
+  :description
+  "Root test suite for the syntax-xml module.")
+
+(defun run-tests ()
+  (let ((results (run 'options.sources.syntax-xml)))
+    (explain! results)
+    (results-status results)))
+
+;;; Tests
+
+(in-suite options.sources.syntax-xml)
 
 (test xml-syntax.smoke
   "Smoke test for the `xml-syntax' class."
