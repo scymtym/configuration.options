@@ -24,9 +24,9 @@
 (defmethod option-documentation ((option standard-configuration))
   (option-documentation (configuration-schema option)))
 
-(defmethod find-options ((name      t)
+(defmethod find-options ((query     sequence)
                          (container standard-configuration))
-  (remove name (options container)
+  (remove query (options container)
           :key  #'option-name
           :test (complement #'name-matches)))
 
