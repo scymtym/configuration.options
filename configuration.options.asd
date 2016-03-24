@@ -100,4 +100,4 @@
 
 (defmethod perform ((op     test-op)
                     (system (eql (find-system :configuration.options-test))))
-  (funcall (find-symbol "RUN-TESTS" :configuration.options.test)))
+  (uiop:symbol-call '#:configuration.options.test '#:run-tests))
