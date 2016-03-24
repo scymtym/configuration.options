@@ -25,6 +25,6 @@ script:
       -e '(load "quicklisp/setup.lisp")'
       -e '(ql:register-local-projects)'
       -e '(ql:quickload (list :configuration.options :configuration.options-test))'
-      -e '(ql:quickload (list :configuration.options-and-parser.ini :configuration.options-and-parser.ini-test))'
-      -e '(ql:quickload (list :configuration.options-xml :configuration.options-xml-test))'
+      -e '(ql:quickload (list :configuration.options-syntax-ini :configuration.options-syntax-ini-test))'
+      -e '(ql:quickload (list :configuration.options-syntax-xml :configuration.options-syntax-xml-test))'
       '(or (configuration.options.test:run-tests) (uiop:quit -1))'
