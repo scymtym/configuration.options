@@ -179,8 +179,8 @@
                  ,(first entry)
                  ,(remove-from-plist (rest entry) :source))))))
     (format stream "Type    ~A~%~
-                    Default ~:[<no default>~*~:;~<~@;~S~:>~]~%~
-                    Value   ~:[<no value>~*~:;~<~@;~S~:>~]~
+                    Default ~:[<no default>~*~;~<~@;~S~:>~]~%~
+                    Value   ~:[<no value>~*~;~<~@;~S~:>~]~
                     ~@[~%Sources ~<~@;~{~{~
                       ~A:~%~
                       ~2@T~S~

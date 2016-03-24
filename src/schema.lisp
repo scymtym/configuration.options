@@ -155,7 +155,7 @@
          ((&values default default?)
           (option-default object :if-does-not-exist nil)))
     (format stream "Type    ~A~%~
-                    Default ~:[<no default>~*~:;~<~@;~S~:>~]~@[~%~
+                    Default ~:[<no default>~*~;~<~@;~S~:>~]~@[~%~
                     ~/configuration.options::print-documentation/~]"
             type default? (list default) documentation)))
 
