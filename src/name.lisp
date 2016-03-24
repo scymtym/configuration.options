@@ -87,23 +87,55 @@
 
 ;; relation protocols
 
-(defmethod name-matches ((query wildcard-name)
-                         (name  t))
-  (let+ (((&labels+ recur ((            &optional query-first &rest query-rest)
-                           (&whole name &optional name-first  &rest name-rest))
-            (etypecase query-first
-              (null
-               (null name-first))
-              (string
-               (when (and name-first (string= query-first name-first))
-                 (recur query-rest name-rest)))
-              ((eql :wild)
-               (when name-first
-                 (recur query-rest name-rest)))
-              ((eql :wild-inferiors)
-               (some (curry #'recur query-rest)
-                     (cons '() (maplist #'identity name))))))))
-    (recur (name-components query) (name-components name))))
+(flet ((check-bounding-indices (sequence start end)
+         (let* ((length (length sequence))
+                (start  (or start 0))
+                (end    (or end length)))
+           (unless (<= 0 start end length)
+             (error 'simple-type-error
+                    :datum            (cons start end)
+                    :expected-type    `(cons (integer 0 ,length)
+                                             (integer 0 ,length))
+                    :format-control   "~@<The bounding indices ~S and ~S ~
+                                       are bad for a sequence of ~
+                                       length ~D~@:>."
+                    :format-arguments (list start end length))))))
+
+  (defmethod name-matches ((query wildcard-name)
+                           (name  t)
+                           &key
+                           start1 end1
+                           start2 end2)
+    (check-bounding-indices query start1 end1)
+    (check-bounding-indices name  start2 end2)
+    (let+ (((&labels+ recur
+                ((            &optional query-first &rest query-rest) end1
+                 (&whole name &optional name-first  &rest name-rest)  end2)
+              (cond
+                ((zerop end1)
+                 (zerop end2))
+                ((stringp query-first)
+                 (when (and (plusp end2) (string= query-first name-first))
+                   (recur query-rest (1- end1) name-rest (1- end2))))
+                ((eq query-first :wild)
+                 (when (plusp end2)
+                   (recur query-rest (1- end1) name-rest (1- end2))))
+                (t
+                 (assert (eq query-first :wild-inferiors))
+                 (or (loop :for end  :downfrom end2
+                           :for tail :on       name
+                           :when (recur query-rest (1- end1) tail end)
+                           :do (return t))
+                     (recur query-rest (1- end1) '() 0))))))
+           ((&flet maybe-drop (sequence start end)
+              (values (if (and start (plusp start))
+                          (nthcdr start sequence)
+                          sequence)
+                      (- (or end (length sequence))
+                         (or start 0))))))
+      (multiple-value-call #'recur
+        (maybe-drop (name-components query) start1 end1)
+        (maybe-drop (name-components name)  start2 end2)))))
 
 (defmethod name< ((left sequence) (right wildcard-name))
   (or (not (typep left 'wild-name)) (call-next-method)))

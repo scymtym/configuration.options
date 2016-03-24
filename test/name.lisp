@@ -90,25 +90,80 @@
   "Smoke test for `name-matches' function."
 
   (mapc
-   (lambda+ ((query name expected))
-     (is (eq expected
-             (name-matches (make-name query) (make-name name)))))
+   (lambda+ ((query name extra-args expected))
+     (let+ (((&flet do-it ()
+               (apply #'name-matches (make-name query) (make-name name)
+                      extra-args))))
+      (case expected
+        (type-error
+         (signals type-error (do-it)))
+        (t
+         (is (eq expected (do-it))
+             "~A did ~:[~;not ~]match ~A" query expected name)))))
 
-   `((()           ()          t)
-     ("a"          "a"         t) ("a"          "b"         nil)
-     ("a.b"        "a.b"       t) ("a.b"        "a.c"       nil)
-     ("a.b.c"      "a.b.c"     t)
+   `((()           ()          ()                                    t)
+     ("a"          "a"         ()                                    t)
+     ("a"          "b"         ()                                    nil)
+     ("a.b"        "a.b"       ()                                    t)
+     ("a.b"        "a.c"       ()                                    nil)
+     ("a.b.c"      "a.b.c"     ()                                    t)
 
-     ("*"          "a"         t) ("*"          "a.b"       nil)
-     ("a.b.*"      "a.b.c"     t) ("a.b.*"      "a.d.c"     nil)
-     ("*.b.c"      "a.b.c"     t) ("*.b.c"      "a.b.d"     nil)
+     ("*"          "a"         ()                                    t)
+     ("*"          "a.b"       ()                                    nil)
+     ("a.b.*"      "a.b.c"     ()                                    t)
+     ("a.b.*"      "a.d.c"     ()                                    nil)
+     ("*.b.c"      "a.b.c"     ()                                    t)
+     ("*.b.c"      "a.b.d"     ()                                    nil)
 
-     ("**"         ()          t)
-     ("**"         "a"         t)
-     ("**.a"       "a"         t) ("**.a"       "b"         nil)
-     ("a.b.**.e"   "a.b.c.d.e" t) ("a.b.**.e"   "a.b.c.d.f" nil)
+     ("**"         ()          ()                                    t)
+     ("**"         "a"         ()                                    t)
+     ("**.a"       "a"         ()                                    t)
+     ("**.a"       "b"         ()                                    nil)
+     ("a.b.**.e"   "a.b.c.d.e" ()                                    t)
+     ("a.b.**.e"   "a.b.c.d.f" ()                                    nil)
 
-     ("*.b.**.e"   "a.b.c.d.e" t) ("*.b.**.e"   "a.c.b.d.e" nil))))
+     ("*.b.**.e"   "a.b.c.d.e" ()                                    t)
+     ("*.b.**.e"   "a.c.b.d.e" ()                                    nil)
+
+     ;; Some invalid bounds
+     ("a.b.c"      "a.b.c"     (:start1 4)                           type-error)
+     ("a.b.c"      "a.b.c"     (          :end1 4)                   type-error)
+     ("a.b.c"      "a.b.c"     (:start1 2 :end1 1)                   type-error)
+     ("a.b.c"      "a.b.c"     (                  :start2 4)         type-error)
+     ("a.b.c"      "a.b.c"     (                            :end2 4) type-error)
+     ("a.b.c"      "a.b.c"     (                  :start2 2 :end2 1) type-error)
+
+     ("a.**.c"     "a.b.c"     (:start1 4)                           type-error)
+     ("a.**.c"     "a.b.c"     (          :end1 4)                   type-error)
+     ("a.**.c"     "a.b.c"     (:start1 2 :end1 1)                   type-error)
+     ("a.**.c"     "a.b.c"     (                  :start2 4)         type-error)
+     ("a.**.c"     "a.b.c"     (                            :end2 4) type-error)
+     ("a.**.c"     "a.b.c"     (                  :start2 2 :end2 1) type-error)
+
+     ;; Some valid bounds
+     ("a.b.c"      "a.b.c"     (:start1 1)                           nil)
+     ("a.b.c"      "a.b.c"     (          :end1 2)                   nil)
+     ("a.b.c"      "a.b.c"     (:start1 1 :end1 2)                   nil)
+     ("a.b.c"      "a.b.c"     (                  :start2 1)         nil)
+     ("a.b.c"      "a.b.c"     (                            :end2 1) nil)
+     ("a.b.c"      "a.b.c"     (                            :end2 2) nil)
+     ("a.b.c"      "a.b.c"     (                  :start2 1 :end2 2) nil)
+
+     ("a.*"        "a.b.c"     (:start1 1)                           nil)
+     ("a.*"        "a.b.c"     (          :end1 1)                   nil)
+     ("a.*"        "a.b.c"     (:start1 1 :end1 1)                   nil)
+     ("a.*"        "a.b.c"     (                  :start2 1)         nil)
+     ("a.*"        "a.b.c"     (                            :end2 1) nil)
+     ("a.*"        "a.b.c"     (                            :end2 2) t)
+     ("a.*"        "a.b.c"     (                  :start2 1 :end2 2) nil)
+
+     ("a.**.c"     "a.b.c"     (:start1 1)                           t)
+     ("a.**.c"     "a.b.c"     (          :end1 2)                   t)
+     ("a.**.c"     "a.b.c"     (:start1 1 :end1 2)                   t)
+     ("a.**.c"     "a.b.c"     (                  :start2 1)         nil)
+     ("a.**.c"     "a.b.c"     (                            :end2 1) nil)
+     ("a.**.c"     "a.b.c"     (                            :end2 2) nil)
+     ("a.**.c"     "a.b.c"     (                  :start2 1 :end2 2) nil))))
 
 (test name<.smoke
   "Smoke test for `name<' function."

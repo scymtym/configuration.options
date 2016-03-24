@@ -25,15 +25,29 @@
   (:documentation
    "Return a sequence of the components of NAME."))
 
-(defgeneric name-equal (left right)
+(defgeneric name-equal (left right &key start1 end1 start2 end2)
   (:documentation
-   "Return non-nil when LEFT and RIGHT are equal."))
+   "Return non-nil when LEFT and RIGHT are equal.
 
-(defgeneric name-matches (query name)
+    START1 and END1, if supplied, select a subseqeuence of LEFT to be
+    used in the equality test.
+
+    START2 and END2, if supplied, select a subseqeuence of RIGHT to be
+    used in the equality test."))
+
+(defgeneric name-matches (query name &key start1 end1 start2 end2)
   (:documentation
-   "Return non-nil when QUERY matches name. This can be the case
-    either when QUERY and NAME are equal or when QUERY contains :wild
-    or :wild-inferiors components matching components of NAME."))
+   "Return non-nil when QUERY matches name.
+
+    This can be the case either when QUERY and NAME are equal or when
+    QUERY contains :wild or :wild-inferiors components matching
+    components of NAME.
+
+    START1 and END1, if supplied, select a subseqeuence of QUERY to be
+    used in the matching computation.
+
+    START2 and END2, if supplied, select a subseqeuence of NAME to be
+    used in the matching computation."))
 
 (defgeneric name< (left right)
   (:documentation
@@ -57,11 +71,14 @@
 (defmethod name-components ((name list))
   name)
 
-(defmethod name-equal ((left t) (right t))
-  (equal (name-components left) (name-components right)))
+(defmethod name-equal ((left t) (right t) &key start1 end1 start2 end2)
+  (not (mismatch (name-components left) (name-components right)
+                 :test   #'equal
+                 :start1 (or start1 0) :end1 end1
+                 :start2 (or start2 0) :end2 end2)))
 
-(defmethod name-matches ((query t) (name t))
-  (name-equal query name))
+(defmethod name-matches ((query t) (name t) &key start1 end1 start2 end2)
+  (name-equal query name :start1 start1 :end1 end1 :start2 start2 :end2 end2))
 
 (defmethod name< ((left t) (right t))
   (let+ (((&labels+ recur ((&optional left-first  &rest left-rest)
