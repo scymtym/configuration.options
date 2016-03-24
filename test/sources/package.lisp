@@ -24,6 +24,30 @@
    #:read-stream-content-into-byte-vector
    #:read-stream-content-into-string)
 
+  ;; Mock syntax class
+  (:export
+   #:mock-syntax)
+
+  ;; Source construction tests
+  (:export
+   #:call-as-source-construct-test
+   #:source-construct-test)
+
+  ;; Fixtures for external resources
+  (:export
+   #:with-environment-variable
+   #:with-file
+   #:with-files
+   #:with-config-files)
+
+  ;; Source test utilities
+  (:export
+   #:with-source-and-sink
+
+   #:are-expected-sink-calls
+   #:expecting-sink-calls
+   #:expected-notify-calls-for-schema-items)
+
   (:documentation
    "This package contains unit tests for the sources module"))
 
