@@ -100,14 +100,16 @@
 (defgeneric value (option-or-name
                    &key
                    configuration
-                   if-does-not-exist)
+                   if-does-not-exist
+                   if-no-value)
   (:documentation
    "TODO(jmoringe): document"))
 
 (defgeneric (setf value) (new-value option-or-name
                           &key
                           configuration
-                          if-does-not-exist)
+                          if-does-not-exist
+                          if-no-value)
   (:documentation
    "TODO(jmoringe): document"))
 
