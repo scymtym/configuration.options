@@ -137,8 +137,12 @@
   (mapc (lambda+ ((option new-value if-invalid expected))
           (let+ ((old-value 1)
                  ((&flet do-it ()
-                    (setf (option-value option :if-invalid if-invalid)
-                          new-value))))
+                    (case if-invalid
+                      (:not-supplied
+                       (setf (option-value option) new-value))
+                      (t
+                       (setf (option-value option :if-invalid if-invalid)
+                             new-value))))))
             (setf (option-value option) old-value)
             (case expected
               (option-value-error
@@ -147,9 +151,10 @@
                (equal expected (do-it))))
             (is (equal old-value (option-value option)))))
 
-        `((,(simple-option) "foo" nil      nil)
-          (,(simple-option) "foo" :foo     :foo)
-          (,(simple-option) "foo" ,#'error option-value-error))))
+        `((,(simple-option) "foo" :not-supplied option-value-error)
+          (,(simple-option) "foo" nil           nil)
+          (,(simple-option) "foo" :foo          :foo)
+          (,(simple-option) "foo" ,#'error      option-value-error))))
 
 (test standard-option.describe-object
   "Smoke test for the `describe-object' method for the

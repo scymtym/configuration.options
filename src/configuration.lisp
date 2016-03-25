@@ -230,7 +230,7 @@
                                 (option    standard-option)
                                 &key
                                 if-does-not-exist
-                                if-invalid)
+                                (if-invalid       #'error))
   (declare (ignore if-does-not-exist))
   (setf (option-value (option-%cell option) :if-invalid if-invalid)
         new-value))
