@@ -297,7 +297,8 @@
   (let* ((item   (make-instance 'standard-schema-item
                                 :name '("a") :type t))
          (option (make-option item '("a"))))
-    (setf (option-value option :if-does-not-exist #'error) 1)))
+    (finishes
+      (setf (option-value option :if-does-not-exist #'error) 1))))
 
 (test protocol.validate-value.default-behavior
   "Smoke test for the default behavior of the `validate-value'
