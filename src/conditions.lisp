@@ -241,7 +241,7 @@
   (:report
    (lambda (condition stream)
      (format stream "~@<When notifying sink ~A of ~S option ~
-                     \"~/configuration.options:print-name/\" ~
+                     \"~/configuration.options:print-name/\"~
                      ~@[ with value ~S~]~@[ by source ~A~]~
                      ~/more-conditions:maybe-print-cause/~@:>"
              (notification-error-sink   condition)
