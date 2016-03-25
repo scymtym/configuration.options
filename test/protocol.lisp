@@ -6,7 +6,11 @@
 
 (cl:in-package #:configuration.options.test)
 
-(in-suite options)
+(def-suite protocol
+  :in options
+  :description
+  "Test suite for protocol functions.")
+(in-suite protocol)
 
 ;;; Helper for name coercion tests
 
