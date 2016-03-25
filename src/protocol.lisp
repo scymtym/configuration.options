@@ -813,9 +813,14 @@
 ;;; TODO(jmoringe, 2012-02-22): always supported?
 (defgeneric (setf option-value) (new-value option
                                  &key
-                                 if-does-not-exist)
+                                 if-does-not-exist
+                                 if-invalid)
   (:documentation
-   "TODO(jmoringe): document"))
+   "TODO(jmoringe): document
+
+    IF-INVALID controls the behavior in case NEW-VALUE is not a valid
+    value for OPTION. See the description of the if-invalid keyword
+    parameter of the `validate-value' generic function."))
 
 (defgeneric option-values (option)
   (:documentation

@@ -130,6 +130,27 @@
      ((:name ("a" :wild-inferiors) :type string)          ("a" "b")
       ("a" "b") string nil nil nil))))
 
+(test standard-option.setf-option-value.if-invalid
+  "Test that setf `option-value' handles the if-invalid keyword
+   parameter correctly."
+
+  (mapc (lambda+ ((option new-value if-invalid expected))
+          (let+ ((old-value 1)
+                 ((&flet do-it ()
+                    (setf (option-value option :if-invalid if-invalid)
+                          new-value))))
+            (setf (option-value option) old-value)
+            (case expected
+              (option-value-error
+               (signals option-value-error (do-it)))
+              (t
+               (equal expected (do-it))))
+            (is (equal old-value (option-value option)))))
+
+        `((,(simple-option) "foo" nil      nil)
+          (,(simple-option) "foo" :foo     :foo)
+          (,(simple-option) "foo" ,#'error option-value-error))))
+
 (test standard-option.describe-object
   "Smoke test for the `describe-object' method for the
    `standard-option' class."

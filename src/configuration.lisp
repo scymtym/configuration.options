@@ -120,26 +120,31 @@
   (when (slot-boundp option 'value)
     (values (option-%value option) t)))
 
-(defmethod (setf option-value) :before ((new-value t)
+(defmethod (setf option-value) :around ((new-value t)
                                         (option    option-cell)
                                         &key
-                                        if-does-not-exist)
+                                        if-does-not-exist
+                                        (if-invalid       #'error))
   (declare (ignore if-does-not-exist))
-  (validate-value (option-schema-item option) new-value))
+  (if (eq if-invalid (validate-value (option-schema-item option) new-value
+                                     :if-invalid if-invalid))
+      new-value
+      (values (call-next-method) t)))
 
 (defmethod (setf option-value) ((new-value t)
                                 (option    option-cell)
                                 &key
-                                if-does-not-exist)
-  (declare (ignore if-does-not-exist))
+                                if-does-not-exist
+                                if-invalid)
+  (declare (ignore if-does-not-exist if-invalid))
   (setf (option-%value option) new-value))
-
 
 (defmethod (setf option-value) :after ((new-value t)
                                        (option    option-cell)
                                        &key
-                                       if-does-not-exist)
-  (declare (ignore if-does-not-exist))
+                                       if-does-not-exist
+                                       if-invalid)
+  (declare (ignore if-does-not-exist if-invalid))
   (hooks:run-hook (hooks:object-hook option 'event-hook)
                   :new-value option new-value))
 
@@ -224,9 +229,11 @@
 (defmethod (setf option-value) ((new-value t)
                                 (option    standard-option)
                                 &key
-                                if-does-not-exist)
+                                if-does-not-exist
+                                if-invalid)
   (declare (ignore if-does-not-exist))
-  (setf (option-value (option-%cell option)) new-value))
+  (setf (option-value (option-%cell option) :if-invalid if-invalid)
+        new-value))
 
 (defmethod print-items append ((object standard-option))
   (print-items (option-%cell object)))
