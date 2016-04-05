@@ -410,6 +410,7 @@
       indicating that an option named NAME already exists in
       CONTAINER."))
 
+;; TODO may also work for schemas…
 (defgeneric sub-configuration (query container)
   (:documentation
    "Return a sub-configuration of CONTAINER using QUERY to select options.

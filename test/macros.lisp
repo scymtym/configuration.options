@@ -15,6 +15,8 @@
 (define-schema *child-schema* ; used in next test
   ("b" :type 'string))
 
+;; TODO schema value case
+
 (test macros.eval-schema-spec.smoke
   "Smoke test for the `eval-schema-spec' function."
 

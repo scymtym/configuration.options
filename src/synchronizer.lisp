@@ -8,6 +8,7 @@
 
 ;;; Utilities
 
+;; TODO should the synchronizer do this at all?
 (defclass synchronizer-handler (closer-mop:funcallable-standard-object)
   ((synchronizer :initarg  :synchronizer
                  :reader    synchronizer-handler-synchronizer

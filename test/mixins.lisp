@@ -204,3 +204,8 @@
             option)
       (setf (find-option "foo" container :if-exists :supersede)
             option))))
+
+(test sub-configuration.smoke
+  "Smoke test for the `sub-configuration' function."
+
+  :TODO)
