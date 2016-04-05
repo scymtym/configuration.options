@@ -135,6 +135,7 @@
 
 (source-construct-test (common-cascade-source.construct :common-cascade)
   "Test constructing `common-cascade-source' instances."
+
   ;; :basename and :syntax are missing.
   '(()                     missing-required-initarg)
   '((:paths ("/" "/" "/")) missing-required-initarg)
@@ -144,11 +145,21 @@
   '((:basename "foo")      missing-required-initarg)
 
   ;; These are valid.
-  '((:basename "foo"
-     :syntax    :mock)     t)
-  '((:basename "foo"
-     :type      "ini"
-     :syntax    :mock)     t))
+  '((:basename                     "foo"
+     :syntax                       :mock)
+    t)
+  '((:basename                     "foo"
+     :type                         "ini"
+     :syntax                       :mock)
+    t)
+  '((:basename                     "foo"
+     :syntax                       :mock
+     :prefix/commandline           "bar-")
+    t)
+  '((:basename                     "foo"
+     :syntax                       :mock
+     :prefix/environment-variables "BAR_")
+    t))
 
 (test common-cascade-source.smoke
   "Smoke test for `common-cascade-source' class."
@@ -161,16 +172,17 @@
                        'configuration.options.sources::source :commandline
                        :if-does-not-exist nil)
                       1 0)))
-    (with-environment-variable ((format nil "~A_B_C" basename) "1")
+    (with-environment-variable ("FOO_B_C" "1")
       (with-config-files (prefix basename type)
           ("a=2 b.c=3 d=4"
            "a=5"
            "b.c=6")
         (with-source-and-sink ((:common-cascade
-                                :prefix   prefix
-                                :basename basename
-                                :type     type
-                                :syntax   :mock)
+                                :prefix                       prefix
+                                :basename                     basename
+                                :type                         type
+                                :syntax                       :mock
+                                :prefix/environment-variables "FOO_")
                                :schema   schema
                                :sink-var sink)
           (are-expected-sink-calls

@@ -263,14 +263,17 @@
 (service-provider:register-provider/class
  'source :common-cascade :class 'common-cascade-source)
 
-(defmethod shared-initialize :around ((instance   common-cascade-source)
-                                      (slot-names t)
-                                      &rest args
-                                      &key
-                                      (sources '()    sources-supplied?)
-                                      basename
-                                      (type    "conf")
-                                      &allow-other-keys)
+(defmethod shared-initialize :around
+    ((instance   common-cascade-source)
+     (slot-names t)
+     &rest args
+     &key
+     (sources                      '()                               sources-supplied?)
+     basename
+     (type                         "conf")
+     (prefix/commandline           (format nil "~(~A~)-" basename))
+     (prefix/environment-variables (format nil "~:@(~A~)_" basename))
+     &allow-other-keys)
   (cond
     ((not basename)
      (call-next-method))
@@ -279,21 +282,27 @@
                             :sources  sources
                             :basename basename))
     (t
-     (let ((prefix/commandline           (format nil "~(~A~)-" basename))
-           (prefix/environment-variables (format nil "~:@(~A~)_" basename))
-           (pathname (merge-pathnames
+     (let ((pathname (merge-pathnames
                       basename (make-pathname :name "_" :type type))))
        (call-next-method
         instance slot-names
-        :sources `(,@(when (service-provider:find-provider
+        :sources `(;; Commandline
+                   ,@(when (service-provider:find-provider
                             'source :commandline
                             :if-does-not-exist nil)
                        `((:commandline
-                          :prefix ,prefix/commandline)))
+                          ,@(when prefix/commandline
+                              `(:prefix ,prefix/commandline)))))
+                   ;; Environment variables
                    (:environment-variables
-                    :prefix ,prefix/environment-variables)
+                    ,@(when prefix/environment-variables
+                        `(:prefix ,prefix/environment-variables)))
+                   ;; Configuration files
                    (:config-file-cascade
                     :config-file       ,pathname
                     :if-does-not-exist nil
-                    ,@(remove-from-plist args :basename :type))
+                    ,@(remove-from-plist
+                       args :basename :type :prefix/commandline
+                       :prefix/environment-variables))
+                   ;; Default values
                    (:defaults)))))))
