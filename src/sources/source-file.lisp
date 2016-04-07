@@ -47,9 +47,12 @@
 (defmethod process ((source file-source) (sink t))
   (let+ (((&structure-r/o source- pathname element-type if-does-not-exist)
           source))
-    (with-input-from-file (stream pathname
-                                  :element-type      element-type
-                                  :if-does-not-exist if-does-not-exist)
+    ;; TODO should use `with-input-from-file' but that behaves
+    ;; strangely for :if-does-not-exist nil.
+    (with-open-file (stream pathname
+                            :direction         :input
+                            :element-type      element-type
+                            :if-does-not-exist if-does-not-exist)
       (when stream
         (setf (source-%stream source) stream)
         (call-next-method source sink)))))
