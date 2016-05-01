@@ -20,10 +20,6 @@
 
    #:configuration.options.test)
 
-  (:import-from #:configuration.options.sources ; TODO until alexandria provides these
-   #:read-stream-content-into-byte-vector
-   #:read-stream-content-into-string)
-
   ;; Mock syntax class
   (:export
    #:mock-syntax)
