@@ -1,12 +1,12 @@
-;;;; source-commandline.lisp --- Unit tests for the commandline source.
+;;;; source.lisp --- Unit tests for the commandline source.
 ;;;;
 ;;;; Copyright (C) 2013, 2016 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
-(cl:in-package #:configuration.options.sources.test)
+(cl:in-package #:configuration.options.sources.commandline.test)
 
-(in-suite options.sources)
+(in-suite options.sources.commandline)
 
 (test commandline-source.smoke
   "Smoke test for the `commandline-source' class."

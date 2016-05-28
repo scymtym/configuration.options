@@ -27,4 +27,5 @@ script:
       -e '(ql:quickload (list :configuration.options :configuration.options-test))'
       -e '(ql:quickload (list :configuration.options-syntax-ini :configuration.options-syntax-ini-test))'
       -e '(ql:quickload (list :configuration.options-syntax-xml :configuration.options-syntax-xml-test))'
+      -e '(ql:quickload (list :configuration.options-source-commandline :configuration.options-source-commandline-test))'
       '(or (configuration.options.test:run-tests) (uiop:quit -1))'

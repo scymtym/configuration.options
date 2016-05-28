@@ -1,10 +1,10 @@
-;;;; source-commandline.lisp --- Source for commandline options.
+;;;; source.lisp --- Source for commandline options.
 ;;;;
 ;;;; Copyright (C) 2011-2016 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
-(cl:in-package #:configuration.options.sources)
+(cl:in-package #:configuration.options.sources.commandline)
 
 (defclass commandline-source ()
   ((prefix    :initarg  :prefix
@@ -47,7 +47,8 @@
     arguments."))
 
 (service-provider:register-provider/class
- 'source :commandline :class 'commandline-source)
+ 'configuration.options.sources::source :commandline
+ :class 'commandline-source)
 
 (defmethod initialize ((source commandline-source) (schema t))
   (let+ (((&structure

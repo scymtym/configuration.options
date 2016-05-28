@@ -23,9 +23,7 @@
                    (:version :architecture.service-provider "0.1")
                    :log4cl
 
-                   (:version :esrap                         "0.9")
-
-                   :net.didierverna.clon) ; TODO temp for commandline source
+                   (:version :esrap                         "0.9"))
   :encoding       :utf-8
   :components     ((:module     "src"
                     :serial     t
@@ -57,7 +55,6 @@
                                  ;; Sources
                                  (:file       "source-defaults")
                                  (:file       "source-environment-variables")
-                                 (:file       "source-commandline")
                                  (:file       "source-stream")
                                  (:file       "source-file")
                                  (:file       "source-cascade"))))
@@ -100,7 +97,6 @@
                               ;; Sources
                               (:file       "source-defaults")
                               (:file       "source-environment-variables")
-                              (:file       "source-commandline")
                               (:file       "source-stream")
                               (:file       "source-file")
                               (:file       "source-cascade")))))
