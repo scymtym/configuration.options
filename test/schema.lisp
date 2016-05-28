@@ -216,6 +216,32 @@
   "Test suite for the `standard-schema-item' class.")
 (in-suite standard-schema-item)
 
+(test standard-schema-item.option-default
+  "Test handling of default value in the `standard-schema-item'
+   class."
+
+  (flet ((test-case (type default default? expected-default expected-default?)
+           (let+ ((item (apply #'make-instance 'standard-schema-item
+                               :name "test"
+                               :type type
+                               (when default?
+                                 (list :default default))))
+                  ((&values default default?)
+                   (option-default item :if-does-not-exist nil)))
+             (case type
+               (function
+                (is (eq expected-default? default?))
+                (when default?
+                  (is (functionp default))
+                  (is (equal expected-default (funcall default)))))
+               (t
+                (is (eq expected-default? default?))
+                (is (equal expected-default default)))))))
+    (test-case 'integer  nil                       nil nil nil)
+    (test-case 'integer  1                         t   1   t)
+    (test-case 'integer  (lambda () 1)             t   1   t)
+    (test-case 'function (lambda () (lambda () 1)) t   1   t)))
+
 (test standard-schema-item.describe-object
   "Smoke test for the `describe-object' method for the
    `standard-schema-item' class."

@@ -126,11 +126,14 @@
                  :documentation
                  "Stores the type of the option as an expression
                   similar to a CL type.")
-   (default      :accessor option-%default
+   (default      :type     function
+                 :accessor option-%default
                  :documentation
-                 "Stores the default value of the schema item. Is
-                  unbound when the schema item does not have a default
-                  value.")
+                 "Stores a function returning the default value of the
+                  schema item.
+
+                  Is unbound when the schema item does not have a
+                  default value.")
    (option-class :initarg  :option-class
                  :type     symbol
                  :reader   option-class
@@ -172,11 +175,17 @@
                            if-does-not-exist)
   (declare (ignore if-does-not-exist))
   (when (slot-boundp option 'default)
-    (values (option-%default option) t)))
+    (values (funcall (option-%default option)) t)))
 
-(defmethod (setf option-%default) :before ((new-value t)
+(defmethod (setf option-%default) :around ((new-value t)
                                            (option    standard-schema-item))
-  (validate-value option new-value))
+  (typecase new-value
+    (function (call-next-method))
+    (t        (setf (option-%default option) (constantly new-value)))))
+
+(defmethod (setf option-%default) :before ((new-value function)
+                                           (option    standard-schema-item))
+  (validate-value option (funcall new-value)))
 
 (defmethod make-option ((schema-item standard-schema-item)
                         (name        sequence))
