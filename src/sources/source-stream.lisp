@@ -6,7 +6,7 @@
 
 (cl:in-package #:configuration.options.sources)
 
-(defclass stream-source (print-items-mixin)
+(defclass stream-source (print-items:print-items-mixin)
   ((stream :initarg  :stream
            :type     stream
            :reader   source-stream
@@ -41,7 +41,7 @@
           (apply #'make-syntax syntax-class :source instance
                  syntax-args))))
 
-(defmethod print-items append ((object stream-source))
+(defmethod print-items:print-items append ((object stream-source))
   `((:syntax ,(class-name (class-of (source-syntax object))) " ~A")))
 
 (defmethod process ((source stream-source) (sink t))

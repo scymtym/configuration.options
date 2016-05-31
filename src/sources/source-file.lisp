@@ -41,7 +41,7 @@
                                      pathname)
   (setf (source-%pathname instance) (parse-namestring pathname)))
 
-(defmethod print-items append ((object file-source))
+(defmethod print-items:print-items append ((object file-source))
   `((:pathname ,(source-pathname object) " ~A")))
 
 (defmethod process ((source file-source) (sink t))

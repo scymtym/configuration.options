@@ -15,7 +15,6 @@
    #:iterate
    #:let-plus
    #:more-conditions
-   #:print-items
 
    #:configuration.options)
 

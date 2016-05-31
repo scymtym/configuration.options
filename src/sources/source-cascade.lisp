@@ -55,7 +55,7 @@
     (setf (source-%sources instance)
           (map 'list (curry #'apply #'make-source) sources))))
 
-(defmethod print-items append ((object cascade-source))
+(defmethod print-items:print-items append ((object cascade-source))
   `((:num-sources ,(length (source-sources object)) " (~D)")))
 
 (defmethod initialize ((source cascade-source)
@@ -83,7 +83,7 @@
 ;;; `config-file-cascade-source'
 
 (defclass config-file-cascade-source (cascade-source
-                                      print-items-mixin)
+                                      print-items:print-items-mixin)
   ()
   (:documentation
    "Instances of this class construct a cascade of
@@ -165,8 +165,8 @@
                                   other-args))
                          paths))))))
 
-(defmethod print-items append ((object config-file-cascade-source))
-  ;; This best-effort only and may fail.
+(defmethod print-items:print-items append ((object config-file-cascade-source))
+  ;; This is only a best-effort approach and may fail.
   (ignore-errors
    (let* ((config-file (make-pathname
                         :directory nil
@@ -178,7 +178,7 @@
 ;;; `directory-source'
 
 (defclass directory-source (cascade-source
-                            print-items-mixin)
+                            print-items:print-items-mixin)
   ((pattern :initarg  :pattern
             :type     (or string pathname)
             :reader   source-pattern
@@ -234,13 +234,13 @@
                             files)
            args)))
 
-(defmethod print-items append ((object directory-source))
+(defmethod print-items:print-items append ((object directory-source))
   `((:pattern ,(source-pattern object) " ~S" ((:before :num-sources)))))
 
 ;;; `common-cascade-source'
 
 (defclass common-cascade-source (cascade-source
-                                 print-items-mixin)
+                                 print-items:print-items-mixin)
   ()
   (:default-initargs
    :basename (missing-required-initarg
