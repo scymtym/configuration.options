@@ -6,7 +6,7 @@
 
 (cl:in-package #:configuration.options.sources)
 
-(defclass environment-variables-source ()
+(defclass environment-variables-source (print-items:print-items-mixin)
   ((prefix :initarg  :prefix
            :type     (or null string)
            :accessor source-prefix
@@ -49,6 +49,5 @@
                         (format stream "~@<Skip entry ~S.~@:>" entry))
               (declare (ignore condition)))))))
 
-(defmethod print-object ((object environment-variables-source) stream)
-  (print-unreadable-object (object stream :type t :identity t)
-    (format stream "~:[~;~:*\"~A*\"~]" (source-prefix object))))
+(defmethod print-items:print-items append ((object environment-variables-source))
+  `((:prefix (source-prefix object) "~:[~;~:*\"~A*\"~]")))
