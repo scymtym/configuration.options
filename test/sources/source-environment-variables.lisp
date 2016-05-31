@@ -8,7 +8,16 @@
 
 (in-suite options.sources)
 
+(test environment-variables-source.construction
+  "Test constructing `environment-variables-source' instances."
+
+  (signals incompatible-initargs
+    (make-source :environment-variables :prefix       "foo"
+                                        :name-mapping #'identity)))
+
 (test environment-variables-source.smoke
+  "Smoke test for `environment-variables-source' class."
+
   (let* ((prefix        (concatenate 'string (make-random-string) "_"))
          (rest          (make-random-string))
          #+sbcl (rest/downcase (string-downcase rest))
@@ -20,3 +29,19 @@
         (expecting-sink-calls (sink)
           #+sbcl `(:added     (,rest/downcase) nil)
           #+sbcl `(:new-value (,rest/downcase) ,value))))))
+
+(test environment-variables-source.non-default-name-mapping
+  "Test non-default variable name mapping in
+   `environment-variables-source' class."
+
+  (let ((name  (make-random-string))
+        (value "value"))
+    (with-environment-variable (name value)
+      (with-source-and-sink ((:environment-variables
+                              :name-mapping (lambda (name1)
+                                              (when (string= name1 name)
+                                                (list name1))))
+                             :sink-var sink)
+        (expecting-sink-calls (sink)
+          #+sbcl `(:added     (,name) nil)
+          #+sbcl `(:new-value (,name) ,value))))))
