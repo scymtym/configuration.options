@@ -75,7 +75,7 @@
 
                 (:version :configuration.options (:read-file-form "version-string.sexp"))
 
-                (:version :fiveam                "1.1"))
+                (:version :fiveam                "1.3"))
   :encoding    :utf-8
   :components  ((:module     "test"
                  :serial     t

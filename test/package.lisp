@@ -57,9 +57,7 @@
   "Root unit test suite for the options system.")
 
 (defun run-tests ()
-  (let ((results (run 'options)))
-    (explain! results)
-    (results-status results)))
+  (run! 'options))
 
 ;;; Utilities
 

@@ -36,7 +36,7 @@
 
                 (:version :configuration.options-syntax-xml (:read-file-form "version-string.sexp"))
 
-                (:version :fiveam                           "1.1")
+                (:version :fiveam                           "1.3")
                 (:version :configuration.options-test       (:read-file-form "version-string.sexp")))
   :components  ((:module     "sources"
                  :pathname   "test/sources"
