@@ -27,8 +27,8 @@
                                 :if-does-not-exist nil)))
              :sink-var sink)
           (expecting-sink-calls (sink)
-            #+sbcl '(:added     ("a" "b") nil :index 0)
-            #+sbcl '(:new-value ("a" "b") "1" :index 0)
+            #+sbcl '(:added     ("a" "b") nil :index 0 :entry "FOO_A_B=1")
+            #+sbcl '(:new-value ("a" "b") "1" :index 0 :entry "FOO_A_B=1")
             '(:added     ("a" "b") nil :index 1)
             '(:new-value ("a" "b") "2" :index 1)
             '(:added     ("b" "c") nil :index 1)
@@ -186,8 +186,8 @@
                                :schema   schema
                                :sink-var sink)
           (are-expected-sink-calls
-           `(#+sbcl (:added     ("b" "c") nil :index ,(+ 0 offset))
-             #+sbcl (:new-value ("b" "c") "1" :index ,(+ 0 offset))
+           `(#+sbcl (:added     ("b" "c") nil :index ,(+ 0 offset) :entry "FOO_B_C=1")
+             #+sbcl (:new-value ("b" "c") "1" :index ,(+ 0 offset) :entry "FOO_B_C=1")
 
             (:added     ("b" "c") nil :index ,(+ 1 offset))
             (:new-value ("b" "c") "6" :index ,(+ 1 offset))

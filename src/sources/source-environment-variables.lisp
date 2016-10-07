@@ -49,6 +49,10 @@
 (defmethod process ((source environment-variables-source) (sink t))
   ;; Obtain configuration options from environment variables.
   (let+ (((&structure-r/o source- name-mapping) source)
+         ((&flet notify (event name entry &optional value)
+            (notify sink event name value
+                    :source source
+                    :entry  entry)))
          ((&flet variable->option (string)
             (log:trace "~@<~A is processing environment entry ~S~@:>"
                        source string)
@@ -63,8 +67,8 @@
                 (log:debug "~@<~A mapped ~S to ~
                             ~/configuration.options:print-name/ ← ~S~@:>"
                            source string name value)
-                (notify sink :added     name nil   :source source)
-                (notify sink :new-value name value :source source))))))
+                (notify :added     name string)
+                (notify :new-value name string value))))))
     (iter (for entry in #+sbcl (sb-ext:posix-environ)
                         #-sbcl '())
           (restart-case

@@ -22,20 +22,22 @@
          (rest          (make-random-string))
          #+sbcl (rest/downcase (string-downcase rest))
          (name          (format nil "~A~A" prefix rest))
-         (value         "value"))
+         (value         "value")
+         (entry         (format nil "~A=~A" name value)))
     (with-environment-variable (name value)
       (with-source-and-sink ((:environment-variables :prefix prefix)
                              :sink-var sink)
         (expecting-sink-calls (sink)
-          #+sbcl `(:added     (,rest/downcase) nil)
-          #+sbcl `(:new-value (,rest/downcase) ,value))))))
+          #+sbcl `(:added     (,rest/downcase) nil    :entry ,entry)
+          #+sbcl `(:new-value (,rest/downcase) ,value :entry ,entry))))))
 
 (test environment-variables-source.non-default-name-mapping
   "Test non-default variable name mapping in
    `environment-variables-source' class."
 
-  (let ((name  (make-random-string))
-        (value "value"))
+  (let* ((name  (make-random-string))
+         (value "value")
+         (entry (format nil "~A=~A" name value)))
     (with-environment-variable (name value)
       (with-source-and-sink ((:environment-variables
                               :name-mapping (lambda (name1)
@@ -43,5 +45,5 @@
                                                 (list name1))))
                              :sink-var sink)
         (expecting-sink-calls (sink)
-          #+sbcl `(:added     (,name) nil)
-          #+sbcl `(:new-value (,name) ,value))))))
+          #+sbcl `(:added     (,name) nil    :entry ,entry)
+          #+sbcl `(:new-value (,name) ,value :entry ,entry))))))
