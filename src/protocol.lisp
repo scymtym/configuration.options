@@ -885,13 +885,14 @@
       Call the function with a `value-missing-error' instance
       indicating that OPTION does not have a value."))
 
-;;; TODO(jmoringe, 2012-02-22): always supported?
 (defgeneric (setf option-value) (new-value option
                                  &key
                                  if-does-not-exist
                                  if-invalid)
   (:documentation
-   "TODO(jmoringe): document
+   "Set the current value of OPTION to NEW-VALUE.
+
+    IF-DOES-NOT-EXIST is accepted for parity with `option-value'.
 
     IF-INVALID controls the behavior in case NEW-VALUE is not a valid
     value for OPTION. See the description of the if-invalid keyword
