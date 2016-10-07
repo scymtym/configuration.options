@@ -639,8 +639,8 @@
    "Return the schema object governing CONFIGURATION."))
 
 ;;; Option-like protocol
-;;
-;; OPTION can be (at least) an option or a schema items.
+;;;
+;;; OPTION can be (at least) an option or a schema items.
 
 (defgeneric option-name (option)
   (:documentation
