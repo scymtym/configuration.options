@@ -272,7 +272,7 @@
      basename
      (type                         "conf")
      (prefix/commandline           (format nil "~(~A~)-" basename))
-     (prefix/environment-variables (format nil "~:@(~A~)_" basename))
+     (prefix/environment-variables (environment-variable-namify basename))
      &allow-other-keys)
   (cond
     ((not basename)
@@ -306,3 +306,13 @@
                        :prefix/environment-variables))
                    ;; Default values
                    (:defaults)))))))
+
+;;; Utilities
+
+(defun environment-variable-namify (string)
+  (format nil "~:@(~A~)_" (substitute-if-not
+                           #\_ (lambda (char)
+                                 (or (char<= #\a char #\z)
+                                     (char<= #\A char #\Z)
+                                     (char<= #\0 char #\0)))
+                           string)))
