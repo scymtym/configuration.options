@@ -89,7 +89,7 @@
     (recur (name-components left) (name-components right))))
 
 (defmethod merge-names ((left t) (right t))
-  #+sbcl (concatenate (type-of left) left right)
+  #+sbcl (concatenate (class-of left) left right)
   #-sbcl (append (name-components left) (name-components right)))
 
 (defmethod merge-names ((left (eql nil)) (right t))
