@@ -5,10 +5,14 @@
 #+KEYWORDS:    common lisp, options, configuration
 #+LANGUAGE:    en
 
-* STARTED Introduction
-  The =configuration.options= system provides data structures and
-  functions for configuration options, sources of option values and
-  handling of changes of option values.
+* Introduction
+  The =configuration.options= system provides
+  + data structures and functions for hierarchical configuration
+    schemata and options
+  + sources of option values (builtin sources are configuration files,
+    environment variables and commandline options)
+  + and handling of changes of option values
+  All of these aspects are extensible via protocols.
 
   #+ATTR_HTML: :alt "build status image" :title Build Status :align right
   [[https://travis-ci.org/scymtym/configuration.options][https://travis-ci.org/scymtym/configuration.options.svg]]
@@ -16,26 +20,72 @@
 * STARTED Tutorial
   Implementing configuration processing using the
   =configuration.options= system involves at least three steps
-  1. Specifying a schema
-  2. Constructing and population a configuration based on the schema
+  1. [[*Specifying a Schema]]
+  2. [[*Constructing and Populating a Configuration]] based on the schema
   3. Querying options in the constructed configuration
-** TODO Names
 
-** STARTED Specifying a Schema
-   A schema can be defined in at least three ways:
+** Names
+   Since options (and the corresponding schema items) are organized
+   into a hierarchy, option names are a sequence of multiple
+   components. The notation =COMPONENT₁.COMPONENT₂.…= is used when
+   representing names as strings.
 
-   1. "Manually" via multiple function and method calls
-   2. Declaratively using ~configuration.options:eval-schema-spec~
-   3. Declaratively using ~configuration.options:define-schema~
+   "Wildcard names" are names in which one or more components is
+   ~:wild~ or ~:wild-inferiors~.
 
-   Since the second and third methods use the same syntax, it is
-   sufficient to discuss ~configuration.options:define-schema~. Here
-   is an example:
+   The following functions deal with names:
+   #+BEGIN_SRC lisp  :results values :exports results :colnames '("Form" "Result")
+     (mapcar (lambda (example)
+               (destructuring-bind (function arguments) example
+                 (let ((*package* (find-package :configuration.options)))
+                   (list (format nil "(~(~A~)~{ ~S~})" (symbol-name function) arguments)
+                         (prin1-to-string (apply function arguments))))))
+             `((configuration.options:parse-name      ("a.b.\"c.d\""))
+               (configuration.options:make-name       ("a.b.c"))
+               (configuration.options:make-name       ("a.*.c"))
+               (configuration.options:make-name       ("a.**.c"))
+               (configuration.options:make-name       (("a" "b" "c")))
+               (configuration.options:name-components (,(configuration.options:make-name "a.**.c")))
+               (configuration.options:name-equal      (,(configuration.options:make-name "a.b.c")
+                                                        ,(configuration.options:make-name "d.e.f")))
+               (configuration.options:name-matches    (,(configuration.options:make-name "d.**.g")
+                                                        ,(configuration.options:make-name "d.e.f.g")))
+               (configuration.options:name-equal      (,(configuration.options:make-name "a.b.c")
+                                                        ,(configuration.options:make-name "d.e.f")))
+               (configuration.options:merge-names     (,(configuration.options:make-name "a.b.c")
+                                                       ,(configuration.options:make-name "d.e.f")))))
+   #+END_SRC
+
+   #+RESULTS:
+   | Form                                                                  | Result                               |
+   |-----------------------------------------------------------------------+--------------------------------------|
+   | (parse-name "a.b.\"c.d\"")                                            | ("a" "b" "c.d")                      |
+   | (make-name "a.b.c")                                                   | ("a" "b" "c")                        |
+   | (make-name "a.*.c")                                                   | #<WILDCARD-NAME a.*.c {100D70EF23}>  |
+   | (make-name "a.**.c")                                                  | #<WILDCARD-NAME a.**.c {100D712923}> |
+   | (make-name ("a" "b" "c"))                                             | ("a" "b" "c")                        |
+   | (name-components #<WILDCARD-NAME a.**.c {100D6E5FE3}>)                | ("a" :WILD-INFERIORS "c")            |
+   | (name-equal ("a" "b" "c") ("d" "e" "f"))                              | NIL                                  |
+   | (name-matches #<WILDCARD-NAME d.**.g {100D6EFFC3}> ("d" "e" "f" "g")) | T                                    |
+   | (name-equal ("a" "b" "c") ("d" "e" "f"))                              | NIL                                  |
+   | (merge-names ("a" "b" "c") ("d" "e" "f"))                             | ("a" "b" "c" "d" "e" "f")            |
+
+** Specifying a Schema
+   A schema can be defined in multiple ways:
+
+   + "Manually" via multiple function and method calls
+   + Declaratively using ~configuration.options:eval-schema-spec~
+   + Declaratively using ~configuration.options:define-schema~
+
+   Since the third method is likely the most commonly used (and uses
+   the same syntax as the second method), it is probably sufficient to
+   only discuss ~configuration.options:define-schema~. Here is an
+   example:
    #+BEGIN_SRC lisp :results silent :exports both
      (configuration.options:define-schema *my-schema*
        "Configuration schema for my program."
        ("logging"
-        ("appender"                :type '(member :file :standard-output)
+        ("appender"                :type    '(member :file :standard-output)
                                    :default :standard-output
                                    :documentation
                                    "Appender to use.")
@@ -47,7 +97,7 @@
    parameter ~*my-schema*~. The schema consists of two items:
 
    1. ~logging.appender~ with allowed values ~:file~ and
-      ~:standard-output~ with default value ~:standard-output~
+      ~:standard-output~ and default value ~:standard-output~
 
    2. a "template" option named =logging.**.level= with allowed values
       ~:info~, ~:warning~ and ~:error~ and without a default value
@@ -70,11 +120,11 @@
            Type    (MEMBER INFO WARNING ERROR)
            Default <no default>
            Package/module/component log level.
-#+end_example
+   #+end_example
 
 *** TODO Sub-schemata
 
-** Populating a Configuration
+** Constructing and Populating a Configuration
    Configurations are created from schemata by first creating an empty
    configuration object and then populating it with option objects
    corresponding to schema item objects in the schema:
@@ -176,7 +226,7 @@
              Default <no default>
              Value   <no value>
              Package/module/component log level.
-#+end_example
+   #+end_example
 
    In a more realistic setting, populating the configuration would be
    done exclusively using a synchronizer but with a "cascade" of
@@ -189,6 +239,7 @@
   + https://github.com/Shinmera/ubiquitous
   + https://docs.python.org/3/library/configparser.htm
   + cl-config
+
 * Settings                                                         :noexport:
 
 #+OPTIONS: H:2 num:nil toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
