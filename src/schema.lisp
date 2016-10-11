@@ -47,9 +47,9 @@
 (defmethod find-option ((name      t)
                         (container standard-schema)
                         &key
-                        (match-wildcards? nil)
+                        (interpret-wildcards? nil)
                         &allow-other-keys)
-  (unless match-wildcards?
+  (unless interpret-wildcards?
     (return-from find-option (call-next-method)))
 
   (let+ ((option   (find name (options container)
@@ -68,9 +68,10 @@
                                  (1- (length name))
                                  (length key)))
                    (sub-name (subseq name index)))
-              (when-let ((option (find-option sub-name child
-                                              :match-wildcards?  match-wildcards?
-                                              :if-does-not-exist nil)))
+              (when-let ((option (find-option
+                                  sub-name child
+                                  :interpret-wildcards? interpret-wildcards?
+                                  :if-does-not-exist    nil)))
                 (return-from find-option option))))))
     (cond
       ((not children)

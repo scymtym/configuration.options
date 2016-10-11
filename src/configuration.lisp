@@ -40,8 +40,8 @@
      (or (call-next-method name container :if-does-not-exist nil)
          (let* ((schema      (configuration-schema container))
                 (schema-item (find-option name schema
-                                          :match-wildcards?  t
-                                          :if-does-not-exist #'error)))
+                                          :interpret-wildcards? :container
+                                          :if-does-not-exist    #'error)))
            (setf (find-option name container)
                  (make-option schema-item name)))))
     (t

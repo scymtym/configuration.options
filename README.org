@@ -153,7 +153,8 @@
       #+BEGIN_SRC lisp :exports both
         (let* ((name        "logging.mypackage.myparser.level")
                (schema-item (configuration.options:find-option
-                             name *my-schema* :match-wildcards? t)))
+                             name *my-schema*
+                             :interpret-wildcards? :container)))
           (setf (configuration.options:find-option name *my-configuration*)
                 (configuration.options:make-option schema-item name)))
       #+END_SRC

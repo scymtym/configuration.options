@@ -37,7 +37,8 @@
                                   &optional
                                   (expected-default nil expected-default-supplied?)
                                   expected-documentation))
-                         (let ((item (find-option query schema :match-wildcards? t)))
+                         (let ((item (find-option query schema
+                                                  :interpret-wildcards? :container)))
                            (is (equal expected-type (option-type item)))
                            (when expected-default-supplied?
                              (is (equal expected-default (option-default item))))
