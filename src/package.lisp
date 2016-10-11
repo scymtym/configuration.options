@@ -5,9 +5,6 @@
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
 (cl:defpackage #:configuration.options
-  (:nicknames
-   #:options)
-
   (:use
    #:cl
    #:alexandria

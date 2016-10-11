@@ -5,9 +5,6 @@
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
 (cl:defpackage #:configuration.options.sources
-  (:nicknames
-   #:options.sources)
-
   (:use
    #:cl
    #:alexandria
