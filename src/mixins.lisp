@@ -27,7 +27,7 @@
     (setf (option-%name instance) (make-name name))))
 
 (defmethod print-items append ((object named-mixin))
-  `((:name ,(option-name object) " ~/options:print-name/"
+  `((:name ,(option-name object) " ~/configuration.options:print-name/"
            ((:before :value) (:before :type)))))
 
 ;;; `event-hook-mixin' class
