@@ -195,8 +195,8 @@
   (value->string-using-type schema-item value (option-type schema-item)))
 
 (defmethod string->value ((schema-item type-based-conversion-mixin)
-                          (value       string))
-  (string->value-using-type schema-item value (option-type schema-item)))
+                          (string      string))
+  (string->value-using-type schema-item string (option-type schema-item)))
 
 (defmethod value->string-using-type ((schema-item type-based-conversion-mixin)
                                      (value       t)
@@ -208,12 +208,12 @@
    :inner-type (append (rest type) (ensure-list inner-type))))
 
 (defmethod string->value-using-type ((schema-item type-based-conversion-mixin)
-                                     (value       string)
+                                     (string      string)
                                      (type        cons)
                                      &key
                                      inner-type)
   (string->value-using-type
-   schema-item value (first type)
+   schema-item string (first type)
    :inner-type (append (rest type) (ensure-list inner-type))))
 
 ;;; `list-container-mixin' class
