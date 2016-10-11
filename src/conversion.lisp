@@ -38,8 +38,15 @@
 (defmethod string->value-using-type ((schema-item type-based-conversion-mixin)
                                      (value       string)
                                      (type        (eql 'integer))
-                                     &key &allow-other-keys)
-  (values (parse-integer value)))
+                                     &key
+                                     inner-type)
+  (let ((value (parse-integer value))
+        (type  (list* type inner-type)))
+    (declare (dynamic-extent type))
+    (unless (typep value type)
+      (error "~@<~S is not within the bounds specified by type ~S.~@:>"
+             value type))
+    value))
 
 ;;; type `string'
 
