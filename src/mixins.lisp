@@ -203,18 +203,59 @@
                                      (type        cons)
                                      &key
                                      inner-type)
-  (value->string-using-type
-   schema-item value (first type)
-   :inner-type (append (rest type) (ensure-list inner-type))))
+  (let+ (((&flet dispatch-on-first ()
+            (value->string-using-type
+             schema-item value (first type)
+             :inner-type (append (rest type) (ensure-list inner-type)))))
+         ((&values expansion expanded?) (typexpand-1-unless-builtin type)))
+
+    (cond
+      ((not expanded?)
+       (dispatch-on-first))
+      ((ignore-errors
+        (value->string-using-type schema-item value expansion)))
+      (t
+       (dispatch-on-first)))))
 
 (defmethod string->value-using-type ((schema-item type-based-conversion-mixin)
                                      (string      string)
                                      (type        cons)
                                      &key
                                      inner-type)
-  (string->value-using-type
-   schema-item string (first type)
-   :inner-type (append (rest type) (ensure-list inner-type))))
+  (let+ (((&flet dispatch-on-first ()
+            (string->value-using-type
+             schema-item string (first type)
+             :inner-type (append (rest type) (ensure-list inner-type)))))
+         ((&values expansion expanded?) (typexpand-1-unless-builtin type)))
+    (cond
+      ((not expanded?)
+       (dispatch-on-first))
+      ((ignore-errors
+        (string->value-using-type schema-item string expansion)))
+      (t
+       (dispatch-on-first)))))
+
+(defmethod value->string-using-type ((schema-item type-based-conversion-mixin)
+                                     (value       t)
+                                     (type        symbol)
+                                     &key
+                                     inner-type)
+  (assert (not inner-type))
+  (let+ (((&values expansion expanded?) (typexpand-1-unless-builtin type)))
+    (if expanded?
+        (value->string-using-type schema-item value expansion)
+        (call-next-method))))
+
+(defmethod string->value-using-type ((schema-item type-based-conversion-mixin)
+                                     (string      string)
+                                     (type        symbol)
+                                     &key
+                                     inner-type)
+  (assert (not inner-type))
+  (let+ (((&values expansion expanded?) (typexpand-1-unless-builtin type)))
+    (if expanded?
+        (string->value-using-type schema-item string expansion)
+        (call-next-method))))
 
 ;;; `list-container-mixin' class
 

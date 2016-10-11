@@ -180,7 +180,13 @@
      ((and real integer)         ""      option-syntax-error)
      ((and real integer)         "FOO"   option-syntax-error)
      ((and real integer)         "1"     1)
-     ((and real integer)         "2"     2))))
+     ((and real integer)         "2"     2)
+
+     ;; These require type expansion
+     (positive-integer           "1"     1)
+     (positive-integer           "0"     option-syntax-error)
+     ((array-index 10)           "1"     1)
+     ((array-index 10)           "10"    option-syntax-error))))
 
 ;;; `list-container-mixin'
 
