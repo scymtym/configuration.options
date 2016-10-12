@@ -30,6 +30,13 @@
      ((:wild)           (:wild))
      ((:wild-inferiors) (:wild-inferiors)))))
 
+(test wildcard-name.print-object
+  "Test `print-object' method specialized on `wildcard-name'."
+
+  (mapc (lambda (name)
+          (is (search name (princ-to-string (make-name name)))))
+        `("*" "*.a" "**" "a.**")))
+
 (test make-name.smoke
   "Smoke test for `make-name' function."
 
