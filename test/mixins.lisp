@@ -139,7 +139,7 @@
           (is (equal string (value->string schema-item value)))
           (is (equal value  (string->value schema-item string)))))))
 
-   '((boolean                    ""      option-syntax-error)
+   `((boolean                    ""      option-syntax-error)
      (boolean                    "1"     option-syntax-error)
      (boolean                    "false" nil)
      (boolean                    "true"  t)
@@ -148,6 +148,9 @@
      (integer                    "true"  option-syntax-error)
      (integer                    "1"     1)
      (integer                    "2"     2)
+
+     (string                     "a"     "a")
+     (string                     "a b"   "a b")
 
      ((member :foo :bar)         ""      option-syntax-error)
      ((member :foo :bar)         "1"     option-syntax-error)
@@ -158,6 +161,10 @@
      ((member :|Foo| :|Bar|)     "Bar"   :|Bar|)
      ((member :|foo| :|bar|)     "FOO"   :|foo|)
      ((member :|foo| :|bar|)     "BAR"   :|bar|)
+
+     (pathname                   "a"     ,#P"a")
+     (pathname                   "a.b"   ,#P"a.b")
+     (pathname                   "a/b"   ,#P"a/b")
 
      ((list integer)             ""      option-syntax-error)
      ((list integer)             "1"     (1))
