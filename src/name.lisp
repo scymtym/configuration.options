@@ -87,6 +87,58 @@
 
 ;; relation protocols
 
+(declaim (ftype (function (function
+                           list (or null array-index) (or null array-index)
+                           list (or null array-index) (or null array-index))
+                          (values null &optional))
+                map-query-alignments))
+;;; Call FUNCTION for each alignment of the components of QUERY and
+;;; NAME.
+;;;
+;;; START1 and END1 and START2 and END2 restrict the processing to the
+;;; indicated subsequence of QUERY and NAME respectively.
+;;;
+;;; The lambda list of FUNCTION has to be compatible with
+;;;
+;;;   (total? match-end1 match-end2)
+;;;
+;;; where TOTAL? is a generalized Boolean indicating whether the call
+;;; corresponds to a total match or a partial match. MATCH-END1 and
+;;; MATCH-END2 are the positions at which the not-yet-processed
+;;; remainders of QUERY and NAME start. In case of a total match,
+;;; MATCH-END1 is END1 and MATCH-END2 is END2.
+(defun map-query-alignments (function query start1 end1 name start2 end2)
+  (let+ (((&flet done (total? rem1 rem2)
+            (funcall function total? (- end1 rem1) (- end2 rem2))))
+         ((&labels+ recur
+              ((&whole query &optional query-first &rest query-rest) rem1
+               (&whole name  &optional name-first  &rest name-rest)  rem2)
+            (cond
+              ((zerop rem1)
+               (done (zerop rem2) rem1 rem2))
+              ((zerop rem2)
+               (done (and (= rem1 1) (eq query-first :wild-inferiors))
+                     rem1 rem2))
+              ((stringp query-first)
+               (if (equal query-first name-first)
+                   (recur query-rest (1- rem1) name-rest (1- rem2))
+                   (done nil rem1 rem2)))
+              ((eq query-first :wild)
+               (recur query-rest (1- rem1) name-rest (1- rem2)))
+              (t ; implies (eq query-first :wild-inferiors)
+               (recur query      rem1      name-rest (1- rem2))
+               (recur query-rest (1- rem1) name      rem2)))))
+         ((&flet maybe-drop (sequence start end)
+            (let ((start (or start 0)))
+              (values (if (plusp start)
+                          (nthcdr start sequence)
+                          sequence)
+                      (- end start))))))
+    (multiple-value-call #'recur
+      (maybe-drop query start1 end1)
+      (maybe-drop name  start2 end2))
+    nil))
+
 (flet ((check-bounding-indices (sequence start end)
          (let* ((length (length sequence))
                 (start  (or start 0))

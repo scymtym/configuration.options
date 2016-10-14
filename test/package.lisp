@@ -18,6 +18,8 @@
    #:name
    #:wild-name
 
+   #:map-query-alignments
+
    #:type-based-validation-mixin
    #:type-based-merging-mixin
    #:type-based-conversion-mixin

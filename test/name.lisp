@@ -119,6 +119,82 @@
      (("a")     ("a" "b") (:end2 1)   t)
      (("a" "b") ("a" "b") (:end2 1)   (nil 1)))))
 
+(test map-query-alignments.smoke
+  "Smoke test for the `map-query-alignments' function."
+
+  (mapc
+   (lambda+ ((query-spec name-spec expected))
+     (let+ (((&flet+ expand-spec ((name &key (start 0) end))
+               (let ((name (name-components (make-name name))))
+                 (values name start (or end (length name))))))
+            ((&values query query-start query-end)
+             (expand-spec (ensure-list query-spec)))
+            ((&values name  name-start  name-end)
+             (expand-spec (ensure-list name-spec)))
+            (calls '())
+            ((&flet set-equal/equal (left right)
+               (set-equal left right :test #'equal))))
+       (map-query-alignments (lambda (&rest args)
+                               (push args calls))
+                             query query-start query-end
+                             name  name-start  name-end)
+       (is (set-equal/equal expected calls))))
+   '((#()              #()   ((t   0 0)))
+     (#()              "a"   ((nil 0 0)))
+     (#()              "*"   ((nil 0 0)))
+     (#()              "**"  ((nil 0 0)))
+     (#()              "a.b" ((nil 0 0)))
+     (#()              "a.c" ((nil 0 0)))
+
+     ("a"              #()   ((nil 0 0)))
+     ("a"              "a"   ((t   1 1)))
+     ("a"              "*"   ((nil 0 0)))
+     ("a"              "**"  ((nil 0 0)))
+     ("a"              "a.b" ((nil 1 1)))
+     ("a"              "a.c" ((nil 1 1 )))
+
+     ("*"              #()   ((nil 0 0)))
+     ("*"              "a"   ((t   1 1)))
+     ("*"              "*"   ((t   1 1)))
+     ("*"              "**"  ((t   1 1)))
+     ("*"              "a.b" ((nil 1 1)))
+     ("*"              "a.c" ((nil 1 1 )))
+
+     ("**"             #()   ((t   0 0)))
+     ("**"             "a"   ((t   0 1) (nil 1 0)))
+     ("**"             "*"   ((t   0 1) (nil 1 0)))
+     ("**"             "**"  ((t   0 1) (nil 1 0)))
+     ("**"             "a.b" ((t   0 2) (nil 1 1) (nil 1 0)))
+     ("**"             "a.c" ((t   0 2) (nil 1 1) (nil 1 0)))
+
+     ("a.b"            #()   ((nil 0 0)))
+     ("a.b"            "a"   ((nil 1 1)))
+     ("a.b"            "*"   ((nil 0 0)))
+     ("a.b"            "**"  ((nil 0 0)))
+     ("a.b"            "a.b" ((t   2 2)))
+     ("a.b"            "a.c" ((nil 1 1)))
+
+     ("a.c"            #()   ((nil 0 0)))
+     ("a.c"            "a"   ((nil 1 1)))
+     ("a.c"            "*"   ((nil 0 0)))
+     ("a.c"            "**"  ((nil 0 0)))
+     ("a.c"            "a.b" ((nil 1 1)))
+     ("a.c"            "a.c" ((t   2 2)))
+
+     (("a.c" :start 1) #()   ((nil 1 0)))
+     (("a.c" :start 1) "a"   ((nil 1 0)))
+     (("a.c" :start 1) "*"   ((nil 1 0)))
+     (("a.c" :start 1) "**"  ((nil 1 0)))
+     (("a.c" :start 1) "a.b" ((nil 1 0)))
+     (("a.c" :start 1) "a.c" ((nil 1 0)))
+
+     (("a.c" :end 1)   #()   ((nil 0 0)))
+     (("a.c" :end 1)   "a"   ((t   1 1)))
+     (("a.c" :end 1)   "*"   ((nil 0 0)))
+     (("a.c" :end 1)   "**"  ((nil 0 0)))
+     (("a.c" :end 1)   "a.b" ((nil 1 1)))
+     (("a.c" :end 1)   "a.c" ((nil 1 1))))))
+
 (test name-matches.smoke
   "Smoke test for `name-matches' function."
 
