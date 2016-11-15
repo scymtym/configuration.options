@@ -45,20 +45,18 @@
    method implementing the builder protocol of the parser.ini
    system.")
 
-(defmethod #+parser.ini.builder-protocol architecture.builder-protocol:make-node
-           #-parser.ini.builder-protocol parser.ini:make-node
+(defmethod architecture.builder-protocol:make-node
     ((builder ini-syntax)
      (kind    t)
      &rest args &key &allow-other-keys)
   args)
 
-(defmethod #+parser.ini.builder-protocol architecture.builder-protocol:relate
-           #-parser.ini.builder-protocol parser.ini:add-child
-    (                              (builder  ini-syntax)
-     #+parser.ini.builder-protocol (relation (eql :section-option))
-                                   (left     list)
-                                   (right    list)
-     #+parser.ini.builder-protocol &key)
+(defmethod architecture.builder-protocol:relate
+    ((builder  ini-syntax)
+     (relation (eql :section-option))
+     (left     list)
+     (right    list)
+     &key)
   (restart-case
       (let+ (((&plist-r/o (section-name :name))
               left)

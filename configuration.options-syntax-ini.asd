@@ -18,7 +18,7 @@
 
                    (:version :configuration.options (:read-file-form "version-string.sexp"))
 
-                   (:version :parser.ini            "0.1.0"))
+                   (:version :parser.ini            "0.4"))
   :encoding       :utf-8
   :components     ((:module     "sources"
                     :pathname   "src/sources"
