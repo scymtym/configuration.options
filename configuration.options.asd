@@ -59,9 +59,9 @@
                                  (:file       "source-file")
                                  (:file       "source-cascade"))))
 
-  :in-order-to    ((test-op (test-op :configuration.options-test))))
+  :in-order-to    ((test-op (test-op :configuration.options/test))))
 
-(defsystem :configuration.options-test
+(defsystem :configuration.options/test
   :author      "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :maintainer  "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :version     (:read-file-form "version-string.sexp")
@@ -102,5 +102,5 @@
                               (:file       "source-cascade")))))
 
 (defmethod perform ((op     test-op)
-                    (system (eql (find-system :configuration.options-test))))
+                    (system (eql (find-system :configuration.options/test))))
   (uiop:symbol-call '#:configuration.options.test '#:run-tests))

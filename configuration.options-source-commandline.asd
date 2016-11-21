@@ -30,9 +30,9 @@
 
                                  (:file       "source"))))
 
-  :in-order-to    ((test-op (test-op :configuration.options-source-commandline-test))))
+  :in-order-to    ((test-op (test-op :configuration.options-source-commandline/test))))
 
-(defsystem :configuration.options-source-commandline-test
+(defsystem :configuration.options-source-commandline/test
   :author      "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :maintainer  "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :version     (:read-file-form "version-string.sexp")
@@ -53,5 +53,5 @@
                               (:file       "source")))))
 
 (defmethod perform ((op     test-op)
-                    (system (eql (find-system :configuration.options-source-commandline-test))))
+                    (system (eql (find-system :configuration.options-source-commandline/test))))
   (uiop:symbol-call '#:configuration.options.sources.commandline.test '#:run-tests))

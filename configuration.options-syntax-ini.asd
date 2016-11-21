@@ -24,9 +24,9 @@
                     :pathname   "src/sources"
                     :components ((:file       "syntax-ini"))))
 
-  :in-order-to    ((test-op (test-op :configuration.options-syntax-ini-test))))
+  :in-order-to    ((test-op (test-op :configuration.options-syntax-ini/test))))
 
-(defsystem :configuration.options-syntax-ini-test
+(defsystem :configuration.options-syntax-ini/test
   :author      "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :maintainer  "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :version     (:read-file-form "version-string.sexp")
@@ -39,13 +39,13 @@
 
                 (:version :fiveam                           "1.3")
 
-                (:version :configuration.options-test       (:read-file-form "version-string.sexp")))
+                (:version :configuration.options/test       (:read-file-form "version-string.sexp")))
   :encoding    :utf-8
   :components  ((:module     "sources"
                  :pathname   "test/sources"
                  :components ((:file       "syntax-ini")))))
 
 (defmethod perform ((operation test-op)
-                    (component (eql (find-system :configuration.options-syntax-ini-test))))
+                    (component (eql (find-system :configuration.options-syntax-ini/test))))
   (uiop:symbol-call '#:configuration.options.sources.syntax-ini.test
                     '#:run-tests))
