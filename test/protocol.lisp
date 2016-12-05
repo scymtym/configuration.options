@@ -126,14 +126,14 @@
 
   ;; Value.
   (let ((option (simple-option :value 1)))
-    (is (equal '(1 t) (multiple-value-list (value option))))))
+    (is (equal '(1 t nil) (multiple-value-list (value option))))))
 
 (test protocol.setf-value.smoke
   "Smoke test for the setf `value' generic function."
 
   (let ((option (simple-option)))
     (setf (value option) 5)
-    (is (equal '(5 t) (multiple-value-list (value option))))))
+    (is (equal '(5 t nil) (multiple-value-list (value option))))))
 
 ;;; Option container protocol
 
@@ -363,18 +363,24 @@
     '((nil)    nil              t))
 
   (define-value-function-test (option-value
-                               (value)
-                               (value value?))
-      (let* ((item   (make-instance 'standard-schema-item
-                                    :name '("a" "b") :type t))
+                               (default values value)
+                               (value value? source))
+      (let* ((item   (apply #'make-instance 'standard-schema-item
+                            :name    '("a" "b")
+                            :type    t
+                            (when default `(:default ,(first default)))))
              (option (make-option item '("a" "b"))))
+        (when values
+          (setf (option-values option) values))
         (when value
           (setf (option-value option) (first value)))
         option)
-    ;; value expected value expected value?
-    '(()     nil            nil)
-    '((1)    1              t)
-    '((nil)  nil            t)))
+    ;; default values                  value  ex. val ex val? ex source
+    `(nil      #()                     nil    nil     nil     nil)
+    `(nil      #((nil :source :foo))   (nil)  nil     t       :foo)
+    `((1)      #()                     nil    nil     nil     nil)
+    `((1)      #((1 :source :default)) (1)    1       t       :default)
+    `((1)      #((1) (2))              (1)    1       t       t)))
 
 (test protocol.setf-option-value.if-does-not-exist
   "Test that setf `option-value' accepts the :if-does-not-exist

@@ -8,10 +8,6 @@
 
 ;;; Utilities
 
-(defconstant +no-value+ '..no-value..
-  "This object is used to indicate that a value cell is not
-   occupied.")
-
 (defclass synchronizer-handler (closer-mop:funcallable-standard-object)
   ((synchronizer :initarg  :synchronizer
                  :reader    synchronizer-handler-synchronizer

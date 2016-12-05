@@ -872,9 +872,11 @@
                           &key
                           if-does-not-exist)
   (:documentation
-   "Return two values describing the value of OPTION: 1) nil or the
-    value of OPTION 2) nil if OPTION does not have a value and t if
-    OPTION has a value.
+   "Return up to three values describing the value of OPTION:
+    1) nil or the value of OPTION
+    2) nil if OPTION does not have a value and t if OPTION has a value
+    3) if OPTION has a value and a single source provided it, that
+       source.
 
     IF-DOES-NOT-EXIST controls the behavior in case OPTION does not
     have value:
@@ -936,9 +938,9 @@
                                  (if-does-not-exist #'error))
   (tagbody
    :start
-     (let+ (((&values value value?) (call-next-method)))
+     (let+ (((&values value value? source) (call-next-method)))
        (when value?
-         (return-from option-value (values value value?))))
+         (return-from option-value (values value value? source))))
      (return-from option-value
        (error-behavior-restart-case
            (if-does-not-exist
@@ -958,7 +960,7 @@
                                      of the missing value of ~
                                      ~A.~@:>"
                              option))
-           (values value t))))))
+           (values value t 'use-value))))))
 
 ;;; Sink protocol
 

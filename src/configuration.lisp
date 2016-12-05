@@ -118,7 +118,15 @@
                          if-does-not-exist)
   (declare (ignore if-does-not-exist))
   (when (slot-boundp option 'value)
-    (values (option-%value option) t)))
+    (let+ (((&structure-r/o option- %value values) option)
+           (value-count (count +no-value+ values :test-not #'eq))
+           (source      (case value-count
+                          (0 nil)
+                          (1 (let ((entry (find +no-value+ values
+                                                :test-not #'eq)))
+                               (getf (rest entry) :source)))
+                          (t t))))
+      (values %value t source))))
 
 (defmethod (setf option-value) :around ((new-value t)
                                         (option    option-cell)

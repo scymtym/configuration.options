@@ -6,6 +6,14 @@
 
 (cl:in-package #:configuration.options)
 
+;;; Internal variables and constants
+
+(defconstant +no-value+ '..no-value..
+  "This object is used to indicate that a value cell is not
+   occupied.")
+
+;;; User-facing variables
+
 (defvar *configuration* nil
   "When bound to a configuration object, provides the default
    configuration for the `value' and setf `value' functions. ")
