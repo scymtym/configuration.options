@@ -711,29 +711,29 @@
                                    (if-does-not-exist #'error))
   (tagbody
    :start
+     (let+ (((&values default default?) (call-next-method)))
+       (when default?
+         (return-from option-default (values default default?))))
      (return-from option-default
-       (or (let+ (((&values default default?) (call-next-method)))
-             (when default?
-               (return-from option-default (values default default?))))
-           (error-behavior-restart-case
-               (if-does-not-exist
-                (value-missing-error
-                 :option option
-                 :which :default)
-                :warning-condition value-missing-warning)
-             (retry ()
-               :report (lambda (stream)
-                         (format stream "~@<Retry obtaining the ~
-                                         default value of ~A.~@:>"
-                                 option))
-               (go :start))
-             (use-value (value)
-               :report (lambda (stream)
-                         (format stream "~@<Use a particular value ~
-                                         instead of the missing ~
-                                         default value of ~A.~@:>"
-                                 option))
-               value))))))
+       (error-behavior-restart-case
+           (if-does-not-exist
+            (value-missing-error
+             :option option
+             :which :default)
+            :warning-condition value-missing-warning)
+         (retry ()
+           :report (lambda (stream)
+                     (format stream "~@<Retry obtaining the default ~
+                                     value of ~A.~@:>"
+                             option))
+           (go :start))
+         (use-value (value)
+           :report (lambda (stream)
+                     (format stream "~@<Use a particular value ~
+                                     instead of the missing default ~
+                                     value of ~A.~@:>"
+                             option))
+           value)))))
 
 ;;; Schema item protocol
 
@@ -936,29 +936,29 @@
                                  (if-does-not-exist #'error))
   (tagbody
    :start
+     (let+ (((&values value value?) (call-next-method)))
+       (when value?
+         (return-from option-value (values value value?))))
      (return-from option-value
-       (or (let+ (((&values value value?) (call-next-method)))
-             (when value?
-               (return-from option-value (values value value?))))
-           (error-behavior-restart-case
-               (if-does-not-exist
-                (value-missing-error
-                 :option option
-                 :which :value)
-                :warning-condition value-missing-warning)
-             (retry ()
-               :report (lambda (stream)
-                         (format stream "~@<Retry obtaining the value ~
-                                         of ~A.~@:>"
-                                 option))
-               (go :start))
-             (use-value (value)
-               :report (lambda (stream)
-                         (format stream "~@<Use a particular value ~
-                                         instead of the missing ~
-                                         value of ~A.~@:>"
-                                 option))
-               value))))))
+       (error-behavior-restart-case
+           (if-does-not-exist
+            (value-missing-error
+             :option option
+             :which  :value)
+            :warning-condition value-missing-warning)
+         (retry ()
+           :report (lambda (stream)
+                     (format stream "~@<Retry obtaining the value of ~
+                                     ~A.~@:>"
+                             option))
+           (go :start))
+         (use-value (value)
+           :report (lambda (stream)
+                     (format stream "~@<Use a particular value instead ~
+                                     of the missing value of ~
+                                     ~A.~@:>"
+                             option))
+           (values value t))))))
 
 ;;; Sink protocol
 
