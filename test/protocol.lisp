@@ -252,7 +252,7 @@
 ;; Default behavior
 
 (test protocol.find-child.remove
-  "Test removing options via setf `find-option'."
+  "Test removing children via setf `find-child'."
 
   (mapc
    (lambda+ ((exists? if-does-not-exist if-exists expected))
