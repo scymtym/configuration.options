@@ -305,41 +305,54 @@
 ;;; Option-like protocol
 
 (macrolet
-    ((define-value-function-test ((name &key (value-var 'value))
+    ((define-value-function-test ((name
+                                   parameters
+                                   (value-var value?-var &rest values))
                                   construction-expression
                                   &body cases)
-       `(test ,(symbolicate '#:protocol. name)
-          ,(format nil "Test default behavior of `~(~A~)' function."
-                   name)
-          (mapc
-           (lambda+ ((,value-var expected-value expected-value?))
-             (let+ ((object ,construction-expression)
-                    ((&flet do-it (&optional (if-does-not-exist
-                                              nil
-                                              if-does-not-exist-supplied?))
-                       (apply #',name object
-                              (when if-does-not-exist-supplied?
-                                `(:if-does-not-exist ,if-does-not-exist))))))
-               (let+ (((&values value value?) (do-it nil)))
-                 (is (equal expected-value  value))
-                 (is (eq    expected-value? value?)))
-               (when (not expected-value?)
-                 (signals value-missing-error (do-it))
-                 (is (equal :foo (handler-bind
-                                     ((value-missing-error
-                                       (lambda (condition)
-                                         (declare (ignore condition))
-                                         (let ((restart (find-restart 'retry)))
-                                           (is-true restart)
-                                           (is (not (emptyp (princ-to-string restart)))))
-                                         (let ((restart (find-restart 'use-value)))
-                                           (is-true restart)
-                                           (is (not (emptyp (princ-to-string restart))))
-                                           (invoke-restart restart :foo)))))
-                                   (do-it)))))))
-           (list ,@cases)))))
+       (let+ (((&flet expected-name (name)
+                 (symbolicate '#:expected- name)))
+              (expected-values (mapcar #'expected-name values)))
+         `(test ,(symbolicate '#:protocol. name)
+            ,(format nil "Test default behavior of `~(~A~)' function."
+                     name)
+            (mapc
+             (lambda+ ((,@parameters
+                        expected-value expected-value? ,@expected-values))
+               (let+ ((object ,construction-expression)
+                      ((&flet do-it (&optional (if-does-not-exist
+                                                nil
+                                                if-does-not-exist-supplied?))
+                         (apply #',name object
+                                (when if-does-not-exist-supplied?
+                                  `(:if-does-not-exist ,if-does-not-exist))))))
+                 (let+ (((&values ,value-var ,value?-var ,@values) (do-it nil)))
+                   ,@(mapcar
+                      (lambda (expected value)
+                        `(is (equal ,expected ,value)))
+                      (list* 'expected-value 'expected-value? expected-values)
+                      (list* value-var       value?-var       values)))
+                 (when (not expected-value?)
+                   (signals value-missing-error (do-it))
+                   (is (equal
+                        :foo
+                        (handler-bind
+                            ((value-missing-error
+                              (lambda (condition)
+                                (declare (ignore condition))
+                                (let ((restart (find-restart 'retry)))
+                                  (is-true restart)
+                                  (is (not (emptyp (princ-to-string restart)))))
+                                (let ((restart (find-restart 'use-value)))
+                                  (is-true restart)
+                                  (is (not (emptyp (princ-to-string restart))))
+                                  (invoke-restart restart :foo)))))
+                          (do-it)))))))
+             (list ,@cases))))))
 
-  (define-value-function-test (option-default :value-var default)
+  (define-value-function-test (option-default
+                               (default)
+                               (default default?))
       (apply #'make-instance 'standard-schema-item
              :name '("a" "b")
              :type t
@@ -349,7 +362,9 @@
     '((1)      1                t)
     '((nil)    nil              t))
 
-  (define-value-function-test (option-value :value-var value)
+  (define-value-function-test (option-value
+                               (value)
+                               (value value?))
       (let* ((item   (make-instance 'standard-schema-item
                                     :name '("a" "b") :type t))
              (option (make-option item '("a" "b"))))
