@@ -27,4 +27,10 @@ script:
                               :configuration.options-syntax-ini/test
                               :configuration.options-syntax-xml/test
                               :configuration.options-source-commandline/test))'
-      '(or (configuration.options.test:run-tests) (uiop:quit -1))'
+      '(or (every (function identity)
+                  (mapcar (function funcall)
+                          (quote (configuration.options.test:run-tests
+                                  configuration.options.sources.syntax-ini.test:run-tests
+                                  configuration.options.sources.syntax-xml.test:run-tests
+                                  configuration.options.sources.commandline.test:run-tests))))
+           (uiop:quit -1))'
