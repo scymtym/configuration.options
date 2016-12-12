@@ -52,6 +52,7 @@
 
                               (:file       "source")))))
 
-(defmethod perform ((op     test-op)
-                    (system (eql (find-system :configuration.options-source-commandline/test))))
-  (uiop:symbol-call '#:configuration.options.sources.commandline.test '#:run-tests))
+(defmethod perform ((operation test-op)
+                    (component (eql (find-system :configuration.options-source-commandline/test))))
+  (uiop:symbol-call '#:configuration.options.sources.commandline.test
+                    '#:run-tests))

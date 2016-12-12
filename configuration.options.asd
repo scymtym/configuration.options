@@ -101,6 +101,6 @@
                               (:file       "source-file")
                               (:file       "source-cascade")))))
 
-(defmethod perform ((op     test-op)
-                    (system (eql (find-system :configuration.options/test))))
+(defmethod perform ((operation test-op)
+                    (component (eql (find-system :configuration.options/test))))
   (uiop:symbol-call '#:configuration.options.test '#:run-tests))
