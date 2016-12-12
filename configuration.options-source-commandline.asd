@@ -39,11 +39,11 @@
   :license     "LLGPLv3" ; see COPYING file for details.
   :description "Unit tests for the configuration.options.source-commandline system."
   :depends-on  (:alexandria
-                (:version :let-plus              "0.2")
+                (:version :let-plus                                 "0.2")
 
-                (:version :configuration.options (:read-file-form "version-string.sexp"))
+                (:version :configuration.options-source-commandline (:read-file-form "version-string.sexp"))
 
-                (:version :fiveam                "1.3"))
+                (:version :fiveam                                   "1.3"))
   :encoding    :utf-8
   :components  ((:module     "commandline"
                  :pathname   "test/sources/commandline"
