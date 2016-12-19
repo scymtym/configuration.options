@@ -27,7 +27,7 @@
          :index (+ (indexed-sink-index sink) index)
          (remove-from-plist args :index)))
 
-(defclass cascade-source ()
+(defclass cascade-source (print-items:print-items-mixin)
   ((sources :initarg  :sources
             :type     list
             :reader   source-sources
@@ -82,8 +82,7 @@
 
 ;;; `config-file-cascade-source'
 
-(defclass config-file-cascade-source (cascade-source
-                                      print-items:print-items-mixin)
+(defclass config-file-cascade-source (cascade-source)
   ()
   (:documentation
    "This source implements a cascade of file-based sources.
@@ -177,8 +176,7 @@
 
 ;;; `directory-source'
 
-(defclass directory-source (cascade-source
-                            print-items:print-items-mixin)
+(defclass directory-source (cascade-source)
   ((pattern :initarg  :pattern
             :type     (or string pathname)
             :reader   source-pattern
@@ -238,8 +236,7 @@
 
 ;;; `common-cascade-source'
 
-(defclass common-cascade-source (cascade-source
-                                 print-items:print-items-mixin)
+(defclass common-cascade-source (cascade-source)
   ()
   (:default-initargs
    :basename (missing-required-initarg
