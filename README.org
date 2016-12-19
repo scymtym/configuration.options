@@ -18,6 +18,20 @@
   [[https://travis-ci.org/scymtym/configuration.options][https://travis-ci.org/scymtym/configuration.options.svg]]
 
 * STARTED Tutorial
+
+  #+BEGIN_SRC lisp :exports results :results silent
+    (defun first-line-or-less (string)
+      (let ((end (min 70 (or (position #\Newline string) (length string)))))
+        (subseq string 0 end)))
+
+    (defun provider-table (service)
+     (loop :for (name . provider) :in (service-provider:service-providers/alist service)
+        :collect `(,name ,(first-line-or-less (documentation provider t)))))
+
+    (defun provider-table/sorted (service)
+      (sort (provider-table service) #'string< :key #'first))
+  #+END_SRC
+
   Implementing configuration processing using the
   =configuration.options= system involves at least three steps:
   1. [[*Specifying a Schema]]
@@ -235,6 +249,81 @@
 
 ** TODO Querying a Configuration
 ** TODO Tracking Changes of Option Values
+** More on Sources
+   [[*Constructing and Populating a Configuration]] introduced the
+   "source" and "synchronizer" concepts by demonstrating the default
+   values source.
+
+   In more realistic settings, a combination of multiple sources like
+   (from highest to lowest priority)
+
+   1. Commandline options
+   2. Environment variables
+   3. Configuration file(s) and directories
+   4. Default values
+
+   will be used. Cascades of this kind can be constructed by
+   instantiating the ~:cascade~ source with appropriate subordinate
+   sources:
+
+   #+BEGIN_SRC lisp :exports both :resuts value
+     (configuration.options.sources:make-source
+      :cascade
+      :sources '((:commandline)
+                 (:environment-variables)
+                 (:config-file-cascade :config-file "my-program.conf"
+                                       :syntax      :ini)
+                 (:defaults)))
+   #+END_SRC
+
+   #+RESULTS:
+   : #<CASCADE-SOURCE  (4) {100B9D0953}>
+
+   A similar cascade of sources is constructed by the
+   ~:common-cascade~ source without the need for manually specifying
+   the involved sources.
+
+   #+BEGIN_SRC lisp :exports both :results value
+     (configuration.options.sources:make-source
+      :common-cascade :basename "my-program" :syntax :ini)
+   #+END_SRC
+
+   #+RESULTS:
+   : #<COMMON-CASCADE-SOURCE  (4) {100B962693}>
+
+   Currently available sources are:
+
+   #+BEGIN_SRC lisp :exports results :results value table :colnames '("Name" "Documentation")
+     (provider-table/sorted 'configuration.options.sources::source)
+   #+END_SRC
+
+   #+RESULTS:
+   | Name                   | Documentation                                                        |
+   |------------------------+----------------------------------------------------------------------|
+   | :CASCADE               | This source organizes a set of sources into a prioritized cascade.   |
+   | :COMMANDLINE           | This source obtains option values from commandline arguments.        |
+   | :COMMON-CASCADE        | This source implements a typical cascade for commandline programs.   |
+   | :CONFIG-FILE-CASCADE   | This source implements a cascade of file-based sources.              |
+   | :DEFAULTS              | This source assigns default values to options.                       |
+   | :DIRECTORY             | Collects config files and creates corresponding subordinate sources. |
+   | :ENVIRONMENT-VARIABLES | This source reads values of environment variables.                   |
+   | :FILE                  | This source reads configuration data from files.                     |
+   | :STREAM                | This source reads and configuration data from streams.               |
+
+   The ~:stream~ (and therefore ~:file~, ~:config-file-cascade~ and
+   ~:common-cascade~) source supports the following syntaxes:
+
+   #+BEGIN_SRC lisp :exports results :results value table :colnames '("Name" "Documentation")
+     (provider-table/sorted 'configuration.options.sources::syntax)
+   #+END_SRC
+
+   #+RESULTS:
+   | Name | Documentation                                            |
+   |------+----------------------------------------------------------|
+   | :INI | Parse textual configuration information in "ini" syntax. |
+   | :XML | This syntax allows using some kinds of XML documents as  |
+
+* TODO Reference
 * TODO Related Work
   + https://github.com/Shinmera/universal-config/
   + https://github.com/Shinmera/ubiquitous
@@ -249,9 +338,4 @@
 
 * Footnotes
 
-[fn:1] Typically something like (from lowest to highest priority)
-
-       1. Default values
-       2. Configuration file(s) and directories
-       3. Environment variables
-       4. Commandline options
+[fn:1] See [[*More on Sources]]
