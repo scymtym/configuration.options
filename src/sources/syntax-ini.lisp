@@ -33,8 +33,7 @@
   (:default-initargs
    :source (missing-required-initarg 'ini-syntax :source))
   (:documentation
-   "Instances of this class parse textual configuration information
-    according to the widely used \"ini\" syntax."))
+   "Parse textual configuration information in \"ini\" syntax."))
 
 (service-provider:register-provider/class 'syntax :ini :class 'ini-syntax)
 

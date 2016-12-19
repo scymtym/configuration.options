@@ -36,10 +36,10 @@
             :documentation
             "Stores a list of sources in order of priority."))
   (:documentation
-   "Instances of this class organize a set of sources into a
-    prioritized cascade. Option values from sources with higher
-    priority are shadow or are combined with option values from
-    sources with lower priority.
+   "This source organizes a set of sources into a prioritized cascade.
+
+    Option values from sources with higher priority are shadow or are
+    combined with option values from sources with lower priority.
 
     When subordinate sources are themselves cascades, their priorities
     are integrated into the priorities of the containing cascade."))
@@ -86,9 +86,9 @@
                                       print-items:print-items-mixin)
   ()
   (:documentation
-   "Instances of this class construct a cascade of
-    configuration-file-based sources, deriving names of configuration
-    files from a given base name.
+   "This source implements a cascade of file-based sources.
+
+    Names of configuration files are derived from a given base name.
 
     The following initargs are accepted:
 
@@ -193,8 +193,7 @@
                (string< (pathname-name x) (pathname-name y)))
              t))
   (:documentation
-   "Instances of this class collect files according specified rules
-    and create subordinate sources for these files.
+   "Collects config files and creates corresponding subordinate sources.
 
     The following initargs are accepted:
 
@@ -246,8 +245,7 @@
    :basename (missing-required-initarg
                'common-cascade-source :basename))
   (:documentation
-   "Instances of this class construct a cascade which is typical for
-    commandline programs.
+   "This source implements a typical cascade for commandline programs.
 
     The cascade consists of the following sources:
     1. Commandline options

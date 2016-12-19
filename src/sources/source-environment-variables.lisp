@@ -16,8 +16,7 @@
                  "Stores a function that maps environment variable
                   names to option names."))
   (:documentation
-   "Instances of this class provide values of environment variables to
-    sinks."))
+   "This source reads values of environment variables."))
 
 (service-provider:register-provider/class
  'source :environment-variables :class 'environment-variables-source)

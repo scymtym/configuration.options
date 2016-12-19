@@ -23,9 +23,7 @@
    :stream (missing-required-initarg 'stream-source :stream)
    :syntax (missing-required-initarg 'stream-source :syntax))
   (:documentation
-   "Instances of this class are options sources which read and parse
-    stream containing configuration options in order to provide
-    options to sinks.
+   "This source reads and configuration data from streams.
 
     Supplied streams are not closed after processing."))
 

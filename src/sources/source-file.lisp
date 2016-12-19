@@ -29,8 +29,7 @@
    :stream   (load-time-value (make-string-input-stream "") t)
    :pathname (missing-required-initarg 'file-source :pathname))
   (:documentation
-   "Instances of this class are option sources which read and parse
-    configuration files in order to provide options to sinks."))
+   "This source reads configuration data from files."))
 
 (service-provider:register-provider/class
  'source :file :class 'file-source)

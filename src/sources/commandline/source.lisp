@@ -42,9 +42,10 @@
                where OPTION is a commandline option and NAME is an
                option name."))
   (:documentation
-   "This sources generates commandline options specifications based on
-    a given schema and extracts option values from commandline
-    arguments."))
+   "This source obtains option values from commandline arguments.
+
+    It generates commandline options specifications based on a given
+    schema and extracts option values from commandline arguments."))
 
 (service-provider:register-provider/class
  'configuration.options.sources::source :commandline

@@ -9,13 +9,7 @@
 (defclass defaults-source ()
   ((schema :accessor source-%schema))
   (:documentation
-   "Instances of this class organize a set of sources into a
-    prioritized cascade. Option values from sources with higher
-    priority are shadow or are combined with option values from
-    sources with lower priority.
-
-    When subordinate sources are themselves cascades, their priorities
-    are integrated into the priorities of the containing cascade."))
+   "This source assigns default values to options."))
 
 (service-provider:register-provider/class
  'source :defaults :class 'defaults-source)
