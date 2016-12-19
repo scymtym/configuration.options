@@ -1,7 +1,7 @@
 #+TITLE:       configuration.options README
 #+AUTHOR:      Jan Moringen
 #+EMAIL:       jmoringe@techfak.uni-bielefeld.de
-#+DESCRIPTION:
+#+DESCRIPTION: Description, tutorial and reference for the configuration.options system
 #+KEYWORDS:    common lisp, options, configuration
 #+LANGUAGE:    en
 
@@ -19,10 +19,10 @@
 
 * STARTED Tutorial
   Implementing configuration processing using the
-  =configuration.options= system involves at least three steps
+  =configuration.options= system involves at least three steps:
   1. [[*Specifying a Schema]]
   2. [[*Constructing and Populating a Configuration]] based on the schema
-  3. Querying options in the constructed configuration
+  3. [[*Querying a Configuration]]
 
 ** Names
    Since options (and the corresponding schema items) are organized
@@ -238,13 +238,14 @@
 * TODO Related Work
   + https://github.com/Shinmera/universal-config/
   + https://github.com/Shinmera/ubiquitous
-  + https://docs.python.org/3/library/configparser.htm
+  + https://docs.python.org/3/library/configparser.html
   + cl-config
 
 * Settings                                                         :noexport:
 
 #+OPTIONS: H:2 num:nil toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
 #+OPTIONS: TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+SEQ_TODO: TODO STARTED | DONE
 
 * Footnotes
 
