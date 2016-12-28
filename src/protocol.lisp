@@ -37,7 +37,7 @@
 
 (defgeneric name-matches (query name &key start1 end1 start2 end2)
   (:documentation
-   "Return non-nil when QUERY matches name.
+   "Return non-nil when QUERY matches NAME.
 
     This can be the case either when QUERY and NAME are equal or when
     QUERY contains :wild or :wild-inferiors components matching
