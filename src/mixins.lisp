@@ -115,8 +115,8 @@
                                               (type        (eql ',type))
                                               &key
                                               inner-type)
-        (,operator (curry #'validate-value-using-type schema-item value)
-                   inner-type))))
+          (,operator (curry #'validate-value-using-type schema-item value)
+                     inner-type))))
 
   (define-composite-validation and every)
   (define-composite-validation or  some))
