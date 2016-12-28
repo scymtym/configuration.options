@@ -160,34 +160,14 @@
                            start2 end2)
     (check-bounding-indices query start1 end1)
     (check-bounding-indices name  start2 end2)
-    (let+ (((&labels+ recur
-                ((            &optional query-first &rest query-rest) end1
-                 (&whole name &optional name-first  &rest name-rest)  end2)
-              (cond
-                ((zerop end1)
-                 (zerop end2))
-                ((stringp query-first)
-                 (when (and (plusp end2) (string= query-first name-first))
-                   (recur query-rest (1- end1) name-rest (1- end2))))
-                ((eq query-first :wild)
-                 (when (plusp end2)
-                   (recur query-rest (1- end1) name-rest (1- end2))))
-                (t
-                 (assert (eq query-first :wild-inferiors))
-                 (or (loop :for end  :downfrom end2
-                           :for tail :on       name
-                           :when (recur query-rest (1- end1) tail end)
-                           :do (return t))
-                     (recur query-rest (1- end1) '() 0))))))
-           ((&flet maybe-drop (sequence start end)
-              (values (if (and start (plusp start))
-                          (nthcdr start sequence)
-                          sequence)
-                      (- (or end (length sequence))
-                         (or start 0))))))
-      (multiple-value-call #'recur
-        (maybe-drop (name-components query) start1 end1)
-        (maybe-drop (name-components name)  start2 end2)))))
+    (let ((end1 (or end1 (length query)))
+          (end2 (or end2 (length name))))
+      (map-query-alignments (lambda (total? end1 end2)
+                              (declare (ignore end1 end2))
+                              (when total? (return-from name-matches t)))
+                            (name-components query) start1 end1
+                            (name-components name)  start2 end2)
+      nil)))
 
 (defmethod name< ((left sequence) (right wildcard-name))
   (or (not (typep left 'wild-name)) (call-next-method)))
