@@ -86,6 +86,39 @@
      ("**"               t t   (:wild-inferiors) t)
      ((:wild-inferiors)  t t   (:wild-inferiors) t))))
 
+(test name-equal.smoke
+  "Smoke test for `name-equal' function."
+
+  (mapc
+   (lambda+ ((left right args expected))
+     (let ((expected (ensure-list expected)))
+       (is (equal expected (multiple-value-list
+                            (apply #'name-equal left right args))))))
+
+   '((()        ()        ()          t)
+     (()        ("a")     ()          (nil 0))
+     (()        (:wild)   ()          (nil 0))
+     (("a")     ()        ()          (nil 0))
+     (("a")     ("a")     ()          t)
+     (("a")     (:wild)   ()          (nil 0))
+     ((:wild)   ()        ()          (nil 0))
+     ((:wild)   ("a")     ()          (nil 0))
+     ((:wild)   (:wild)   ()          t)
+
+     (("a")     ("a" "b") ()          (nil 1))
+     (("a" "b") ("a")     ()          (nil 1))
+     (("a" "b") ("a" "b") ()          t)
+
+     (("a" "b") ("b")     (:start1 1) t)
+     (("a" "b") ("a" "b") (:start1 1) (nil 1))
+     (("a" "b") ("a")     (:end1 1)   t)
+     (("a" "b") ("a" "b") (:end1 1)   (nil 1))
+
+     (("b")     ("a" "b") (:start2 1) t)
+     (("a" "b") ("a" "b") (:start2 1) (nil 0))
+     (("a")     ("a" "b") (:end2 1)   t)
+     (("a" "b") ("a" "b") (:end2 1)   (nil 1)))))
+
 (test name-matches.smoke
   "Smoke test for `name-matches' function."
 

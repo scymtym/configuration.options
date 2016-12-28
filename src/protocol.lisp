@@ -29,6 +29,9 @@
   (:documentation
    "Return non-nil when LEFT and RIGHT are equal.
 
+    In case LEFT is not equal to RIGHT, return two values: 1) nil 2)
+    the position of the mismatch in LEFT.
+
     START1 and END1, if supplied, select a subseqeuence of LEFT to be
     used in the equality test.
 
@@ -72,10 +75,12 @@
   name)
 
 (defmethod name-equal ((left t) (right t) &key start1 end1 start2 end2)
-  (not (mismatch (name-components left) (name-components right)
-                 :test   #'equal
-                 :start1 (or start1 0) :end1 end1
-                 :start2 (or start2 0) :end2 end2)))
+  (if-let ((position (mismatch (name-components left) (name-components right)
+                               :test   #'equal
+                               :start1 (or start1 0) :end1 end1
+                               :start2 (or start2 0) :end2 end2)))
+    (values nil position)
+    t))
 
 (defmethod name-matches ((query t) (name t) &key start1 end1 start2 end2)
   (name-equal query name :start1 start1 :end1 end1 :start2 start2 :end2 end2))
