@@ -317,7 +317,9 @@
       arbitrary name components in corresponding positions in QUERY to
       match."))
 
-(defgeneric find-options (query container)
+(defgeneric find-options (query container
+                          &key
+                          interpret-wildcards?)
   (:documentation
    "Find and return a sequence of options in CONTAINER matching QUERY
     which can be a name with wildcard components.
@@ -327,7 +329,10 @@
 
     If CONTAINER has child containers (as can be the case for schema
     objects), matching options in ancestor containers (i.e. transitive
-    children) are also found and returned."))
+    children) are also found and returned.
+
+    For a description of INTERPRET-WILDCARDS?, see
+    `map-matching-options'."))
 
 (defgeneric find-option (name container
                          &key
@@ -428,10 +433,12 @@
     (call-next-method)
     (apply #'map-matching-options function query container args)))
 
-(defmethod find-options :around ((query sequence) (container t))
+(defmethod find-options :around ((query sequence) (container t)
+                                 &key
+                                 (interpret-wildcards? :query))
   (if-name query
     (call-next-method)
-    (find-options query container)))
+    (find-options query container :interpret-wildcards? interpret-wildcards?)))
 
 (defmethod find-option :around ((name sequence) (container t)
                                 &rest args &key &allow-other-keys)
@@ -498,13 +505,14 @@
            (name-components query)  0 (length query))))))
    container))
 
-(defmethod find-options ((query t) (container t))
+(defmethod find-options ((query t) (container t)
+                         &key
+                         (interpret-wildcards? :query))
   (let ((result '()))
-    (map-options (lambda (option &key (prefix '()) &allow-other-keys)
-                   (let ((name (merge-names prefix (option-name option))))
-                     (when (name-matches query name)
-                       (push option result))))
-                 container)
+    (map-matching-options
+     (lambda (option &key &allow-other-keys)
+       (push option result))
+     query container :interpret-wildcards? interpret-wildcards?)
     result))
 
 (defmethod find-option :around ((name t) (container t)

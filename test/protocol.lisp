@@ -27,7 +27,9 @@
   (declare (ignore interpret-wildcards?))
   (list query))
 
-(defmethod find-options ((query t) (container mock-container/name-coercion))
+(defmethod find-options ((query t) (container mock-container/name-coercion)
+                         &key interpret-wildcards?)
+  (declare (ignore interpret-wildcards?))
   (list query))
 
 (defmethod find-option ((name t) (container mock-container/name-coercion)

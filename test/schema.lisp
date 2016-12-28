@@ -42,35 +42,56 @@
   ;; therefore not redundant given the general `find-options' test in
   ;; protocol.lisp).
 
-  (let+ (((&flet check-query (query expected container)
-            (let ((result (find-options query container)))
+  (let+ (((&flet check-query (query-and-args expected container)
+            (let+ (((query &rest args) (ensure-list query-and-args))
+                   (result (apply #'find-options query container args)))
               (is (set-equal/name-equal
                    expected (mapcar #'option-name result)))))))
     (macrolet
         ((test-case ((container) &body body)
            `(let+ ((container ,container)
-                   ((&flet check-query (query expected)
-                      (check-query query expected container))))
+                   ((&flet check-query (query-and-args expected)
+                      (check-query query-and-args expected container))))
               ,@body)))
 
       ;; Empty results.
       (test-case ((make-instance 'standard-schema))
         (check-query "no.such.option" '()))
 
-      ;; Wild[-inferiors] queries.
+      ;; Complex queries.
       (test-case (*simple-schema*)
-        (check-query "*" '("*" "foo" "bar"))
+        ;; Single component and wild[-inferiors] queries.
+        (check-query "foo" '("foo"))
+        (check-query "*"   '("*" "foo" "bar"))
         ;; "*" is returned twice (not checked by
         ;; `set-equal/name-equal') because the parent schema and the
         ;; sub-schema both have an option named (:wild)
-        (check-query "**" '("*" "whoop" "*" "wild.**" "foo.fez" "foo"
-                            "baz.foo" "bar.fez" "bar")))
+        (check-query "**"  '("*" "whoop" "*" "wild.**" "foo.fez" "foo"
+                             "baz.foo" "bar.fez" "bar"))
 
-      ;; Complex queries.
-      (test-case (*simple-schema*)
-        (check-query "**.bar" '("bar"))
-        (check-query "bar.**" '("bar.fez" "bar"))
-        (check-query "sub.*"  '("*" "whoop"))))))
+        (check-query '("foo" :interpret-wildcards? :container) '("*" "foo"))
+        (check-query '("*"   :interpret-wildcards? :container) '("*"))
+        (check-query '("**"  :interpret-wildcards? :container) '("*"))
+
+        (check-query '("foo" :interpret-wildcards? nil)        '("foo"))
+        (check-query '("*"   :interpret-wildcards? nil)        '("*"))
+        (check-query '("**"  :interpret-wildcards? nil)        '())
+
+        ;; Mixed queries.
+        (check-query "**.bar"   '("bar"))
+        (check-query "bar.**"   '("bar.fez" "bar"))
+        (check-query "wild.foo" '())
+        (check-query "sub.*"    '("*" "whoop"))
+
+        (check-query '("**.bar"   :interpret-wildcards? :container) '())
+        (check-query '("bar.**"   :interpret-wildcards? :container) '())
+        (check-query '("wild.foo" :interpret-wildcards? :container) '("wild.**"))
+        (check-query '("sub.*"    :interpret-wildcards? :container) '("*"))
+
+        (check-query '("**.bar"   :interpret-wildcards? nil)        '())
+        (check-query '("bar.**"   :interpret-wildcards? nil)        '())
+        (check-query '("wild.foo" :interpret-wildcards? nil)        '())
+        (check-query '("sub.*"    :interpret-wildcards? nil)        '("*"))))))
 
 (test standard-schema.find-child.smoke
   "Smoke test for the `find-child' and (setf find-child) functions."

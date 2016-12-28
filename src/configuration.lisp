@@ -1,6 +1,6 @@
 ;;;; configuration.lisp --- Option and configuration classes.
 ;;;;
-;;;; Copyright (C) 2011-2016 Jan Moringen
+;;;; Copyright (C) 2011-2017 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -23,12 +23,6 @@
 
 (defmethod option-documentation ((option standard-configuration))
   (option-documentation (configuration-schema option)))
-
-(defmethod find-options ((query     sequence)
-                         (container standard-configuration))
-  (remove query (options container)
-          :key  #'option-name
-          :test (complement #'name-matches)))
 
 (defmethod find-option :around ((name      t)
                                 (container standard-configuration)

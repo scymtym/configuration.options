@@ -49,41 +49,18 @@
                         &key
                         (interpret-wildcards? nil)
                         &allow-other-keys)
-  (unless interpret-wildcards?
-    (return-from find-option (call-next-method)))
-
-  (let+ ((option   (find name (options container)
-                         :key  #'option-name
-                         :test (lambda (name query) (name-matches query name))))
-         ;; TODO add :start :end to name-matches instead?
-         ((&flet name-matches* (name query)
-            (iter (for i :from (length name) :downto (length query))
-                  (thereis (name-matches query (subseq name 0 i))))))
-         (children (remove name (%children container)
-                           :key  #'car
-                           :test (complement #'name-matches*)))
-         ((&flet+ process-child ((key . child))
-            (let* ((index    (if (ends-with-subseq
-                                  '(:wild-inferiors) (name-components key))
-                                 (1- (length name))
-                                 (length key)))
-                   (sub-name (subseq name index)))
-              (when-let ((option (find-option
-                                  sub-name child
-                                  :interpret-wildcards? interpret-wildcards?
-                                  :if-does-not-exist    nil)))
-                (return-from find-option option))))))
-    (cond
-      ((not children)
-       option)
-      ((not option)
-       (mapc #'process-child children)
-       nil)
-      ((name< (car (first children)) (option-name option))
-       (mapc #'process-child children)
-       nil)
-      (t
-       option))))
+  (let ((result nil))
+    (map-matching-options
+     (lambda (option &key container prefix)
+       (declare (ignore container))
+       (let ((name (if prefix
+                       (merge-names prefix (option-name option))
+                       (option-name option))))
+         (when (or (not result)
+                   (not (name< (car result) name)))
+           (setf result (cons name option)))))
+     name container :interpret-wildcards? interpret-wildcards?)
+    (cdr result)))
 
 (defmethod schema-children ((container standard-schema))
   (mapcar #'cdr (%children container)))
