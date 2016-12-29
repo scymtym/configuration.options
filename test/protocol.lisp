@@ -152,7 +152,7 @@
     (call-with-name-coercion-cases
      (make-instance 'mock-container/name-coercion) #'find-option)))
 
-(test protocol.setf-find-options.name-coercion
+(test protocol.setf-find-option.name-coercion
   "Test name coercion performed by the setf `find-option' generic
    function."
   (call-with-name-coercion-cases
