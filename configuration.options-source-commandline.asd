@@ -1,6 +1,6 @@
 ;;;; configuration.options.asd --- System definition for the configuration.options system.
 ;;;;
-;;;; Copyright (C) 2011-2016 Jan Moringen
+;;;; Copyright (C) 2011-2017 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -9,7 +9,7 @@
   :maintainer     "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :version        (:read-file-form "version-string.sexp")
   :license        "LLGPLv3" ; see COPYING file for details.
-  :description    "BLA"
+  :description    "Commandline configuration source."
   :homepage       "https://github.com/scymtym/configuration.options"
   :bug-tracker    "https://github.com/scymtym/configuration.options/issues"
   :source-control (:git "https://github.com/scymtym/configuration.options.git")
