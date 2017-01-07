@@ -1,6 +1,6 @@
 ;;;; source-cascade.lisp --- Unit tests for the cascade source.
 ;;;;
-;;;; Copyright (C) 2013, 2016 Jan Moringen
+;;;; Copyright (C) 2013, 2016, 2017 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -112,7 +112,9 @@
                  ((format nil "~A/01-baz.~A" directory type)
                   "a=4")
                  ((format nil "~A/02-bar.~A" directory type)
-                  "a=1 b.c=2 d=3"))
+                  "a=1 b.c=2 d=3")
+                 ((format nil "~A/directory.~A/dummy" directory type)
+                  ""))
       (with-source-and-sink ((:directory
                               :pattern (merge-pathnames
                                         (make-pathname :name :wild :type type)

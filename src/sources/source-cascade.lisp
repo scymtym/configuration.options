@@ -1,6 +1,6 @@
 ;;;; source-cascade.lisp --- Cascades of sources.
 ;;;;
-;;;; Copyright (C) 2011-2016 Jan Moringen
+;;;; Copyright (C) 2011-2017 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -222,8 +222,10 @@
                                       ignore
                                       compare
                                       &allow-other-keys)
-  (let+ ((other-args (remove-from-plist args :pattern :ignore :compare))
-         (files (sort (remove-if ignore (directory pattern)) compare)))
+  (let+ ((other-args     (remove-from-plist args :pattern :ignore :compare))
+         (matching-files (remove-if (disjoin #'uiop:directory-exists-p ignore)
+                                    (directory pattern)))
+         (files          (sort matching-files compare)))
     (apply #'call-next-method
            instance slot-names
            :sources (mapcar (lambda (file)
