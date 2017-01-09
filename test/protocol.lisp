@@ -1,6 +1,6 @@
 ;;;; protocol.lisp --- Test for the protocol functions of the options system.
 ;;;;
-;;;; Copyright (C) 2013, 2014, 2016 Jan Moringen
+;;;; Copyright (C) 2013, 2014, 2016, 2017 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -176,6 +176,63 @@
   (is (eq #'map-options.ensure-function
           (map-options 'map-options.ensure-function
                        (make-instance 'map-options.ensure-function)))))
+
+(defclass mock-option/matching ()
+  ((name :initarg  :name
+         :reader   option-name)))
+
+(defclass mock-container/matching ()
+  ((options :initarg  :options
+            :accessor options
+            :initform '())))
+
+(defmethod shared-initialize :after ((instance   mock-container/matching)
+                                     (slot-names t)
+                                     &key
+                                     options)
+  (setf (options instance)
+        (mapcar (compose (curry #'make-instance 'mock-option/matching :name)
+                         #'make-name)
+                options)))
+
+(defmethod map-options ((function  function)
+                        (container mock-container/matching))
+  (mapcar function (options container)))
+
+(macrolet
+    ((test-case ((container) &body body)
+       `(let+ ((container ,container)
+               ((&flet check-query (query expected)
+                  (check-query query expected container))))
+          ,@body))
+     (test-cases ()
+       `(progn
+          ;; Empty results.
+          (test-case ((make-instance 'mock-container/matching))
+            (check-query "no.such.option" '()))
+
+          ;; Complex queries.
+          (test-case ((make-instance 'mock-container/matching
+                                     :options '("*" "wild.**" "foo" "foo.fez"
+                                                "bar" "bar.fez" "baz.foo")))
+            ;; Single component and wild[-inferiors] queries.
+            (check-query "foo" '("foo"))
+            (check-query "*"   '("*" "foo" "bar"))
+            (check-query "**"  '("*" "wild.**" "foo.fez" "foo" "baz.foo"
+                                 "bar.fez" "bar"))
+
+            ;; Mixed queries.
+            (check-query "**.bar" '("bar"))
+            (check-query "bar.**" '("bar.fez" "bar"))))))
+
+  (test protocol.find-options.smoke
+    "Smoke test for the `find-options' generic function."
+
+    (let+ (((&flet check-query (query expected container)
+              (let ((result (find-options query container)))
+                (is (set-equal/name-equal
+                     expected (mapcar #'option-name result)))))))
+      (test-cases))))
 
 (test protocol.find-option.remove
   "Test removing options via setf `find-option'."

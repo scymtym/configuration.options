@@ -38,6 +38,9 @@
 
 (test standard-schema.find-options.smoke
   "Smoke test for the `find-options' method."
+  ;; This test exercises finding options in sub-schemas (and is
+  ;; therefore not redundant given the general `find-options' test in
+  ;; protocol.lisp).
 
   (let+ (((&flet check-query (query expected container)
             (let ((result (find-options query container)))
