@@ -139,35 +139,19 @@
       (maybe-drop name  start2 end2))
     nil))
 
-(flet ((check-bounding-indices (sequence start end)
-         (let* ((length (length sequence))
-                (start  (or start 0))
-                (end    (or end length)))
-           (unless (<= 0 start end length)
-             (error 'simple-type-error
-                    :datum            (cons start end)
-                    :expected-type    `(cons (integer 0 ,length)
-                                             (integer 0 ,length))
-                    :format-control   "~@<The bounding indices ~S and ~S ~
-                                       are bad for a sequence of ~
-                                       length ~D~@:>."
-                    :format-arguments (list start end length))))))
-
-  (defmethod name-matches ((query wildcard-name)
-                           (name  t)
-                           &key
-                           start1 end1
-                           start2 end2)
-    (check-bounding-indices query start1 end1)
-    (check-bounding-indices name  start2 end2)
-    (let ((end1 (or end1 (length query)))
-          (end2 (or end2 (length name))))
-      (map-query-alignments (lambda (total? end1 end2)
-                              (declare (ignore end1 end2))
-                              (when total? (return-from name-matches t)))
-                            (name-components query) start1 end1
-                            (name-components name)  start2 end2)
-      nil)))
+(defmethod name-matches ((query wildcard-name)
+                         (name  t)
+                         &key
+                         start1 end1
+                         start2 end2)
+  (let ((end1 (or end1 (length query)))
+        (end2 (or end2 (length name))))
+    (map-query-alignments (lambda (total? end1 end2)
+                            (declare (ignore end1 end2))
+                            (when total? (return-from name-matches t)))
+                          (name-components query) start1 end1
+                          (name-components name)  start2 end2)
+    nil))
 
 (defmethod name< ((left sequence) (right wildcard-name))
   (or (not (typep left 'wild-name)) (call-next-method)))

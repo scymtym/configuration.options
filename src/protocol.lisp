@@ -82,6 +82,24 @@
     (values nil position)
     t))
 
+(defmethod name-matches :around ((query t) (name t) &key start1 end1 start2 end2)
+  (flet ((check-bounding-indices (sequence start end)
+           (let* ((length (length sequence))
+                  (start  (or start 0))
+                  (end    (or end length)))
+             (unless (<= 0 start end length)
+               (error 'simple-type-error
+                      :datum            (cons start end)
+                      :expected-type    `(cons (integer 0 ,length)
+                                               (integer 0 ,length))
+                      :format-control   "~@<The bounding indices ~S and ~S ~
+                                          are bad for a sequence of ~
+                                          length ~D~@:>."
+                      :format-arguments (list start end length))))))
+    (check-bounding-indices query start1 end1)
+    (check-bounding-indices name  start2 end2)
+    (call-next-method)))
+
 (defmethod name-matches ((query t) (name t) &key start1 end1 start2 end2)
   (name-equal query name :start1 start1 :end1 end1 :start2 start2 :end2 end2))
 
