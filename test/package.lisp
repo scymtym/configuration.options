@@ -1,6 +1,6 @@
 ;;;; package.lisp --- Package definition for unit tests of the options system.
 ;;;;
-;;;; Copyright (C) 2013, 2015, 2016 Jan Moringen
+;;;; Copyright (C) 2013, 2015, 2016, 2017 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -62,6 +62,12 @@
   (run! 'options))
 
 ;;; Utilities
+
+(defun set-equal/equal (expected actual)
+  (set-equal expected actual :test #'equal))
+
+(defun set-equal/name-equal (expected actual)
+  (set-equal expected actual :test #'name-equal :key #'make-name))
 
 (defun make-random-string (&key (case :upper) (length 20))
   "Return a random string of length LENGTH."

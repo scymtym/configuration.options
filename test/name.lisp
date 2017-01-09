@@ -1,6 +1,6 @@
 ;;;; name.lisp --- Unit tests for name-related stuff.
 ;;;;
-;;;; Copyright (C) 2013, 2016 Jan Moringen
+;;;; Copyright (C) 2013, 2016, 2017 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -131,9 +131,7 @@
              (expand-spec (ensure-list query-spec)))
             ((&values name  name-start  name-end)
              (expand-spec (ensure-list name-spec)))
-            (calls '())
-            ((&flet set-equal/equal (left right)
-               (set-equal left right :test #'equal))))
+            (calls '()))
        (map-query-alignments (lambda (&rest args)
                                (push args calls))
                              query query-start query-end

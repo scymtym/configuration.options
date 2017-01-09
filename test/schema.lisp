@@ -1,6 +1,6 @@
 ;;;; schema.lisp --- Unit tests for schema-related stuff.
 ;;;;
-;;;; Copyright (C) 2013, 2015, 2016 Jan Moringen
+;;;; Copyright (C) 2013, 2015, 2016, 2017 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -17,9 +17,7 @@
 (test standard-schema.map-options.smoke
   "Smoke test for the `map-options' method."
 
-  (let+ (((&flet set-equal/equal (expected actual)
-            (set-equal expected actual :test #'equal)))
-         ((&flet test-case (container expected-calls)
+  (let+ (((&flet test-case (container expected-calls)
             (is (set-equal/equal expected-calls
                                  (collect-map-options-calls container))))))
     ;; Empty schema.
@@ -47,9 +45,10 @@
          `(let+ ((container ,container)
                  ((&flet check-query (expected query)
                     (let ((result (find-options query container)))
-                      (is (equal expected (mapcar (compose #'name-components
-                                                           #'option-name)
-                                                  result)))))))
+                      (is (set-equal/equal
+                           expected (mapcar (compose #'name-components
+                                                     #'option-name)
+                                            result)))))))
             ,@body)))
 
     ;; Empty results.
