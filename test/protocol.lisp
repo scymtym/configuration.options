@@ -272,9 +272,9 @@
                   (check-query '("bar.**"   :interpret-wildcards? nil)        '())
                   (check-query '("wild.foo" :interpret-wildcards? nil)        '())))))))
 
-  (test protocol.map-matching-options.smoke
-    "Smoke test for the `map-matching-options' function."
-
+  ;;; This hack is needed because fiveam evaluates test bodies in the
+  ;;; null lexical environment.
+  (defun protocol.map-matching-options.smoke-body ()
     (let+ (((&flet check-query (query-and-args expected container)
               (let+ (((query &rest args) (ensure-list query-and-args))
                      (result '()))
@@ -286,14 +286,22 @@
                 (is (set-equal/name-equal expected result))))))
       (test-cases :interpret-wildcards?-parameter? t)))
 
-  (test protocol.find-options.smoke
-    "Smoke test for the `find-options' generic function."
-
+  (defun protocol.find-options.smoke-body ()
     (let+ (((&flet check-query (query expected container)
               (let ((result (find-options query container)))
                 (is (set-equal/name-equal
                      expected (mapcar #'option-name result)))))))
       (test-cases))))
+
+(test protocol.map-matching-options.smoke
+  "Smoke test for the `map-matching-options' function."
+
+  (protocol.map-matching-options.smoke-body))
+
+(test protocol.find-options.smoke
+  "Smoke test for the `find-options' generic function."
+
+  (protocol.find-options.smoke-body))
 
 (test protocol.find-option.remove
   "Test removing options via setf `find-option'."
