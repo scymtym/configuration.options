@@ -39,36 +39,35 @@
 (test standard-schema.find-options.smoke
   "Smoke test for the `find-options' method."
 
-  (macrolet
-      ((test-case ((&optional (container '(make-instance 'standard-schema)))
-                   &body body)
-         `(let+ ((container ,container)
-                 ((&flet check-query (expected query)
-                    (let ((result (find-options query container)))
-                      (is (set-equal/equal
-                           expected (mapcar (compose #'name-components
-                                                     #'option-name)
-                                            result)))))))
-            ,@body)))
+  (let+ (((&flet check-query (query expected container)
+            (let ((result (find-options query container)))
+              (is (set-equal/name-equal
+                   expected (mapcar #'option-name result)))))))
+    (macrolet
+        ((test-case ((container) &body body)
+           `(let+ ((container ,container)
+                   ((&flet check-query (query expected)
+                      (check-query query expected container))))
+              ,@body)))
 
-    ;; Empty results.
-    (test-case ()
-     (check-query '() "no.such.option")
-     (check-query '() '("no" "such" "option")))
+      ;; Empty results.
+      (test-case ((make-instance 'standard-schema))
+        (check-query "no.such.option" '()))
 
-    ;; [Wild-]inferiors queries.
-    (test-case (*simple-schema*)
-     (check-query '((:wild) ("foo") ("bar")) '(:wild))
-     (check-query '((:wild) ("whoop") (:wild) ("wild" :wild-inferiors)
-                    ("foo" "fez") ("foo") ("baz" "foo") ("bar" "fez")
-                    ("bar"))
-                  "**"))
+      ;; Wild[-inferiors] queries.
+      (test-case (*simple-schema*)
+        (check-query "*" '("*" "foo" "bar"))
+        ;; "*" is returned twice (not checked by
+        ;; `set-equal/name-equal') because the parent schema and the
+        ;; sub-schema both have an option named (:wild)
+        (check-query "**" '("*" "whoop" "*" "wild.**" "foo.fez" "foo"
+                            "baz.foo" "bar.fez" "bar")))
 
-    ;; Complex queries.
-    (test-case (*simple-schema*)
-      (check-query '(("bar"))               "**.bar")
-      (check-query '(("bar" "fez") ("bar")) "bar.**")
-      (check-query '((:wild) ("whoop"))     "sub.*"))))
+      ;; Complex queries.
+      (test-case (*simple-schema*)
+        (check-query "**.bar" '("bar"))
+        (check-query "bar.**" '("bar.fez" "bar"))
+        (check-query "sub.*"  '("*" "whoop"))))))
 
 (test standard-schema.find-child.smoke
   "Smoke test for the `find-child' and (setf find-child) functions."
