@@ -335,41 +335,44 @@
         (is (name-equal (make-name expected) (parse-name input))))))
 
    `(;; Some invalid cases
-     (""      t   t   name-parse-error)
-     ("."     t   t   name-parse-error)
-     (".."    t   t   name-parse-error)
-     ("a."    t   t   name-parse-error)
-     (".a"    t   t   name-parse-error)
-     ("a..b"  t   t   name-parse-error)
+     (""          t   t   name-parse-error)
+     ("."         t   t   name-parse-error)
+     (".."        t   t   name-parse-error)
+     ("a."        t   t   name-parse-error)
+     (".a"        t   t   name-parse-error)
+     ("a..b"      t   t   name-parse-error)
 
-     ("a*"    t   t   name-parse-error)
-     ("*a"    t   t   name-parse-error)
+     ("a*"        t   t   name-parse-error)
+     ("*a"        t   t   name-parse-error)
 
-     ("a**"   t   t   name-parse-error)
-     ("**a"   t   t   name-parse-error)
+     ("a**"       t   t   name-parse-error)
+     ("**a"       t   t   name-parse-error)
 
-     ("***"   t   t   name-parse-error)
+     ("***"       t   t   name-parse-error)
 
-     ("*"     nil t   name-parse-error)
-     ("a.*"   nil t   name-parse-error)
-     ("*.a"   nil t   name-parse-error)
+     ("*"         nil t   name-parse-error)
+     ("a.*"       nil t   name-parse-error)
+     ("*.a"       nil t   name-parse-error)
 
-     ("**"    t   nil name-parse-error)
-     ("a.**"  t   nil name-parse-error)
-     ("**.a"  t   nil name-parse-error)
+     ("**"        t   nil name-parse-error)
+     ("a.**"      t   nil name-parse-error)
+     ("**.a"      t   nil name-parse-error)
 
      ;; These are valid
-     ("a"     t   t   ("a"))
-     ("a.b"   t   t   ("a" "b"))
-     ("a.b.c" t   t   ("a" "b" "c"))
+     ("a"         t   t   ("a"))
+     ("a.b"       t   t   ("a" "b"))
+     ("a.b.c"     t   t   ("a" "b" "c"))
 
-     ("*"     t   t   (:wild))
-     ("a.*"   t   t   ("a" :wild))
-     ("*.a"   t   t   (:wild "a"))
+     ("*"         t   t   (:wild))
+     ("a.*"       t   t   ("a" :wild))
+     ("*.a"       t   t   (:wild "a"))
 
-     ("**"    t   t   (:wild-inferiors))
-     ("a.**"  t   t   ("a" :wild-inferiors))
-     ("**.a"  t   t   (:wild-inferiors "a")))))
+     ("**"        t   t   (:wild-inferiors))
+     ("a.**"      t   t   ("a" :wild-inferiors))
+     ("**.a"      t   t   (:wild-inferiors "a"))
+
+     ("\"a.b\""   t   t   ("a.b"))
+     ("\"\\\"a\"" t   t   ("\"a")))))
 
 (test print-name.smoke
   "Smoke test for `print-name' function."
