@@ -917,7 +917,7 @@
 
 (defgeneric option-class (schema-item)
   (:documentation
-   "TODO(jmoringe): document"))
+   "Return the name of the class for options based on SCHEMA-ITEM."))
 
 (defgeneric make-option (schema-item name)
   (:documentation
