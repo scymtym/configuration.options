@@ -919,7 +919,10 @@
   (:documentation
    "Return the name of the class for options based on SCHEMA-ITEM."))
 
-(defgeneric make-option (schema-item name)
+(defgeneric make-option (schema-item name
+                         &key
+                         option-class
+                         option-cell-class)
   (:documentation
    "Make and return an option object according to SCHEMA-ITEM and
     NAME.
@@ -991,10 +994,11 @@
 
 ;; Name coercion
 
-(defmethod make-option :around ((schema-item t) (name sequence))
+(defmethod make-option :around ((schema-item t) (name sequence)
+                                &rest args &key &allow-other-keys)
   (if-name name
     (call-next-method)
-    (make-option schema-item name)))
+    (apply #'make-option schema-item name args)))
 
 ;; Default behavior
 

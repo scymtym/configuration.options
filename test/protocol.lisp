@@ -60,7 +60,8 @@
 (defclass mock-schema-item/name-coercion () ())
 
 (defmethod make-option ((schema-item mock-schema-item/name-coercion)
-                        (name        t))
+                        (name        t)
+                        &key &allow-other-keys)
   (list name))
 
 (defun call-with-name-coercion-cases (container thunk)

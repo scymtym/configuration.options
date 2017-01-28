@@ -1,6 +1,6 @@
 ;;;; schema.lisp --- Schema item and schema classes.
 ;;;;
-;;;; Copyright (C) 2011-2016 Jan Moringen
+;;;; Copyright (C) 2011-2017 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -167,7 +167,10 @@
   (validate-value option (funcall new-value)))
 
 (defmethod make-option ((schema-item standard-schema-item)
-                        (name        sequence))
+                        (name        sequence)
+                        &key
+                        (option-class      (option-class schema-item))
+                        (option-cell-class 'option-cell))
   (when (typep name 'wild-name) ; TODO proper conditions
     (error "~@<~A cannot make an option with wild name ~
             ~/configuration.options:print-name/.~@:>"
@@ -180,9 +183,5 @@
             ~/configuration.options:print-name/.~@:>"
             schema-item (option-name schema-item) name))
 
-  ;; TODO(jmoringe, 2013-03-01): use `option-class' for cell instead of option?
-  (let ((cell (make-instance 'option-cell
-                             :schema-item schema-item)))
-    (make-instance (option-class schema-item)
-                   :name name
-                   :cell cell)))
+  (let ((cell (make-instance option-cell-class :schema-item schema-item)))
+    (make-instance option-class :name name :cell cell)))
