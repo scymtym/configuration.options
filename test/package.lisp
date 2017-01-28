@@ -126,7 +126,7 @@
   "Empty configuration for tests."
   (make-configuration *simple-schema*))
 
-(defun simple-configuration (&key (schema *simple-schema*) )
+(defun simple-configuration (&key (schema *simple-schema*))
   "Simple configuration for tests."
   (let* ((configuration (make-configuration schema))
          (synchronizer  (make-instance 'standard-synchronizer
@@ -141,7 +141,7 @@
 
 (defun simple-option (&key
                       (name '("simple" "option") name-supplied?)
-                      (value nil                 value-supplied?)  )
+                      (value nil                 value-supplied?))
   (let* ((schema-item (if name-supplied?
                           (simple-schema-item :name name)
                           *simple-schema-item*))
