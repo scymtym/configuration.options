@@ -116,7 +116,8 @@
                  :type     symbol
                  :reader   option-class
                  :documentation
-                 "TODO"))
+                 "Stores the name of the class that should be used for
+                  making options corresponding to this schema item."))
   (:default-initargs
    :type         (missing-required-initarg 'standard-schema-item 'type)
    :option-class 'standard-option)
