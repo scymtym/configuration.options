@@ -69,3 +69,13 @@
 
     ;; Instantiate the provider.
     (service-provider:make-provider service configuration)))
+
+;;; Some classes to be used as providers
+
+(defclass bar ()
+  ((a :initarg :a :type string)))
+
+(defclass baz ()
+  ((b :initarg :b :type (integer 0 10)))
+  (:documentation
+   "An implementation of the BAZ algorithm."))

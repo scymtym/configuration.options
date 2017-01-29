@@ -8,14 +8,6 @@
 
 (in-suite configuration.options.service-provider)
 
-(defclass bar ()
-  ((a :initarg :a :type string)))
-
-(defclass baz ()
-  ((b :initarg :b :type (integer 0 10)))
-  (:documentation
-   "An implementation of the BAZ algorithm."))
-
 (test service-schema.smoke
   "Smoke test for the `service-schema' function."
 

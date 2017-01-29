@@ -30,7 +30,10 @@
    #:make-provider
 
    #:provider-class
-   #:class-provider)
+   #:class-provider
+
+   #:service-change-hook
+   #:change-hook-mixin)
 
   (:import-from #:configuration.options
    #:type-based-validation-mixin

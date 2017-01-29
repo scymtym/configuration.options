@@ -11,19 +11,23 @@
   :license     "LLGPLv3" ; see COPYING file for details.
   :description "Configuration for services defined using the architecture.service-provider system."
   :depends-on  (:alexandria
-                (:version :let-plus                      "0.2")
+                (:version :let-plus                                "0.2")
+                :log4cl
 
-                (:version :configuration.options         (:read-file-form "version-string.sexp"))
-                (:version :configuration.options-and-mop (:read-file-form "version-string.sexp"))
+                (:version :configuration.options                   (:read-file-form "version-string.sexp"))
+                (:version :configuration.options-and-mop           (:read-file-form "version-string.sexp"))
 
-                (:version :architecture.service-provider "0.1"))
+                (:version :architecture.service-provider           "0.1")
+                (:version :architecture.service-provider-and-hooks "0.1"))
   :components  ((:module     "service-provider"
                  :pathname   "src/service-provider"
                  :serial     t
                  :components ((:file       "package")
                               (:file       "protocol")
                               (:file       "value-type")
-                              (:file       "service-provider"))))
+                              (:file       "service-provider")
+
+                              (:file       "hooks"))))
 
   :in-order-to ((test-op (test-op :configuration.options-and-service-provider/test))))
 
@@ -40,13 +44,16 @@
 
                 (:version :configuration.options-and-service-provider (:read-file-form "version-string.sexp"))
 
-                (:version :architecture.service-provider/test         "0.1"))
+                (:version :architecture.service-provider/test         "0.1")
+                (:version :configuration.options/test                 (:read-file-form "version-string.sexp")))
   :components  ((:module     "service-provider"
                  :pathname   "test/service-provider"
                  :serial     t
                  :components ((:file       "package")
                               (:file       "value-type")
-                              (:file       "service-provider")))))
+                              (:file       "service-provider")
+
+                              (:file       "hooks")))))
 
 (defmethod perform ((operation test-op)
                     (component (eql (find-system :configuration.options-and-service-provider/test))))

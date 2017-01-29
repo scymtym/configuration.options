@@ -18,7 +18,7 @@
          (schema (make-instance 'standard-schema
                                 :documentation documentation))
          (names  (loop :for (name . provider) :in providers
-                    :do (%add-provider-schema
+                    :do (%add-or-update-provider-schema
                          schema name (provider-schema service provider))
                     :collect name)))
     (setf (find-option "provider" schema)
@@ -96,9 +96,11 @@
 (defun %provider-designator->child-name (name)
   (format nil "~(~{~A~^:~}~)" (ensure-list name)))
 
-(defun %add-provider-schema (service-schema provider-name provider-schema)
+(defun %add-or-update-provider-schema
+    (service-schema provider-name provider-schema)
   (let ((name (%provider-designator->child-name provider-name)))
-    (setf (find-child name service-schema) provider-schema)))
+    (setf (find-child name service-schema :if-exists :supersede)
+          provider-schema)))
 
 (defun %remove-provider-schema (service-schema provider-name)
   (let ((name (%provider-designator->child-name provider-name)))
