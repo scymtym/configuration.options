@@ -104,7 +104,13 @@
 
      (nil            (and real integer)         nil)
      (1              (and real integer)         t)
-     (0.5d0          (and real integer)         nil))))
+     (0.5d0          (and real integer)         nil)
+
+     ;; These require type expansion
+     (1              positive-integer           t)
+     (0              positive-integer           nil)
+     (1              (array-index 10)           t)
+     (10             (array-index 10)           nil))))
 
 ;;; `type-based-merging-mixin'
 
