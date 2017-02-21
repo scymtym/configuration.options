@@ -1,6 +1,6 @@
 ;;;; mixins.lisp --- Mixins for configuration and schema classes.
 ;;;;
-;;;; Copyright (C) 2012, 2013, 2016 Jan Moringen
+;;;; Copyright (C) 2012-2017 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -107,19 +107,6 @@
                                       inner-type)
   (declare (ignore inner-type))
   (typep value type))
-
-(macrolet
-    ((define-composite-validation (type operator)
-       `(defmethod validate-value-using-type ((schema-item type-based-validation-mixin)
-                                              (value       t)
-                                              (type        (eql ',type))
-                                              &key
-                                              inner-type)
-          (,operator (curry #'validate-value-using-type schema-item value)
-                     inner-type))))
-
-  (define-composite-validation and every)
-  (define-composite-validation or  some))
 
 ;;; `type-based-merging-mixin' class
 

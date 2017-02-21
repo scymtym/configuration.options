@@ -151,8 +151,17 @@
 ;;; types `or' and `and'
 
 (macrolet
-    ((define-composite-conversion (type)
+    ((define-composite-methods (type operator)
        `(progn
+          (defmethod validate-value-using-type
+              ((schema-item type-based-validation-mixin)
+               (value       t)
+               (type        (eql ',type))
+               &key
+               inner-type)
+            (,operator (curry #'validate-value-using-type schema-item value)
+                       inner-type))
+
           (defmethod value->string-using-type
               ((schema-item type-based-conversion-mixin)
                (value       t)
@@ -184,5 +193,5 @@
             (error "~@<~S is not valid for any of ~{~S~^, ~}.~@:>"
                    value inner-type)))))
 
-  (define-composite-conversion or)
-  (define-composite-conversion and))
+  (define-composite-methods or  some)
+  (define-composite-methods and every))
