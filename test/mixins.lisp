@@ -1,6 +1,6 @@
 ;;;; mixin.lisp --- Unit tests for mixins used by the options system.
 ;;;;
-;;;; Copyright (C) 2013, 2016 Jan Moringen
+;;;; Copyright (C) 2013, 2016, 2017 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -64,7 +64,11 @@
      (t     (or integer boolean) t)
      (1     (or integer boolean) t)
      (0.5d0 (or integer boolean) nil)
-     ("foo" (or integer boolean) nil))))
+     ("foo" (or integer boolean) nil)
+
+     (nil   (and real integer)   nil)
+     (1     (and real integer)   t)
+     (0.5d0 (and real integer)   nil))))
 
 ;;; `type-based-merging-mixin'
 
