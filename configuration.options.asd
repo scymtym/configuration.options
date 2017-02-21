@@ -1,6 +1,6 @@
 ;;;; configuration.options.asd --- System definition for the configuration.options system.
 ;;;;
-;;;; Copyright (C) 2011-2016 Jan Moringen
+;;;; Copyright (C) 2011-2017 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -37,7 +37,7 @@
                                  (:file       "name")
                                  (:file       "schema")
                                  (:file       "configuration")
-                                 (:file       "conversion")
+                                 (:file       "value-types")
 
                                  (:file       "synchronizer")
 

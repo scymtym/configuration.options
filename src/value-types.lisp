@@ -1,6 +1,6 @@
-;;;; conversion.lisp --- Conversion between strings and parsed values.
+;;;; value-types.lisp --- Conversion and validation methods for some value types.
 ;;;;
-;;;; Copyright (C) 2013, 2016 Jan Moringen
+;;;; Copyright (C) 2013, 2016, 2017 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
