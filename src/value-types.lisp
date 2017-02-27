@@ -99,6 +99,16 @@
 
 ;;; type `list'
 
+(defmethod validate-value-using-type ((schema-item type-based-validation-mixin)
+                                      (value       t)
+                                      (type        (eql 'list))
+                                      &key
+                                      inner-type)
+  (let+ (((&optional (element-type t) &rest &ign) inner-type))
+    (and (listp value)
+         (or (eq element-type t)
+             (every (of-type element-type) value)))))
+
 (defmethod merge-values-using-type ((schema-item type-based-merging-mixin)
                                     (values      sequence)
                                     (type        (eql 'list))
