@@ -78,6 +78,7 @@
     Default behavior is provided for types of the forms
 
     * (integer ...)
+    * (list [ELEMENT-TYPE [:inherit? INHERIT]])
     * (and ...)
     * (or ...)"))
 
@@ -125,9 +126,10 @@
 
     * t: use the value with the highest priority; ignore other
       values
-    * (list [:inherit? INHERIT]): depending on INHERIT either use the
-      value with highest priority or look for :inherit markers in
-      values and concatenate values appropriately."))
+
+    * (list [ELEMENT-TYPE [:inherit? INHERIT]]): depending on INHERIT
+      either use the value with highest priority or look for :inherit
+      markers in values and concatenate values appropriately."))
 
 (defmethod merge-values ((schema-item type-based-merging-mixin)
                          (values      sequence))
@@ -173,7 +175,7 @@
     * string
     * member
     * pathname
-    * (list TYPE [:inherit? INHERIT])
+    * (list ELEMENT-TYPE [:inherit? INHERIT])
     * (or ...)
     * (and ...)"))
 
