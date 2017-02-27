@@ -60,6 +60,11 @@
      (0.5d0 (real 0 (1))         t)
      ("foo" (real 0 (1))         nil)
 
+     (:a    (member :a)          t)
+     (:b    (member :a)          nil)
+     (:a    (member :a :b)       t)
+     (:b    (member :a :b)       t)
+
      (nil   (or integer boolean) t)
      (t     (or integer boolean) t)
      (1     (or integer boolean) t)
