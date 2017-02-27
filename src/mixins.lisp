@@ -151,7 +151,9 @@
 (defmethod merge-values-using-type ((schema-item type-based-merging-mixin)
                                     (values      sequence)
                                     (type        t)
-                                    &key &allow-other-keys)
+                                    &key
+                                    inner-type)
+  (declare (ignore inner-type))
   (elt values 0))
 
 ;;; `type-based-conversion-mixin' class
