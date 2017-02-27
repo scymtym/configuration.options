@@ -60,6 +60,16 @@
      (0.5d0 (real 0 (1))         t)
      ("foo" (real 0 (1))         nil)
 
+     (nil   string               nil)
+     (1     string               nil)
+     (""    string               t)
+     ("foo" string               t)
+
+     (nil   (string 3)           nil)
+     (1     (string 3)           nil)
+     (""    (string 3)           nil)
+     ("foo" (string 3)           t)
+
      (:a    (member :a)          t)
      (:b    (member :a)          nil)
      (:a    (member :a :b)       t)

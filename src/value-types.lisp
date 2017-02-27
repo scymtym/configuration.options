@@ -40,12 +40,10 @@
                                      (type        (eql 'integer))
                                      &key
                                      inner-type)
-  (let ((value (parse-integer value))
-        (type  (list* type inner-type)))
-    (declare (dynamic-extent type))
-    (unless (typep value type)
-      (error "~@<~S is not within the bounds specified by type ~S.~@:>"
-             value type))
+  (let ((value (parse-integer value)))
+    (%maybe-check-detailed-type
+     value type inner-type
+     "~@<~S is not within the bounds specified by type ~S.~@:>")
     value))
 
 ;;; type `string'
@@ -59,7 +57,10 @@
 (defmethod string->value-using-type ((schema-item type-based-conversion-mixin)
                                      (value       string)
                                      (type        (eql 'string))
-                                     &key &allow-other-keys)
+                                     &key inner-type)
+  (%maybe-check-detailed-type
+   value type inner-type
+   "~@<~S is not of the length specified by type ~S.~@:>")
   value)
 
 ;;; type `member'
@@ -195,3 +196,12 @@
 
   (define-composite-methods or  some)
   (define-composite-methods and every))
+
+;;; Utility functions
+
+(defun %maybe-check-detailed-type (value type inner-type format-control)
+  (or (not inner-type)
+      (let ((type (list* type inner-type)))
+        (declare (dynamic-extent type))
+        (typep value type))
+      (error format-control value (list* type inner-type))))

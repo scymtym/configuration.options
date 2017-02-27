@@ -95,7 +95,7 @@
                                       (type        cons)
                                       &key
                                       inner-type)
-  (if (member (first type) '(integer rational float real member))
+  (if (member (first type) '(integer rational float real string member))
       (call-next-method)
       (validate-value-using-type
        schema-item value (first type)
