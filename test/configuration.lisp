@@ -52,7 +52,9 @@
    `standard-configuration' class."
 
   (mapc (curry #'apply #'check-describe-option-container)
-        `((,*simple-configuration*
+        `((,(empty-configuration)
+            "<empty>")
+          (,*simple-configuration*
            ,(format nil "<root>~@
                          ├─bar~@
                          │ │ Type    BOOLEAN~@

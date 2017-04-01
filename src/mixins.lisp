@@ -288,6 +288,17 @@
     that need a method on `describe-opbject'."))
 
 (defmethod describe-object ((object describe-via-map-options-mixin) stream)
+  (let ((*print-circle* nil)
+        (*print-pretty* t))
+    (format stream "~<~A~@:_~
+                      ~@:_~
+                      Tree:~@:_~
+                      ~2@T~@<~/configuration.options:print-option-container-tree/~@:>~
+                    ~@:>"
+            (list object object))))
+
+(defun print-option-container-tree (stream object &optional colon? at?)
+  (declare (ignore colon? at?))
   ;; We build a hash table which maps parents to children and then
   ;; perform a tree traversal.
   (let+ ((tree (make-hash-table :test #'equal))
@@ -329,10 +340,9 @@
          (add-item prefix container)
          (add-item name   option)))
      object)
-    (when-let ((root (gethash '() tree)))
-      (let ((*print-pretty* t)
-            (*print-circle* nil))
-        (utilities.print-tree:print-tree
-         stream root
-         (utilities.print-tree:make-node-printer
-          #'print-first-line #'print-rest #'node-children))))))
+    (if-let ((root (gethash '() tree)))
+      (utilities.print-tree:print-tree
+       stream root
+       (utilities.print-tree:make-node-printer
+        #'print-first-line #'print-rest #'node-children))
+      (format stream "<empty>"))))

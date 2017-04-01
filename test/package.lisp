@@ -85,8 +85,14 @@
     (nreverse calls)))
 
 (defun check-describe-option-container (object expected-description)
-  (is (string= expected-description (with-output-to-string (stream)
-                                      (describe-object object stream)))))
+  (let* ((description (with-output-to-string (stream)
+                        (describe-object object stream)))
+         (rest        (subseq description
+                              (1+ (position #\Newline description))))
+         (expected    (format nil "~%Tree:~%~{~2@T~A~^~%~}"
+                              (split-sequence:split-sequence
+                               #\Newline expected-description))))
+    (is (string= expected rest))))
 
 ;;; Simple schema and schema-item for tests
 

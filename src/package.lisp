@@ -74,6 +74,10 @@
    #:notification-error-name
    #:notification-error-source)
 
+  ;; Utilities
+  (:export
+   #:print-option-container-tree)
+
   ;; Event hook protocol
   (:export
    #:event-hook)
