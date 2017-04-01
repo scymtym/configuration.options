@@ -84,6 +84,10 @@
     (map-options #'collect-call container)
     (nreverse calls)))
 
+(defun check-describe-option-container (object expected-description)
+  (is (string= expected-description (with-output-to-string (stream)
+                                      (describe-object object stream)))))
+
 ;;; Simple schema and schema-item for tests
 
 (define-schema *simple-sub-schema*

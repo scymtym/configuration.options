@@ -1,6 +1,6 @@
 ;;;; protocol.lisp --- Test for the protocol functions of the options system.
 ;;;;
-;;;; Copyright (C) 2013, 2016 Jan Moringen
+;;;; Copyright (C) 2013, 2016, 2017 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -51,38 +51,38 @@
   "Smoke test for the `describe-object' method for the
    `standard-configuration' class."
 
-  (is (string= (format nil "<root>~@
-                            ├─bar~@
-                            │ │ Type    BOOLEAN~@
-                            │ │ Default <no default>~@
-                            │ │ Value   <no value>~@
-                            │ └─fez~@
-                            │     Type    PATHNAME~@
-                            │     Default <no default>~@
-                            │     Value   <no value>~@
-                            ├─baz~@
-                            │ └─foo~@
-                            │     Type    STRING~@
-                            │     Default <no default>~@
-                            │     Value   <no value>~@
-                            ├─foo~@
-                            │ │ Type    INTEGER~@
-                            │ │ Default 1~@
-                            │ │ Value   1~@
-                            │ │ Sources DEFAULT:~@
-                            │ │           1~@
-                            │ │ This option controls foo.~@
-                            │ └─fez~@
-                            │     Type    INTEGER~@
-                            │     Default <no default>~@
-                            │     Value   <no value>~@
-                            └─sub~@
-                            ~0@T  └─whoop~@
-                            ~0@T      Type    STRING~@
-                            ~0@T      Default <no default>~@
-                            ~0@T      Value   <no value>")
-               (with-output-to-string (stream)
-                 (describe-object *simple-configuration* stream)))))
+  (mapc (curry #'apply #'check-describe-option-container)
+        `((,*simple-configuration*
+           ,(format nil "<root>~@
+                         ├─bar~@
+                         │ │ Type    BOOLEAN~@
+                         │ │ Default <no default>~@
+                         │ │ Value   <no value>~@
+                         │ └─fez~@
+                         │     Type    PATHNAME~@
+                         │     Default <no default>~@
+                         │     Value   <no value>~@
+                         ├─baz~@
+                         │ └─foo~@
+                         │     Type    STRING~@
+                         │     Default <no default>~@
+                         │     Value   <no value>~@
+                         ├─foo~@
+                         │ │ Type    INTEGER~@
+                         │ │ Default 1~@
+                         │ │ Value   1~@
+                         │ │ Sources DEFAULT:~@
+                         │ │           1~@
+                         │ │ This option controls foo.~@
+                         │ └─fez~@
+                         │     Type    INTEGER~@
+                         │     Default <no default>~@
+                         │     Value   <no value>~@
+                         └─sub~@
+                         ~0@T  └─whoop~@
+                         ~0@T      Type    STRING~@
+                         ~0@T      Default <no default>~@
+                         ~0@T      Value   <no value>")))))
 
 (def-suite standard-option
   :in options
