@@ -78,10 +78,11 @@
                  :serial     t
                  :components ((:file       "package")
                               (:file       "protocol")
-                              (:file       "name")
                               (:file       "mixins")
-                              (:file       "configuration")
+                              (:file       "name")
                               (:file       "schema")
+                              (:file       "configuration")
+
                               (:file       "synchronizer")
 
                               (:file       "macros")
