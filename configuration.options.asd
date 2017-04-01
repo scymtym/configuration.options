@@ -77,6 +77,9 @@
   :components  ((:module     "test"
                  :serial     t
                  :components ((:file       "package")
+                              (:file       "util")
+                              (:file       "mocks")
+
                               (:file       "protocol")
                               (:file       "mixins")
                               (:file       "name")
