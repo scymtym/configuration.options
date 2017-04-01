@@ -19,83 +19,26 @@
 (test type-based-validation-mixin.smoke
   "Smoke test for methods on `validate-value' and
    `validate-value-using-type' for `type-based-validation-mixin'."
-  (mapc
-   (curry #'apply #'check-validate-value)
-   '((nil            integer                    nil)
-     (t              integer                    nil)
-     (1              integer                    t)
-     (0.5d0          integer                    nil)
-     ("foo"          integer                    nil)
+  (mapc (curry #'apply #'check-validate-value)
+        '(;; Atomic type specifier
+          (nil   integer          nil)
+          (t     integer          nil)
+          (1     integer          t)
+          (0.5d0 integer          nil)
+          ("foo" integer          nil)
 
-     (nil            (integer 0 1)              nil)
-     (t              (integer 0 1)              nil)
-     (1              (integer 0 1)              t)
-     (0.5d0          (integer 0 1)              nil)
-     ("foo"          (integer 0 1)              nil)
+          ;; Compound type specifier
+          (nil   (integer 0 1)    nil)
+          (t     (integer 0 1)    nil)
+          (1     (integer 0 1)    t)
+          (0.5d0 (integer 0 1)    nil)
+          ("foo" (integer 0 1)    nil)
 
-     (nil            (integer 0 (1))            nil)
-     (t              (integer 0 (1))            nil)
-     (1              (integer 0 (1))            nil)
-     (0.5d0          (integer 0 (1))            nil)
-     ("foo"          (integer 0 (1))            nil)
-
-     (nil            (real 0 (1))               nil)
-     (t              (real 0 (1))               nil)
-     (1              (real 0 (1))               nil)
-     (0.5d0          (real 0 (1))               t)
-     ("foo"          (real 0 (1))               nil)
-
-     (nil            string                     nil)
-     (1              string                     nil)
-     (""             string                     t)
-     ("foo"          string                     t)
-
-     (nil            (string 3)                 nil)
-     (1              (string 3)                 nil)
-     (""             (string 3)                 nil)
-     ("foo"          (string 3)                 t)
-
-     (:a             (member :a)                t)
-     (:b             (member :a)                nil)
-     (:a             (member :a :b)             t)
-     (:b             (member :a :b)             t)
-
-     (()             list                       t)
-     ((1 2)          list                       t)
-     ((1 "a")        list                       t)
-     ("a"            list                       nil)
-
-     (t              (list integer)             nil)
-     (1              (list integer)             nil)
-     (()             (list integer)             t)
-     ((:inherit)     (list integer)             nil)
-     ((1)            (list integer)             t)
-     ((1 2)          (list integer)             t)
-     ((1 2 :inherit) (list integer)             nil)
-
-     (t              (list integer :inherit? t) nil)
-     (1              (list integer :inherit? t) nil)
-     (()             (list integer :inherit? t) t)
-     ((:inherit)     (list integer :inherit? t) nil)
-     ((1)            (list integer :inherit? t) t)
-     ((1 2)          (list integer :inherit? t) t)
-     ((1 2 :inherit) (list integer :inherit? t) nil)
-
-     (nil            (or integer boolean)       t)
-     (t              (or integer boolean)       t)
-     (1              (or integer boolean)       t)
-     (0.5d0          (or integer boolean)       nil)
-     ("foo"          (or integer boolean)       nil)
-
-     (nil            (and real integer)         nil)
-     (1              (and real integer)         t)
-     (0.5d0          (and real integer)         nil)
-
-     ;; These require type expansion
-     (1              positive-integer           t)
-     (0              positive-integer           nil)
-     (1              (array-index 10)           t)
-     (10             (array-index 10)           nil))))
+          ;; These require type expansion
+          (1     positive-integer t)
+          (0     positive-integer nil)
+          (1     (array-index 10) t)
+          (10    (array-index 10) nil))))
 
 ;;; `type-based-merging-mixin'
 
@@ -144,61 +87,23 @@
    `type-based-conversion-mixin'."
   (mapc
    (curry #'apply #'check-value<->string)
-   `((boolean                    ""      option-syntax-error)
-     (boolean                    "1"     option-syntax-error)
-     (boolean                    "false" nil)
-     (boolean                    "true"  t)
+   `(;; Atomic type specifier
+     (integer          ""      option-syntax-error)
+     (integer          "true"  option-syntax-error)
+     (integer          "1"     1)
+     (integer          "2"     2)
 
-     (integer                    ""      option-syntax-error)
-     (integer                    "true"  option-syntax-error)
-     (integer                    "1"     1)
-     (integer                    "2"     2)
-
-     (string                     "a"     "a")
-     (string                     "a b"   "a b")
-
-     ((member :foo :bar)         ""      option-syntax-error)
-     ((member :foo :bar)         "1"     option-syntax-error)
-     ((member :foo :bar)         "BAZ"   option-syntax-error)
-     ((member :foo :bar)         "foo"   :foo)
-     ((member :foo :bar)         "bar"   :bar)
-     ((member :|Foo| :|Bar|)     "Foo"   :|Foo|)
-     ((member :|Foo| :|Bar|)     "Bar"   :|Bar|)
-     ((member :|foo| :|bar|)     "FOO"   :|foo|)
-     ((member :|foo| :|bar|)     "BAR"   :|bar|)
-
-     (pathname                   "a"     ,#P"a")
-     (pathname                   "a.b"   ,#P"a.b")
-     (pathname                   "a/b"   ,#P"a/b")
-
-     ((list integer)             ""      option-syntax-error)
-     ((list integer)             "1"     (1))
-     ((list integer)             "1:2"   (1 2))
-
-     ((list integer :inherit? t) ""      option-syntax-error)
-     ((list integer :inherit? t) ":"     (:inherit))
-     ((list integer :inherit? t) "1"     (1))
-     ((list integer :inherit? t) "1:"    (1 :inherit))
-     ((list integer :inherit? t) "1:2"   (1 2))
-     ((list integer :inherit? t) "1:2:"  (1 2 :inherit))
-
-     ((or boolean integer)       ""      option-syntax-error)
-     ((or boolean integer)       "FOO"   option-syntax-error)
-     ((or boolean integer)       "false" nil)
-     ((or boolean integer)       "true"  t)
-     ((or boolean integer)       "1"     1)
-     ((or boolean integer)       "2"     2)
-
-     ((and real integer)         ""      option-syntax-error)
-     ((and real integer)         "FOO"   option-syntax-error)
-     ((and real integer)         "1"     1)
-     ((and real integer)         "2"     2)
+     ;; Compound type specifier
+     ((integer 0 1)    ""      option-syntax-error)
+     ((integer 0 1)    "true"  option-syntax-error)
+     ((integer 0 1)    "1"     1)
+     ((integer 0 1)    "2"     option-syntax-error)
 
      ;; These require type expansion
-     (positive-integer           "1"     1)
-     (positive-integer           "0"     option-syntax-error)
-     ((array-index 10)           "1"     1)
-     ((array-index 10)           "10"    option-syntax-error))))
+     (positive-integer "1"     1)
+     (positive-integer "0"     option-syntax-error)
+     ((array-index 10) "1"     1)
+     ((array-index 10) "10"    option-syntax-error))))
 
 ;;; `list-container-mixin'
 

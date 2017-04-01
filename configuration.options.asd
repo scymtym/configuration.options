@@ -85,6 +85,7 @@
                               (:file       "name")
                               (:file       "schema")
                               (:file       "configuration")
+                              (:file       "value-types")
 
                               (:file       "synchronizer")
 
