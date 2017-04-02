@@ -41,7 +41,11 @@
                          #:simple-schema-item   #:*simple-schema-item*
 
    #:empty-configuration #:simple-configuraiton #:*simple-configuration*
-                         #:simple-option        #:*simple-option*)
+                         #:simple-option        #:*simple-option*
+
+   #:check-validate-value
+   #:check-merge-values
+   #:check-value<->string)
 
   (:export
    #:run-tests)

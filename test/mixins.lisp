@@ -16,26 +16,11 @@
   :in options)
 (in-suite options.type-based-validation-mixin)
 
-(defclass mock-type-based-validation-schema-item (mock-typed-schema-item
-                                                  type-based-validation-mixin)
-  ())
-
 (test type-based-validation-mixin.smoke
   "Smoke test for methods on `validate-value' and
    `validate-value-using-type' for `type-based-validation-mixin'."
   (mapc
-   (lambda+ ((value type expected))
-     (let+ ((schema-item (make-instance
-                          'mock-type-based-validation-schema-item
-                          :type type))
-            ((&flet do-it (&key (if-invalid nil))
-               (validate-value schema-item value :if-invalid if-invalid))))
-       (is (eq expected (do-it))
-           "~S is~:[ not~;~] supposed to be of type ~S"
-           value expected type)
-       (when (not expected)
-         (signals option-value-error (do-it :if-invalid #'error)))))
-
+   (curry #'apply #'check-validate-value)
    '((nil            integer                    nil)
      (t              integer                    nil)
      (1              integer                    t)
@@ -118,22 +103,11 @@
   :in options)
 (in-suite options.type-based-merging-mixin)
 
-(defclass mock-type-based-merging-schema-item (mock-typed-schema-item
-                                               type-based-merging-mixin)
-  ())
-
 (test type-based-merging-mixin.smoke
   "Smoke test for methods on `merge-values' and
    `merge-values-using-type' for `type-based-merging-mixin'."
   (mapc
-   (lambda+ ((values type expected))
-     (let+ ((schema-item (make-instance
-                          'mock-type-based-merging-schema-item
-                          :type type)))
-       (is (equal expected
-                  (multiple-value-list
-                   (merge-values schema-item values))))))
-
+   (curry #'apply #'check-merge-values)
    '((()                           boolean                    (nil   nil))
      ((nil)                        boolean                    (nil   t))
      ((t)                          boolean                    (t     t))
@@ -164,27 +138,12 @@
   :in options)
 (in-suite options.type-based-conversion-mixin)
 
-(defclass mock-type-based-conversion-schema-item (mock-typed-schema-item
-                                                  type-based-conversion-mixin)
-  ())
-
 (test type-based-conversion-mixin.smoke
   "Smoke test for methods on `value->string', `string->value',
    `value->string-using-type' and `string->value-using-type' for
    `type-based-conversion-mixin'."
   (mapc
-   (lambda+ ((type string value))
-     (let+ ((schema-item (make-instance
-                          'mock-type-based-conversion-schema-item
-                          :type type)))
-       (case value
-         (option-syntax-error
-          (signals option-syntax-error
-            (string->value schema-item string)))
-         (t
-          (is (equal string (value->string schema-item value)))
-          (is (equal value  (string->value schema-item string)))))))
-
+   (curry #'apply #'check-value<->string)
    `((boolean                    ""      option-syntax-error)
      (boolean                    "1"     option-syntax-error)
      (boolean                    "false" nil)

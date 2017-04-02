@@ -40,3 +40,49 @@
                               (split-sequence:split-sequence
                                #\Newline expected-description))))
     (is (string= expected rest))))
+
+;;; Specialized testing utilities for value types
+
+(defclass mock-type-based-validation-schema-item (mock-typed-schema-item
+                                                  type-based-validation-mixin)
+  ())
+
+(defun check-validate-value (value type expected)
+  (let+ ((schema-item (make-instance
+                       'mock-type-based-validation-schema-item
+                       :type type))
+         ((&flet do-it (&key (if-invalid nil))
+            (validate-value schema-item value :if-invalid if-invalid))))
+    (is (eq expected (do-it))
+        "~S is~:[ not~;~] supposed to be of type ~S"
+        value expected type)
+    (when (not expected)
+      (signals option-value-error (do-it :if-invalid #'error)))))
+
+(defclass mock-type-based-merging-schema-item (mock-typed-schema-item
+                                               type-based-merging-mixin)
+  ())
+
+(defun check-merge-values (values type expected)
+  (let+ ((schema-item (make-instance
+                       'mock-type-based-merging-schema-item
+                       :type type)))
+    (is (equal expected
+               (multiple-value-list
+                (merge-values schema-item values))))))
+
+(defclass mock-type-based-conversion-schema-item (mock-typed-schema-item
+                                                  type-based-conversion-mixin)
+  ())
+
+(defun check-value<->string (type string value)
+  (let+ ((schema-item (make-instance
+                       'mock-type-based-conversion-schema-item
+                       :type type)))
+    (case value
+      (option-syntax-error
+       (signals option-syntax-error
+         (string->value schema-item string)))
+      (t
+       (is (equal string (value->string schema-item value)))
+       (is (equal value  (string->value schema-item string)))))))
