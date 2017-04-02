@@ -32,12 +32,16 @@
   (("wild" :wild-inferiors) :type 'symbol)
   ("sub" *simple-sub-schema*))
 
-(defun simple-schema-item (&key (name '("simple" "option")))
-  (make-instance 'standard-schema-item
-                 :name name
-                 :type 'integer
-                 :documentation
-                 "A simple option."))
+(defun simple-schema-item (&key
+                           (name    '("simple" "option"))
+                           (default nil                  default-supplied?))
+  (apply #'make-instance 'standard-schema-item
+         :name name
+         :type 'integer
+         :documentation
+         "A simple option."
+         (when default-supplied?
+           (list :default default))))
 
 (defparameter *simple-schema-item* (simple-schema-item)
   "Simple schema-item for tests.")

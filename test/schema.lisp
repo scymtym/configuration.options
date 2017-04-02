@@ -268,8 +268,15 @@
   "Smoke test for the `describe-object' method for the
    `standard-schema-item' class."
 
-  (is (string= (format nil "Type    INTEGER~@
-                            Default <no default>~@
-                            A simple option.")
-               (with-output-to-string (stream)
-                 (describe-object *simple-schema-item* stream)))))
+  (mapc (lambda+ ((item expected))
+          (is (string= expected
+                       (with-output-to-string (stream)
+                         (describe-object item stream)))))
+        `((,(simple-schema-item)
+           ,(format nil "Type    INTEGER~@
+                         Default <no default>~@
+                         A simple option."))
+          (,(simple-schema-item :default 1)
+           ,(format nil "Type    INTEGER~@
+                         Default 1~@
+                         A simple option.")))))
