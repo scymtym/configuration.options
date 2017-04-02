@@ -75,14 +75,17 @@
                                                   type-based-conversion-mixin)
   ())
 
-(defun check-value<->string (type string value)
+(defun check-value<->string (type string value
+                             &key (value-test #'equal))
   (let+ ((schema-item (make-instance
                        'mock-type-based-conversion-schema-item
-                       :type type)))
+                       :type type))
+         ((&flet value= (expected actual)
+            (funcall value-test expected actual))))
     (case value
       (option-syntax-error
        (signals option-syntax-error
          (string->value schema-item string)))
       (t
-       (is (equal string (value->string schema-item value)))
-       (is (equal value  (string->value schema-item string)))))))
+       (is (equal  string (value->string schema-item value)))
+       (is (value= value  (string->value schema-item string)))))))
