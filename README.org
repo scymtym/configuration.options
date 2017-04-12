@@ -122,18 +122,21 @@
 
    #+RESULTS:
    #+begin_example
-   <root>
-   │ Configuration schema for my program.
-   └─logging
-     ├─appender
-     │   Type    (MEMBER FILE STANDARD-OUTPUT)
-     │   Default :STANDARD-OUTPUT
-     │   Appender to use.
-     └─**
-       └─level
-           Type    (MEMBER INFO WARNING ERROR)
-           Default <no default>
-           Package/module/component log level.
+   #<STANDARD-SCHEMA  (2) (C 0) {1002EE8E03}>
+
+   Tree:
+     <root>
+     │ Configuration schema for my program.
+     └─logging
+       ├─appender
+       │   Type    (MEMBER FILE STANDARD-OUTPUT)
+       │   Default :STANDARD-OUTPUT
+       │   Appender to use.
+       └─**
+         └─level
+             Type    (MEMBER INFO WARNING ERROR)
+             Default <no default>
+             Package/module/component log level.
    #+end_example
 
 *** TODO Sub-schemata
@@ -150,12 +153,15 @@
    The created configuration is empty:
 
    #+BEGIN_SRC lisp :results output :exports both
-   (describe *my-configuration*)
-   (format t "^ empty configuration (no output)~%")
+     (describe *my-configuration*)
+     (format t "^ empty configuration (no output)~%")
    #+END_SRC
 
    #+RESULTS:
-   : ^ empty configuration (no output)
+   : #<STANDARD-CONFIGURATION  (0) {1002F54013}>
+   :
+   : Tree:
+   :   <empty>
 
    There are several ways to create option objects from schema item
    objects:
@@ -222,28 +228,31 @@
 
    #+RESULTS:
    #+begin_example
-   <root>
-   └─logging
-     ├─appender
-     │   Type    (MEMBER FILE STANDARD-OUTPUT)
-     │   Default :STANDARD-OUTPUT
-     │   Value   :STANDARD-OUTPUT
-     │   Sources DEFAULT:
-     │             :STANDARD-OUTPUT
-     │   Appender to use.
-     └─mypackage
-       ├─mylexer
-       │ └─level
-       │     Type    (MEMBER INFO WARNING ERROR)
-       │     Default <no default>
-       │     Value   <no value>
-       │     Package/module/component log level.
-       └─myparser
-         └─level
-             Type    (MEMBER INFO WARNING ERROR)
-             Default <no default>
-             Value   <no value>
-             Package/module/component log level.
+   #<STANDARD-CONFIGURATION  (3) {1002F54013}>
+
+   Tree:
+     <root>
+     └─logging
+       ├─appender
+       │   Type    (MEMBER FILE STANDARD-OUTPUT)
+       │   Default :STANDARD-OUTPUT
+       │   Value   :STANDARD-OUTPUT
+       │   Sources DEFAULT:
+       │             :STANDARD-OUTPUT
+       │   Appender to use.
+       └─mypackage
+         ├─mylexer
+         │ └─level
+         │     Type    (MEMBER INFO WARNING ERROR)
+         │     Default <no default>
+         │     Value   <no value>
+         │     Package/module/component log level.
+         └─myparser
+           └─level
+               Type    (MEMBER INFO WARNING ERROR)
+               Default <no default>
+               Value   <no value>
+               Package/module/component log level.
    #+end_example
 
    In a more realistic setting, populating the configuration would be
