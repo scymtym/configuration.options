@@ -198,11 +198,14 @@
       as configuration files into configuration objects:
 
       #+BEGIN_SRC lisp :results silent :exports both
-        (let ((synchronizer (make-instance 'configuration.options:standard-synchronizer
-                                           :target *my-configuration*))
-              (source       (configuration.options.sources:make-source :defaults)))
-          (configuration.options.sources:initialize source *my-schema*)
-          (configuration.options.sources:process source synchronizer))
+        (defun populate-configuration (schema configuration)
+          (let ((synchronizer (make-instance 'configuration.options:standard-synchronizer
+                                             :target configuration))
+                (source       (configuration.options.sources:make-source :defaults)))
+            (configuration.options.sources:initialize source schema)
+            (configuration.options.sources:process source synchronizer)))
+
+        (populate-configuration *my-schema* *my-configuration*)
       #+END_SRC
 
       The above example uses the simple "default values" source which
@@ -322,6 +325,113 @@
    |------+----------------------------------------------------------|
    | :INI | Parse textual configuration information in "ini" syntax. |
    | :XML | This syntax allows using some kinds of XML documents as  |
+
+* STARTED Integration with the =architecture.service-provider= System
+
+  The [[https://github.com/scymtym/architecture.service-provider][architecture.service-provider system]] allows defining services
+  and providers of these services. The integration described here adds
+  the ability to automatically define a configuration schema for a
+  given service and use a configuration object to choose, instantiate
+  and configure a provider:
+
+  #+BEGIN_SRC dot :file "service-provider-integration.png" :exports results
+    digraph {
+
+      rankdir="LR"
+      node [shape="box"]
+
+      service
+      provider1 [shape=record,label="provider 1|slot a: boolean"]
+      service -> provider1 [arrowhead="none",weight=1000]
+      service -> provider2 [arrowhead="none"]
+
+      derive_schema [label="derive schema",shape="ellipse"]
+      schema [shape="record",label="schema|item provider: (member 1 2)|item 1.a: boolean"]
+      service -> derive_schema -> schema
+
+      make_configuration [label="make configuration",shape="ellipse"]
+      configuration [shape="record",label="configuration|option provider = 1|option 1.a = t"]
+      schema -> make_configuration
+      make_configuration -> configuration
+      provider1 -> configuration [style="dashed",label="selects",arrowtail="normal",dir="back",weight=0]
+
+      instantiate_provider [label="instantiate provider", shape="ellipse"]
+      instance [shape="record",label="instance|slot a = t"]
+      configuration -> instantiate_provider
+      instantiate_provider -> instance
+      provider1 -> instance [arrowtail="emptytriangle",dir="back",weight=0]
+    }
+  #+END_SRC
+
+  #+RESULTS:
+  [[file:service-provider-integration.png]]
+
+  This functionionality is provided in the separate
+  ~configuration.options-and-service-provider~ system:
+
+  #+BEGIN_SRC lisp :results silent :exports both
+    (asdf:load-system :configuration.options-and-service-provider)
+  #+END_SRC
+
+** STARTED Deriving a Schema for A Schema
+
+   #+BEGIN_SRC lisp :results output :exports both
+     (service-provider:define-service my-service)
+
+     (defclass my-provider () ((a :initarg :a :type string)))
+     (service-provider:register-provider/class
+      'my-service :my-provider :class 'my-provider)
+
+     (describe
+      (configuration.options.service-provider:service-schema
+       (service-provider:find-service 'my-service)))
+   #+END_SRC
+
+   #+RESULTS:
+   #+begin_example
+   #<STANDARD-SCHEMA  (1) (C 1) {10083C2913}>
+
+   Tree:
+     <root>
+     │ Configuration options of the MY-SERVICE service.
+     ├─provider
+     │   Type    (PROVIDER-DESIGNATOR-MEMBER MY-PROVIDER)
+     │   Default <no default>
+     │   Selects one of the providers of the MY-SERVICE service for
+     │   instantiation.
+     └─my-provider
+       │ Configuration of the MY-PROVIDER provider.
+       └─a
+           Type    STRING
+           Default <no default>
+   #+end_example
+
+** STARTED Creating a Configured Provider
+
+   #+BEGIN_SRC lisp :results output :exports both
+     (let* ((schema        (configuration.options.service-provider:service-schema
+                            'my-service))
+            (configuration (configuration.options:make-configuration schema)))
+
+       (populate-configuration schema configuration)
+       (setf (configuration.options:option-value
+              (configuration.options:find-option "provider" configuration))
+             :my-provider
+             (configuration.options:option-value
+              (configuration.options:find-option "my-provider.a" configuration))
+             "foo")
+
+       (describe (service-provider:make-provider 'my-service configuration)))
+   #+END_SRC
+
+   #+RESULTS:
+   : #<MY-PROVIDER {1007F19023}>
+   :   [standard-object]
+   :
+   : Slots with :INSTANCE allocation:
+   :   A  = "foo"
+
+** TODO Tracking Service Changes
 
 * TODO Reference
 * TODO Related Work
