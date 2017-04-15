@@ -118,14 +118,10 @@
      (slot-names t)
      &rest args
      &key
-     (prefix      "/"  prefix-supplied?)
-     (paths       `("./"
-                    ,(merge-pathnames
-                      ".config/" (user-homedir-pathname))
-                    ,(merge-pathnames "etc/" prefix))
-                      paths-supplied?)
-     (config-file nil config-file-supplied?)
-     (sources     ()  sources-supplied?)
+     (config-file nil                           config-file-supplied?)
+     (prefix      "/"                           prefix-supplied?)
+     (paths       *default-configuration-files* paths-supplied?)
+     (sources     '()                           sources-supplied?)
      &allow-other-keys)
   (cond
     ;; No CONFIG-FILE => SOURCES can be supplied, call next method.
@@ -138,12 +134,6 @@
                             :paths       paths
                             :config-file config-file
                             :sources     sources))
-    ;; PREFIX's sole purpose is being used in the default computation
-    ;; of PATHS. Thus supplying both does not make sense.
-    ((and prefix-supplied? paths-supplied?)
-     (incompatible-initargs 'config-file-cascade-source
-                            :prefix prefix
-                            :paths  paths))
     ;; SOURCES has not been supplied => CONFIG-FILE is required to
     ;; compute sources.
     ((not config-file-supplied?)
@@ -151,14 +141,16 @@
     ;; CONFIG-FILE has been supplied, SOURCES has not been supplied =>
     ;; compute sources and call next method.
     (t
-     (let ((other-args (remove-from-plist args :prefix :paths :config-file)))
+     (let ((other-args (remove-from-plist args :prefix :paths :config-file))
+           (files      (configuration-files config-file
+                                            :prefix     prefix
+                                            :file-specs paths)))
        (call-next-method
         instance slot-names
-        :sources (mapcar (lambda (path)
-                           (list* :file
-                                  :pathname (merge-pathnames config-file path)
-                                  other-args))
-                         paths))))))
+        :sources (mapcar (lambda (file)
+                           (let+ (((file &ign) (ensure-list file)))
+                             (list* :file :pathname file other-args)))
+                         files))))))
 
 (defmethod print-items:print-items append ((object config-file-cascade-source))
   ;; This is only a best-effort approach and may fail.
@@ -264,6 +256,8 @@
      (sources                      '()                               sources-supplied?)
      basename
      (type                         "conf")
+     (paths                        (configuration-file-specs
+                                    (environment-variable-namify basename)))
      (prefix/commandline           (format nil "~(~A~)-" basename))
      (prefix/environment-variables (environment-variable-namify basename))
      &allow-other-keys)
@@ -273,7 +267,11 @@
                             :sources  sources
                             :basename basename))
     (t
-     (let ((pathname (make-pathname :type type :defaults basename)))
+     (let ((pathname     (make-pathname :type type :defaults basename))
+           (name-mapping (when prefix/environment-variables
+                           (ignore-meta-configuration-variables
+                            (make-environment-variable-name->option-name
+                             :prefix prefix/environment-variables)))))
        (call-next-method
         instance slot-names
         :sources `(;; Commandline
@@ -285,19 +283,26 @@
                               `(:prefix ,prefix/commandline)))))
                    ;; Environment variables
                    (:environment-variables
-                    ,@(when prefix/environment-variables
-                        `(:prefix ,prefix/environment-variables)))
+                    ,@(when name-mapping
+                        `(:name-mapping ,name-mapping)))
                    ;; Configuration files
                    (:config-file-cascade
                     :config-file       ,pathname
+                    :paths             ,paths
                     :if-does-not-exist nil
                     ,@(remove-from-plist
-                       args :basename :type :prefix/commandline
+                       args :basename :type :paths
+                       :prefix/commandline
                        :prefix/environment-variables))
                    ;; Default values
                    (:defaults)))))))
 
 ;;; Utilities
+
+(defun ignore-meta-configuration-variables (function)
+  (lambda (name)
+    (unless (ends-with-subseq +config-files-variable-suffix+ name)
+      (funcall function name))))
 
 (defun environment-variable-namify (string)
   (format nil "~:@(~A~)_" (substitute-if-not

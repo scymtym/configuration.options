@@ -54,8 +54,6 @@
   '((:sources () :paths ("/" "/" "/"))    incompatible-initargs)
   '((:sources () :config-file "foo.conf") incompatible-initargs)
 
-  '((:paths ("/" "/" "/") :prefix "/")    incompatible-initargs)
-
   ;; :config-file is missing.
   '((:paths ("/" "/" "/"))                missing-required-initarg)
   '((:prefix "/")                         missing-required-initarg)
