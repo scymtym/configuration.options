@@ -18,7 +18,7 @@
   (:import-from #:configuration.options
    #:wild-name)
 
-  ;; Condition
+  ;; Conditions
   (:export
    #:schema-condition
    #:schema-condition-schema

@@ -279,8 +279,7 @@
                             :sources  sources
                             :basename basename))
     (t
-     (let ((pathname (merge-pathnames
-                      basename (make-pathname :name "_" :type type))))
+     (let ((pathname (make-pathname :type type :defaults basename)))
        (call-next-method
         instance slot-names
         :sources `(;; Commandline
