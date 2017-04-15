@@ -52,6 +52,9 @@
                                  (:file       "conditions")
                                  (:file       "protocol")
 
+                                 ;; Utilities
+                                 (:file       "configuration-files")
+
                                  ;; Sources
                                  (:file       "source-defaults")
                                  (:file       "source-environment-variables")
@@ -98,6 +101,9 @@
                  :serial     t
                  :components ((:file       "package")
                               (:file       "protocol")
+
+                              ;; Utilities
+                              (:file       "configuration-files")
 
                               ;; Sources
                               (:file       "source-defaults")

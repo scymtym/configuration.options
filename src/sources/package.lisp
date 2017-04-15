@@ -50,6 +50,11 @@
 
    #:make-syntax)
 
+  ;; Utilities
+  (:export
+   #:configuration-files
+   #:configuration-file-specs)
+
   (:documentation
    "This package contains configuration options sources.
 
