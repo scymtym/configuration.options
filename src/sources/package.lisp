@@ -1,6 +1,6 @@
 ;;;; package.lisp --- Package definition for sources module.
 ;;;;
-;;;; Copyright (C) 2011-2016 Jan Moringen
+;;;; Copyright (C) 2011-2017 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -17,6 +17,11 @@
 
   (:import-from #:configuration.options
    #:wild-name)
+
+  (:import-from #:configuration.options.debug
+   #:+config-debug-variable-suffix+
+
+   #:output)
 
   ;; Conditions
   (:export

@@ -51,7 +51,8 @@
   `((:pathname ,(source-pathname object) " ~A")))
 
 (defmethod process ((source file-source) (sink t))
-  (let+ (((&structure-r/o source- pathname element-type if-does-not-exist)
+  (let+ (((&structure-r/o
+           source- pathname element-type if-does-not-exist description)
           source))
     ;; TODO should use `with-input-from-file' but that behaves
     ;; strangely for :if-does-not-exist nil.
@@ -59,6 +60,8 @@
                             :direction         :input
                             :element-type      element-type
                             :if-does-not-exist if-does-not-exist)
-      (when stream
-        (setf (source-%stream source) stream)
-        (call-next-method source sink)))))
+      (with-source-debug ("~@[~A ~]\"~A\" ~:[does not exist~;exists~]"
+                          description (namestring pathname) stream)
+        (when stream
+          (setf (source-%stream source) stream)
+          (call-next-method source sink))))))

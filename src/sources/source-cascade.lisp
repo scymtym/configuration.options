@@ -63,18 +63,22 @@
   (mapc (rcurry #'initialize schema) (source-%sources source)))
 
 (defmethod process ((source cascade-source) (sink t))
-  (let+ (((&labels descendent-count (source)
-            (if-let ((sources (source-sources source)))
-              (reduce #'+ sources :key (compose #'descendent-count
-                                                #'source-sources))
-              1))))
-    (iter (for child in (source-sources source))
-          (for i initially 0 then (+ i (descendent-count child)))
-          (with-simple-restart
-              (continue "~@<Ignore source ~A and continue with the ~
-                         next source.~@:>"
-                        child)
-            (process child (make-indexed-sink i sink))))))
+  (with-source-debug ("Configuring ~A with child sources (highest ~
+                       priority first)"
+                      (class-name (class-of source)))
+    (let+ (((&labels descendent-count (source)
+              (if-let ((sources (source-sources source)))
+                (reduce #'+ sources :key (compose #'descendent-count
+                                                  #'source-sources))
+                1))))
+      (iter (for child in (source-sources source))
+            (for i initially 0 then (+ i (descendent-count child)))
+            (for *debug-index* = (1+ i))
+            (with-simple-restart
+                (continue "~@<Ignore source ~A and continue with the ~
+                           next source.~@:>"
+                          child)
+              (process child (make-indexed-sink i sink)))))))
 
 ;;; `config-file-cascade-source'
 
@@ -304,7 +308,8 @@
 
 (defun ignore-meta-configuration-variables (function)
   (lambda (name)
-    (unless (ends-with-subseq +config-files-variable-suffix+ name)
+    (unless (or (ends-with-subseq +config-files-variable-suffix+ name)
+                (ends-with-subseq +config-debug-variable-suffix+ name))
       (funcall function name))))
 
 (defun environment-variable-namify (string)

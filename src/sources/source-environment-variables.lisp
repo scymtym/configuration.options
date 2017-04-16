@@ -1,6 +1,6 @@
 ;;;; source-environment-variables.lisp --- Options from environment variables.
 ;;;;
-;;;; Copyright (C) 2011-2016 Jan Moringen
+;;;; Copyright (C) 2011-2017 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -66,12 +66,19 @@
                 (log:debug "~@<~A mapped ~S to ~
                             ~/configuration.options:print-name/ ← ~S~@:>"
                            source string name value)
+                (output "~48@<~A (mapped to ~
+                         ~/configuration.options:print-name/)~> ~
+                         -> ~S~@:_"
+                        string name value)
                 (notify :added     name string)
                 (notify :new-value name string value))))))
-    (iter (for entry in #+sbcl (sb-ext:posix-environ)
-                        #-sbcl '())
-          (with-simple-restart (continue "~@<Skip entry ~S.~@:>" entry)
-            (variable->option entry)))))
+    (with-source-debug ("Environment variables~@[ ~/print-items:format-print-items/~]"
+                        (remove :mapping (print-items:print-items source)
+                                :test-not #'eq :key #'first))
+      (iter (for entry in #+sbcl (sb-ext:posix-environ)
+                 #-sbcl '())
+            (with-simple-restart (continue "~@<Skip entry ~S.~@:>" entry)
+              (variable->option entry))))))
 
 (defmethod print-items:print-items append ((object environment-variables-source))
   (let* ((mapping (source-name-mapping object))

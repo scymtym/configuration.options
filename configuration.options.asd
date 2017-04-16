@@ -55,6 +55,9 @@
                                  (:file       "conditions")
                                  (:file       "protocol")
 
+                                 ;; Debugging
+                                 (:file       "debug")
+
                                  ;; Utilities
                                  (:file       "configuration-files")
 

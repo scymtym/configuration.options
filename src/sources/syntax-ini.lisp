@@ -1,6 +1,6 @@
 ;;;; syntax-ini.lisp --- Interpret configuration information in "ini" syntax.
 ;;;;
-;;;; Copyright (C) 2012, 2013, 2015, 2016 Jan Moringen
+;;;; Copyright (C) 2012-2017 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -70,6 +70,8 @@
               (notify *sink* event name value
                       :source (syntax-source builder)
                       :bounds bounds))))
+      (output "~45/configuration.options:print-name/ -> ~S~%"
+              name value)
       (notify :added)
       (notify :new-value value)))
   left)
