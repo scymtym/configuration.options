@@ -250,12 +250,12 @@
     1. Commandline options
     2. Environment variables
     3. Configuration files
-       1. /etc/BASENAME.TYPE
+       1. ./BASENAME.TYPE
        2. ~/.config/BASENAME.TYPE
-       3. ./BASENAME.TYPE
+       3. PREFIX/etc/BASENAME.TYPE
     4. Default values
 
-    where TYPE defaults to \"conf\"."))
+    where TYPE defaults to \"conf\" and PREFIX defaults to \"/\"."))
 
 (service-provider:register-provider/class
  'source :common-cascade :class 'common-cascade-source)
