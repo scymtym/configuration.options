@@ -29,7 +29,7 @@
           (:foo        (:foo :bar)   t))))
 
 (test string<->value
-  "Test `value->string' and `string->value' methods for
+  "Test `value->string' and `raw->value' methods for
    `provider-designator-member' type."
 
   (mapc (lambda+ ((type-args string value))

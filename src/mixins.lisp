@@ -195,9 +195,9 @@
     types.
 
     This behavior is implemented by a methods on `value->string' and
-    `string->value' which call `value->string-using-type' and
-    `string->value-using-type' respectively with the `option-type' of
-    the schema item.
+    `raw->value' which call `value->string-using-type' and
+    `raw->value-using-type' respectively with the `option-type' of the
+    schema item.
 
     Default behavior is provided for some types:
 
@@ -214,14 +214,14 @@
                           (value       t))
   (value->string-using-type schema-item value (option-type schema-item)))
 
-(defmethod string->value ((schema-item type-based-conversion-mixin)
-                          (string      string))
-  (string->value-using-type schema-item string (option-type schema-item)))
+(defmethod raw->value ((schema-item type-based-conversion-mixin)
+                       (raw         t))
+  (raw->value-using-type schema-item raw (option-type schema-item)))
 
 (define-dispatch-methods value->string-using-type
-    (type-based-conversion-mixin value  t))
-(define-dispatch-methods string->value-using-type
-    (type-based-conversion-mixin string string))
+    (type-based-conversion-mixin value t))
+(define-dispatch-methods raw->value-using-type
+    (type-based-conversion-mixin raw   t))
 
 ;;; `list-container-mixin' class
 

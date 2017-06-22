@@ -1,6 +1,6 @@
 ;;;; synchronizer.lisp --- Synchronizes configurations to external sources.
 ;;;;
-;;;; Copyright (C) 2013, 2016 Jan Moringen
+;;;; Copyright (C) 2013, 2016, 2017 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -116,7 +116,7 @@
   (let+ ((option       (find-option name (synchronizer-target sink)))
          ((&structure-r/o option- values schema-item) option)
          (value/parsed (if raw?
-                           (string->value schema-item value)
+                           (raw->value schema-item value)
                            value))
          (args/clean   (remove-from-plist args :index :source :raw?)))
 

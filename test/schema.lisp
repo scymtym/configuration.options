@@ -172,7 +172,7 @@
                                    :name    '("a" "b")
                                    :type    '(list integer :inherit? t)
                                    :default '(-1)))
-            (parsed (mapcar (curry #'string->value item) input))
+            (parsed (mapcar (curry #'raw->value item) input))
             (value  (merge-values item parsed)))
        (is (equal parsed expected-parsed))
        (is (equal value expected-value))))

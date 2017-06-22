@@ -133,8 +133,8 @@
   ())
 
 (test builtin-types.value<->string.smoke
-  "Smoke test for methods on `value->string', `string->value',
-   `value->string-using-type' and `string->value-using-type' for
+  "Smoke test for methods on `value->string', `raw->value',
+   `value->string-using-type' and `raw->value-using-type' for
    `type-based-conversion-mixin'."
   (mapc
    (lambda+ ((type string value))
@@ -144,10 +144,10 @@
        (case value
          (option-syntax-error
           (signals option-syntax-error
-            (string->value schema-item string)))
+            (raw->value schema-item string)))
          (t
           (is (equal string (value->string schema-item value)))
-          (is (equal value  (string->value schema-item string)))))))
+          (is (equal value  (raw->value schema-item string)))))))
 
    `((boolean                    ""      option-syntax-error)
      (boolean                    "1"     option-syntax-error)

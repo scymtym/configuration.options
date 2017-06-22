@@ -85,7 +85,7 @@
     (case value
       (option-syntax-error
        (signals option-syntax-error
-         (string->value schema-item string)))
+         (raw->value schema-item string)))
       (t
        (is (equal  string (value->string schema-item value)))
-       (is (value= value  (string->value schema-item string)))))))
+       (is (value= value  (raw->value schema-item string)))))))

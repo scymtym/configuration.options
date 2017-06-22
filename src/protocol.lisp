@@ -976,10 +976,10 @@
    "Return a string representation of VALUE taking into account
     properties of SCHEMA-ITEM."))
 
-(defgeneric string->value (schema-item string)
+(defgeneric raw->value (schema-item raw)
   (:documentation
-   "Parse STRING and return a value object taking into properties of
-   SCHEMA-ITEM."))
+   "Parse RAW and return a value object taking into properties of
+    SCHEMA-ITEM."))
 
 (defgeneric value->string-using-type (schema-item value type &key inner-type)
   (:documentation
@@ -987,10 +987,10 @@
     SCHEMA-ITEM, into the conversion of VALUE into a string
     representation."))
 
-(defgeneric string->value-using-type (schema-item string type &key inner-type)
+(defgeneric raw->value-using-type (schema-item raw type &key inner-type)
   (:documentation
-   "Like `string->value' but may incorporate TYPE, besides
-    SCHEMA-ITEM, into the parsing of STRING into a value object."))
+   "Like `raw->value' but may incorporate TYPE, besides SCHEMA-ITEM,
+    into the parsing of RAW into a value object."))
 
 ;; Name coercion
 
@@ -1024,17 +1024,17 @@
           (call-next-method))
         (handle-invalid))))
 
-(defmethod string->value :around ((schema-item t) (string t))
+(defmethod raw->value :around ((schema-item t) (raw t))
   (with-condition-translation (((error option-syntax-error)
                                 :option schema-item
-                                :value  string))
+                                :value  raw))
     (call-next-method)))
 
-(defmethod string->value-using-type :around ((schema-item t) (string t) (type t)
-                                             &key inner-type)
+(defmethod raw->value-using-type :around ((schema-item t) (raw t) (type t)
+                                          &key inner-type)
   (with-condition-translation (((error option-syntax-error)
                                 :option schema-item
-                                :value  string
+                                :value  raw
                                 :type   (if inner-type
                                             (list* type inner-type)
                                             type)))

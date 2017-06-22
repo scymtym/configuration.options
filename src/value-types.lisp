@@ -16,15 +16,15 @@
     ((t)   "true")
     ((nil) "false")))
 
-(defmethod string->value-using-type ((schema-item type-based-conversion-mixin)
-                                     (value       string)
-                                     (type        (eql 'boolean))
-                                     &key &allow-other-keys)
+(defmethod raw->value-using-type ((schema-item type-based-conversion-mixin)
+                                  (raw         string)
+                                  (type        (eql 'boolean))
+                                  &key &allow-other-keys)
   (cond
-    ((string= value "true")  t)
-    ((string= value "false") nil)
-    (t                       (error "~@<~S is not a Boolean value~@:>"
-                                    value))))
+    ((string= raw "true")  t)
+    ((string= raw "false") nil)
+    (t                     (error "~@<~S is not a Boolean value~@:>"
+                                  raw))))
 
 ;;; type `integer'
 
@@ -35,12 +35,12 @@
   (with-standard-io-syntax
     (princ-to-string value)))
 
-(defmethod string->value-using-type ((schema-item type-based-conversion-mixin)
-                                     (value       string)
-                                     (type        (eql 'integer))
-                                     &key
-                                     inner-type)
-  (let ((value (parse-integer value)))
+(defmethod raw->value-using-type ((schema-item type-based-conversion-mixin)
+                                  (raw         string)
+                                  (type        (eql 'integer))
+                                  &key
+                                  inner-type)
+  (let ((value (parse-integer raw)))
     (%maybe-check-detailed-type
      value type inner-type
      "~@<~S is not within the bounds specified by type ~S.~@:>")
@@ -54,14 +54,14 @@
                                      &key &allow-other-keys)
   value)
 
-(defmethod string->value-using-type ((schema-item type-based-conversion-mixin)
-                                     (value       string)
-                                     (type        (eql 'string))
-                                     &key inner-type)
+(defmethod raw->value-using-type ((schema-item type-based-conversion-mixin)
+                                  (raw         string)
+                                  (type        (eql 'string))
+                                  &key inner-type)
   (%maybe-check-detailed-type
-   value type inner-type
+   raw type inner-type
    "~@<~S is not of the length specified by type ~S.~@:>")
-  value)
+  raw)
 
 ;;; type `member'
 
@@ -74,14 +74,14 @@
       (setf (readtable-case *readtable*) :invert)
       (princ-to-string value))))
 
-(defmethod string->value-using-type ((schema-item type-based-conversion-mixin)
-                                     (string      string)
-                                     (type        (eql 'member))
-                                     &key
-                                     inner-type)
-  (or (find string inner-type :test #'string-equal)
+(defmethod raw->value-using-type ((schema-item type-based-conversion-mixin)
+                                  (raw         string)
+                                  (type        (eql 'member))
+                                  &key
+                                  inner-type)
+  (or (find raw inner-type :test #'string-equal)
       (error "~@<~S is not one of ~{~A~^, ~}.~@:>"
-             string inner-type)))
+             raw inner-type)))
 
 ;;; type `pathname'
 
@@ -91,11 +91,11 @@
                                      &key &allow-other-keys)
   (namestring value))
 
-(defmethod string->value-using-type ((schema-item type-based-conversion-mixin)
-                                     (string      string)
-                                     (type        (eql 'pathname))
-                                     &key &allow-other-keys)
-  (parse-namestring string))
+(defmethod raw->value-using-type ((schema-item type-based-conversion-mixin)
+                                  (raw         string)
+                                  (type        (eql 'pathname))
+                                  &key &allow-other-keys)
+  (parse-namestring raw))
 
 ;;; type `list'
 
@@ -139,18 +139,18 @@
                   (remove :inherit value))
           (ends-with :inherit value :test #'eq)))
 
-(defmethod string->value-using-type ((schema-item type-based-conversion-mixin)
-                                     (string      string)
-                                     (type        (eql 'list))
-                                     &key
-                                     inner-type)
+(defmethod raw->value-using-type ((schema-item type-based-conversion-mixin)
+                                  (raw         string)
+                                  (type        (eql 'list))
+                                  &key
+                                  inner-type)
   (let+ ((element-type (first inner-type))
          ((&plist-r/o (inherit? :inherit?)) (rest inner-type))
-         (components (split-sequence #\: string)))
+         (components (split-sequence #\: raw)))
    (mapcar (lambda (component)
              (if (eq component :inherit)
                  component
-                 (string->value-using-type schema-item component element-type)))
+                 (raw->value-using-type schema-item component element-type)))
            (if (and inherit?
                     (not (length= 1 components ))
                     (ends-with "" components :test #'string=))
@@ -189,20 +189,20 @@
                    'value->string schema-item value
                    (list* type inner-type)))
 
-          (defmethod string->value-using-type
+          (defmethod raw->value-using-type
               ((schema-item type-based-conversion-mixin)
-               (value  string)
-               (type   (eql ',type))
+               (raw         t)
+               (type        (eql ',type))
                &key
                inner-type)
             (iter (for type1 in inner-type)
-                  (let+ (((&values value1 error?)
-                          (ignore-errors (string->value-using-type
-                                          schema-item value type1))))
+                  (let+ (((&values value error?)
+                          (ignore-errors (raw->value-using-type
+                                          schema-item raw type1))))
                     (when (not error?)
-                      (return-from string->value-using-type value1))))
+                      (return-from raw->value-using-type value))))
             (error "~@<~S is not valid for any of ~{~S~^, ~}.~@:>"
-                   value inner-type)))))
+                   raw inner-type)))))
 
   (define-composite-methods or  some)
   (define-composite-methods and every))

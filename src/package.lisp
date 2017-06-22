@@ -139,9 +139,9 @@
    #:merge-values-using-type
 
    #:value->string
-   #:string->value
+   #:raw->value
    #:value->string-using-type
-   #:string->value-using-type)
+   #:raw->value-using-type)
 
   ;; Option protocol
   (:export

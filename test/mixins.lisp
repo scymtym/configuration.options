@@ -82,8 +82,8 @@
 (in-suite options.type-based-conversion-mixin)
 
 (test type-based-conversion-mixin.smoke
-  "Smoke test for methods on `value->string', `string->value',
-   `value->string-using-type' and `string->value-using-type' for
+  "Smoke test for methods on `value->string', `raw->value',
+   `value->string-using-type' and `raw->value-using-type' for
    `type-based-conversion-mixin'."
   (mapc
    (curry #'apply #'check-value<->string)
