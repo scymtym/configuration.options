@@ -162,24 +162,33 @@
           (ends-with :inherit value :test #'eq)))
 
 (defmethod raw->value-using-type ((schema-item type-based-conversion-mixin)
-                                  (raw         string)
+                                  (raw         list)
                                   (type        (eql 'list))
                                   &key
                                   inner-type)
-  (let+ ((element-type (first inner-type))
-         ((&plist-r/o (inherit? :inherit?)) (rest inner-type))
-         (components (split-sequence #\: raw)))
-   (mapcar (lambda (component)
-             (if (eq component :inherit)
-                 component
-                 (raw->value-using-type schema-item component element-type)))
-           (if (and inherit?
-                    (not (length= 1 components ))
-                    (ends-with "" components :test #'string=))
-               (remove-if
-                (conjoin #'stringp #'emptyp)
-                (substitute-if :inherit #'emptyp components :count 1 :from-end t))
-               components))))
+  (let ((element-type (first inner-type)))
+    (mapcar (lambda (component)
+              (if (eq component :inherit)
+                  component
+                  (raw->value-using-type schema-item component element-type)))
+            raw)))
+
+(defmethod raw->value-using-type ((schema-item type-based-conversion-mixin)
+                                  (raw         string)
+                                  (type        (eql 'list))
+                                  &rest args &key inner-type)
+  (let+ (((&plist-r/o (inherit? :inherit?)) (rest inner-type))
+         (components (split-sequence #\: raw))
+         (components (if (and inherit?
+                              (not (length= 1 components))
+                              (ends-with "" components :test #'string=))
+                         (remove-if
+                          (conjoin #'stringp #'emptyp)
+                          (substitute-if :inherit #'emptyp components
+                                         :count 1 :from-end t))
+                         components)))
+    (apply #'raw->value-using-type schema-item components type
+           args)))
 
 ;;; types `or' and `and'
 
