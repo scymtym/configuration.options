@@ -6,6 +6,28 @@
 
 (cl:in-package #:configuration.options)
 
+;;; type `null'
+
+(defmethod value->string-using-type ((schema-item type-based-conversion-mixin)
+                                     (value       t)
+                                     (type        (eql 'null))
+                                     &key &allow-other-keys)
+  (if (null value)
+      "nil"
+      (error "~@<~S is not ~S which is the only valid value of type ~
+              ~S.~@:>"
+             value nil type)))
+
+(defmethod raw->value-using-type ((schema-item type-based-conversion-mixin)
+                                  (raw         string)
+                                  (type        (eql 'null))
+                                  &key &allow-other-keys)
+  (if (string= raw "nil")
+      nil
+      (error "~@<~S is not \"nil\" which is the only valid ~
+              representation of values of type ~S.~@:>"
+             raw type)))
+
 ;;; type `boolean'
 
 (defmethod value->string-using-type ((schema-item type-based-conversion-mixin)

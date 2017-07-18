@@ -18,7 +18,13 @@
 
   (mapc
    (curry #'apply #'check-validate-value)
-   '((nil            integer                    nil)
+   '((nil            null                       t)
+     (t              null                       nil)
+     (1              null                       nil)
+     (0.5d0          null                       nil)
+     ("foo"          null                       nil)
+
+     (nil            integer                    nil)
      (t              integer                    nil)
      (1              integer                    t)
      (0.5d0          integer                    nil)
@@ -149,7 +155,11 @@
           (is (equal string (value->string schema-item value)))
           (is (equal value  (raw->value schema-item string)))))))
 
-   `((boolean                    ""      option-syntax-error)
+   `((null                       ""      option-syntax-error)
+     (null                       "1"     option-syntax-error)
+     (null                       "nil"   nil)
+
+     (boolean                    ""      option-syntax-error)
      (boolean                    "1"     option-syntax-error)
      (boolean                    "false" nil)
      (boolean                    "true"  t)
