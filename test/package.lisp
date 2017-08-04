@@ -29,7 +29,7 @@
    #:initialize)
 
   (:export
-   #:make-random-string
+   #:gen-ascii-name
 
    #:mock-source
 

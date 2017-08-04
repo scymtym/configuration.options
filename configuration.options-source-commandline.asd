@@ -54,5 +54,6 @@
 
 (defmethod perform ((operation test-op)
                     (component (eql (find-system :configuration.options-source-commandline/test))))
+  (log:config :warn)
   (uiop:symbol-call '#:configuration.options.sources.commandline.test
                     '#:run-tests))

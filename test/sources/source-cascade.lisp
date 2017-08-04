@@ -13,28 +13,35 @@
 (test cascade-source.smoke
   "Smoke test for `cascade-source' class."
 
-  (let ((config-file-1 (format nil "/tmp/~A.conf" (make-random-string)))
-        (config-file-2 (format nil "/tmp/~A.conf" (make-random-string))))
-    (with-environment-variable ("FOO_A_B" "1")
-      (with-files ((config-file-1 "a.b=2 b.c=3 d=4"))
-        (with-source-and-sink
-            ((:cascade
-              :sources `((:environment-variables :prefix "FOO_")
-                         (:file :pathname ,config-file-1
-                                :syntax   :mock)
-                         (:file :pathname          ,config-file-2
-                                :syntax            :mock
-                                :if-does-not-exist nil)))
-             :sink-var sink)
-          (expecting-sink-calls (sink)
-            #+sbcl '(:added     ("a" "b") nil :index 0 :entry "FOO_A_B=1")
-            #+sbcl '(:new-value ("a" "b") "1" :index 0 :entry "FOO_A_B=1")
-            '(:added     ("a" "b") nil :index 1)
-            '(:new-value ("a" "b") "2" :index 1)
-            '(:added     ("b" "c") nil :index 1)
-            '(:new-value ("b" "c") "3" :index 1)
-            '(:added     ("d")     nil :index 1)
-            '(:new-value ("d")     "4" :index 1)))))))
+  (for-all ((file-name-1        (gen-ascii-name))
+            (file-name-2        (gen-ascii-name) (string/= file-name-1
+                                                           file-name-2))
+            (environment-prefix (gen-ascii-name)))
+    (let* ((config-file-1      (format nil "/tmp/~A.conf" file-name-1))
+           (config-file-2      (format nil "/tmp/~A.conf" file-name-2))
+           (environment-prefix (concatenate 'string environment-prefix "_"))
+           (environment-name   (format nil "~AA_B" environment-prefix))
+           (environment-entry  (format nil "~AA_B=1" environment-prefix)))
+      (with-environment-variable (environment-name "1")
+        (with-files ((config-file-1 "a.b=2 b.c=3 d=4"))
+          (with-source-and-sink
+              ((:cascade
+                :sources `((:environment-variables :prefix ,environment-prefix)
+                           (:file :pathname ,config-file-1
+                                  :syntax   :mock)
+                           (:file :pathname          ,config-file-2
+                                  :syntax            :mock
+                                  :if-does-not-exist nil)))
+               :sink-var sink)
+            (expecting-sink-calls (sink)
+              #+sbcl `(:added     ("a" "b") nil :index 0 :entry ,environment-entry)
+              #+sbcl `(:new-value ("a" "b") "1" :index 0 :entry ,environment-entry)
+              '(:added     ("a" "b") nil :index 1)
+              '(:new-value ("a" "b") "2" :index 1)
+              '(:added     ("b" "c") nil :index 1)
+              '(:new-value ("b" "c") "3" :index 1)
+              '(:added     ("d")     nil :index 1)
+              '(:new-value ("d")     "4" :index 1))))))))
 
 ;;; Tests for `config-file-cascade-source' class
 
@@ -64,29 +71,30 @@
 (test config-file-cascade-source.smoke
   "Smoke test for `config-file-cascade-source' class."
 
-  (let ((prefix   (format nil "/tmp/~A/" (make-random-string)))
-        (basename (make-random-string))
-        (type     "conf"))
-    (with-config-files (prefix basename type)
-        ("a=1 b.c=2 d=3"
-         "a=4"
-         "b.c=5")
-      (with-source-and-sink ((:config-file-cascade
-                              :prefix      prefix
-                              :config-file (format nil "~A.~A" basename type)
-                              :syntax      :mock)
-                             :sink-var sink)
-        (expecting-sink-calls (sink)
-          '(:added     ("b" "c") nil :index 0)
-          '(:new-value ("b" "c") "5" :index 0)
-          '(:added     ("a")     nil :index 1)
-          '(:new-value ("a")     "4" :index 1)
-          '(:added     ("a")     nil :index 2)
-          '(:new-value ("a")     "1" :index 2)
-          '(:added     ("b" "c") nil :index 2)
-          '(:new-value ("b" "c") "2" :index 2)
-          '(:added     ("d")     nil :index 2)
-          '(:new-value ("d")     "3" :index 2))))))
+  (for-all ((directory (gen-ascii-name))
+            (basename  (gen-ascii-name)))
+    (let ((prefix (format nil "/tmp/~A/" directory))
+          (type   "conf"))
+      (with-config-files (prefix basename type)
+          ("a=1 b.c=2 d=3"
+           "a=4"
+           "b.c=5")
+        (with-source-and-sink ((:config-file-cascade
+                                :prefix      prefix
+                                :config-file (format nil "~A.~A" basename type)
+                                :syntax      :mock)
+                               :sink-var sink)
+          (expecting-sink-calls (sink)
+            '(:added     ("b" "c") nil :index 0)
+            '(:new-value ("b" "c") "5" :index 0)
+            '(:added     ("a")     nil :index 1)
+            '(:new-value ("a")     "4" :index 1)
+            '(:added     ("a")     nil :index 2)
+            '(:new-value ("a")     "1" :index 2)
+            '(:added     ("b" "c") nil :index 2)
+            '(:new-value ("b" "c") "2" :index 2)
+            '(:added     ("d")     nil :index 2)
+            '(:new-value ("d")     "3" :index 2)))))))
 
 ;;; Tests for `directory-source' class
 
@@ -105,33 +113,34 @@
 (test directory-source.smoke
   "Smoke test for `directory-source' class."
 
-  (let ((directory (format nil "/tmp/~A/" (make-random-string)))
-        (type      "conf"))
-    (with-files (((format nil "~A/00-foo.~A" directory type)
-                  "b.c=5")
-                 ((format nil "~A/01-baz.~A" directory type)
-                  "a=4")
-                 ((format nil "~A/02-bar.~A" directory type)
-                  "a=1 b.c=2 d=3")
-                 ((format nil "~A/directory.~A/dummy" directory type)
-                  ""))
-      (with-source-and-sink ((:directory
-                              :pattern (merge-pathnames
-                                        (make-pathname :name :wild :type type)
-                                        directory)
-                              :syntax  :mock)
-                             :sink-var sink)
-        (expecting-sink-calls (sink)
-          '(:added     ("b" "c") nil :index 0)
-          '(:new-value ("b" "c") "5" :index 0)
-          '(:added     ("a")     nil :index 1)
-          '(:new-value ("a")     "4" :index 1)
-          '(:added     ("a")     nil :index 2)
-          '(:new-value ("a")     "1" :index 2)
-          '(:added     ("b" "c") nil :index 2)
-          '(:new-value ("b" "c") "2" :index 2)
-          '(:added     ("d")     nil :index 2)
-          '(:new-value ("d")     "3" :index 2))))))
+  (for-all ((name (gen-ascii-name)))
+    (let ((directory (format nil "/tmp/~A/" name))
+          (type      "conf"))
+      (with-files (((format nil "~A/00-foo.~A" directory type)
+                    "b.c=5")
+                   ((format nil "~A/01-baz.~A" directory type)
+                    "a=4")
+                   ((format nil "~A/02-bar.~A" directory type)
+                    "a=1 b.c=2 d=3")
+                   ((format nil "~A/directory.~A/dummy" directory type)
+                    ""))
+        (with-source-and-sink ((:directory
+                                :pattern (merge-pathnames
+                                          (make-pathname :name :wild :type type)
+                                          directory)
+                                :syntax  :mock)
+                               :sink-var sink)
+          (expecting-sink-calls (sink)
+            '(:added     ("b" "c") nil :index 0)
+            '(:new-value ("b" "c") "5" :index 0)
+            '(:added     ("a")     nil :index 1)
+            '(:new-value ("a")     "4" :index 1)
+            '(:added     ("a")     nil :index 2)
+            '(:new-value ("a")     "1" :index 2)
+            '(:added     ("b" "c") nil :index 2)
+            '(:new-value ("b" "c") "2" :index 2)
+            '(:added     ("d")     nil :index 2)
+            '(:new-value ("d")     "3" :index 2)))))))
 
 ;;; Tests for `common-cascade-source' class
 
@@ -166,44 +175,50 @@
 (test common-cascade-source.smoke
   "Smoke test for `common-cascade-source' class."
 
-  (let ((schema   *simple-schema*)
-        (prefix   (format nil "/tmp/~A/" (make-random-string)))
-        (basename (make-random-string))
-        (type     "conf")
-        (offset   (if (service-provider:find-provider
-                       'configuration.options.sources::source :commandline
-                       :if-does-not-exist nil)
-                      1 0)))
-    (with-environment-variable ("FOO_B_C" "1")
-      (with-config-files (prefix basename type)
-          ("a=2 b.c=3 d=4"
-           "a=5"
-           "b.c=6")
-        (with-source-and-sink ((:common-cascade
-                                :prefix                       prefix
-                                :basename                     basename
-                                :type                         type
-                                :syntax                       :mock
-                                :prefix/environment-variables "FOO_")
-                               :schema   schema
-                               :sink-var sink)
-          (are-expected-sink-calls
-           `(#+sbcl (:added     ("b" "c") nil :index ,(+ 0 offset) :entry "FOO_B_C=1")
-             #+sbcl (:new-value ("b" "c") "1" :index ,(+ 0 offset) :entry "FOO_B_C=1")
+  (for-all ((prefix   (gen-ascii-name))
+            (basename (gen-ascii-name)))
+    (let* ((schema             *simple-schema*)
+           (prefix             (format nil "/tmp/~A/" prefix))
+           (type               "conf")
+           (basename/safe      (substitute #\_ #\! basename))
+           (environment-prefix (concatenate 'string basename/safe "_"))
+           (environment-name   (format nil "~AB_C" environment-prefix))
+           (environment-entry  (format nil "~A=1" environment-name))
+           (offset             (if (service-provider:find-provider
+                                    'configuration.options.sources::source :commandline
+                                    :if-does-not-exist nil)
+                                   1 0)))
+      (with-environment-variable (environment-name "1")
+        (with-config-files (prefix basename type)
+            ("a=2 b.c=3 d=4"
+             "a=5"
+             "b.c=6")
+          (with-source-and-sink ((:common-cascade
+                                  :prefix   prefix
+                                  :basename basename
+                                  :type     type
+                                  :syntax   :mock)
+                                 :schema   schema
+                                 :sink-var sink)
+            (are-expected-sink-calls
+             `(#+sbcl (:added     ("b" "c") nil :index ,(+ 0 offset)
+                                  :entry ,environment-entry)
+               #+sbcl (:new-value ("b" "c") "1" :index ,(+ 0 offset)
+                                  :entry ,environment-entry)
 
-            (:added     ("b" "c") nil :index ,(+ 1 offset))
-            (:new-value ("b" "c") "6" :index ,(+ 1 offset))
+               (:added     ("b" "c") nil :index ,(+ 1 offset))
+               (:new-value ("b" "c") "6" :index ,(+ 1 offset))
 
-            (:added     ("a")     nil :index ,(+ 2 offset))
-            (:new-value ("a")     "5" :index ,(+ 2 offset))
+               (:added     ("a")     nil :index ,(+ 2 offset))
+               (:new-value ("a")     "5" :index ,(+ 2 offset))
 
-            (:added     ("a")     nil :index ,(+ 3 offset))
-            (:new-value ("a")     "2" :index ,(+ 3 offset))
-            (:added     ("b" "c") nil :index ,(+ 3 offset))
-            (:new-value ("b" "c") "3" :index ,(+ 3 offset))
-            (:added     ("d")     nil :index ,(+ 3 offset))
-            (:new-value ("d")     "4" :index ,(+ 3 offset))
+               (:added     ("a")     nil :index ,(+ 3 offset))
+               (:new-value ("a")     "2" :index ,(+ 3 offset))
+               (:added     ("b" "c") nil :index ,(+ 3 offset))
+               (:new-value ("b" "c") "3" :index ,(+ 3 offset))
+               (:added     ("d")     nil :index ,(+ 3 offset))
+               (:new-value ("d")     "4" :index ,(+ 3 offset))
 
-            ,@(expected-notify-calls-for-schema-items
-               schema :index (+ 4 offset)))
-           (sink-calls sink)))))))
+               ,@(expected-notify-calls-for-schema-items
+                  schema :index (+ 4 offset)))
+             (sink-calls sink))))))))

@@ -16,13 +16,19 @@
 
 ;;; Specialized testing utilities
 
-(defun make-random-string (&key (case :upper) (length 20))
-  "Return a random string of length LENGTH."
-  (let ((base (case case
-                (:upper (char-code #\A))
-                (:lower (char-code #\a)))))
-    (map-into (make-string length)
-              (lambda () (code-char (+ base (random 26)))))))
+(defun gen-ascii-name (&key (case :upper))
+  (let* ((code         (gen-integer :min (char-code #\0)
+                                    :max (ecase case
+                                           (:upper (char-code #\Z))
+                                           (:lower (char-code #\z)))))
+         (alphanumeric (gen-character :code          code
+                                      :alphanumericp t)))
+    (gen-string :length   (gen-integer :min 1 :max 20)
+                :elements (lambda ()
+                            (case (random 100)
+                              (0 #\_)
+                              (1 #\!)
+                              (t (funcall alphanumeric)))))))
 
 (defun collect-map-options-calls (container)
   (let+ ((calls '())
