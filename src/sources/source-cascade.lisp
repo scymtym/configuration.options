@@ -306,5 +306,5 @@
                            #\_ (lambda (char)
                                  (or (char<= #\a char #\z)
                                      (char<= #\A char #\Z)
-                                     (char<= #\0 char #\0)))
+                                     (char<= #\0 char #\9)))
                            string)))
