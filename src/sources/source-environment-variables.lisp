@@ -70,12 +70,8 @@
                 (notify :new-value name string value))))))
     (iter (for entry in #+sbcl (sb-ext:posix-environ)
                         #-sbcl '())
-          (restart-case
-              (variable->option entry)
-            (continue (&optional condition)
-              :report (lambda (stream)
-                        (format stream "~@<Skip entry ~S.~@:>" entry))
-              (declare (ignore condition)))))))
+          (with-simple-restart (continue "~@<Skip entry ~S.~@:>" entry)
+            (variable->option entry)))))
 
 (defmethod print-items:print-items append ((object environment-variables-source))
   (let* ((mapping (source-name-mapping object))
