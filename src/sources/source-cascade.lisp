@@ -63,22 +63,18 @@
   (mapc (rcurry #'initialize schema) (source-%sources source)))
 
 (defmethod process ((source cascade-source) (sink t))
-  (let+ (((&labels count1 (source)
-            (if (source-sources source)
-                (reduce #'+ (source-sources source)
-                        :key (compose #'count1 #'source-sources))
-                1))))
+  (let+ (((&labels descendent-count (source)
+            (if-let ((sources (source-sources source)))
+              (reduce #'+ sources :key (compose #'descendent-count
+                                                #'source-sources))
+              1))))
     (iter (for child in (source-sources source))
-          (for i initially 0 then (+ i (count1 child)))
-          (restart-case
-              (process child (make-indexed-sink i sink))
-            (continue (&optional condition)
-              :report (lambda (stream)
-                        (format stream "~@<Ignore source ~A and ~
-                                        continue with the next ~
-                                        source.~@:>"
-                                child))
-              (declare (ignore condition)))))))
+          (for i initially 0 then (+ i (descendent-count child)))
+          (with-simple-restart
+              (continue "~@<Ignore source ~A and continue with the ~
+                         next source.~@:>"
+                        child)
+            (process child (make-indexed-sink i sink))))))
 
 ;;; `config-file-cascade-source'
 
