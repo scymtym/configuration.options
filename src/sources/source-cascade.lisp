@@ -268,8 +268,6 @@
      (prefix/environment-variables (environment-variable-namify basename))
      &allow-other-keys)
   (cond
-    ((not basename)
-     (call-next-method))
     (sources-supplied?
      (incompatible-initargs 'common-cascade-source
                             :sources  sources

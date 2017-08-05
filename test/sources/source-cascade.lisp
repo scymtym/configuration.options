@@ -147,13 +147,16 @@
 (source-construct-test (common-cascade-source.construct :common-cascade)
   "Test constructing `common-cascade-source' instances."
 
+  ;; incompatible initargs
+  '((:basename "foo" :sources ()) incompatible-initargs)
+
   ;; :basename and :syntax are missing.
-  '(()                     missing-required-initarg)
-  '((:paths ("/" "/" "/")) missing-required-initarg)
-  '((:prefix "/")          missing-required-initarg)
+  '(()                            missing-required-initarg)
+  '((:paths ("/" "/" "/"))        missing-required-initarg)
+  '((:prefix "/")                 missing-required-initarg)
 
   ;; :syntax is missing
-  '((:basename "foo")      missing-required-initarg)
+  '((:basename "foo")             missing-required-initarg)
 
   ;; These are valid.
   '((:basename                     "foo"
