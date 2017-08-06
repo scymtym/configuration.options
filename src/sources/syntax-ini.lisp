@@ -56,26 +56,22 @@
      (left     list)
      (right    list)
      &key)
-  (restart-case
-      (let+ (((&plist-r/o (section-name :name))
-              left)
-             ((&plist-r/o (option-name :name)
-                          (value       :value)
-                          (bounds      :bounds))
-              right)
-             (name (append section-name option-name))
-             ((&flet notify (event &optional value)
-                (notify *sink* event name value
-                        :source (syntax-source builder)
-                        :bounds bounds))))
-        (notify :added)
-        (notify :new-value value))
-    (continue (&optional condition)
-      :report (lambda (stream)
-                (format stream "~@<Do not process ~S and ~
-                                continue.~@:>"
-                        right))
-      (declare (ignore condition))))
+  (with-simple-restart (continue "~@<Do not process ~S and ~
+                                  continue.~@:>"
+                                 right)
+    (let+ (((&plist-r/o (section-name :name))
+            left)
+           ((&plist-r/o (option-name :name)
+                        (value       :value)
+                        (bounds      :bounds))
+            right)
+           (name (append section-name option-name))
+           ((&flet notify (event &optional value)
+              (notify *sink* event name value
+                      :source (syntax-source builder)
+                      :bounds bounds))))
+      (notify :added)
+      (notify :new-value value)))
   left)
 
 (defmethod process-content ((syntax ini-syntax) (source stream) (sink t))
