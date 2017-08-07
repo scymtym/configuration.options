@@ -122,6 +122,20 @@
             ,@body)
        #+sbcl (sb-posix:unsetenv ,name))))
 
+(defun call-with-temporary-directory (base-directory thunk)
+  (let ((directory (merge-pathnames
+                    (make-pathname :directory `(:relative ,(string (gensym))))
+                    (uiop:ensure-directory-pathname base-directory))))
+    (unwind-protect
+         (progn
+           (ensure-directories-exist directory)
+           (funcall thunk directory))
+      (uiop:delete-directory-tree directory :validate t))))
+
+(defmacro with-temporary-directory ((base-directory directory) &body body)
+  `(call-with-temporary-directory
+    ,base-directory (lambda (,directory) ,@body)))
+
 (defmacro with-file ((name content) &body body)
   "Execute BODY with the file named NAME created and populated with
    CONTENT. The file is deleted when BODY finishes or performs a
