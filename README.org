@@ -154,14 +154,15 @@
 
    #+BEGIN_SRC lisp :results output :exports both
      (describe *my-configuration*)
-     (format t "^ empty configuration (no output)~%")
    #+END_SRC
 
    #+RESULTS:
-   : #<STANDARD-CONFIGURATION  (0) {1002F54013}>
-   :
-   : Tree:
-   :   <empty>
+   #+begin_example
+   #<STANDARD-CONFIGURATION  (0) {10076052B3}>
+
+   Tree:
+     <empty>
+   #+end_example
 
    There are several ways to create option objects from schema item
    objects:
@@ -492,11 +493,13 @@
    #+END_SRC
 
    #+RESULTS:
-   : #<MY-PROVIDER {1007F19023}>
-   :   [standard-object]
-   :
-   : Slots with :INSTANCE allocation:
-   :   A  = "foo"
+   #+begin_example
+   #<MY-PROVIDER {1007F19023}>
+     [standard-object]
+
+   Slots with :INSTANCE allocation:
+     A  = "foo"
+   #+end_example
 
 ** TODO Tracking Service Changes
 
