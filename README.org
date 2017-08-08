@@ -335,6 +335,64 @@
    | :INI | Parse textual configuration information in "ini" syntax. |
    | :XML | This syntax allows using some kinds of XML documents as  |
 
+** STARTED Configuration Debugging
+
+   With multiple configuration sources such as environment variables
+   and various configuration files, it can sometimes be hard to
+   understand how a particular option got its value (or did not get an
+   expected value). This is true in particular for users who cannot
+   poke around inside the program.
+
+   To alleviate this problem, the =configuration.options= system
+   provides a simple configuration debugging facility aimed at
+   users. This facility can be enabled by calling
+
+   + ~(configuration.options.debug:enable-debugging STREAM)~ ::
+
+        To enable debug output to ~STREAM~ unconditionally
+
+   + ~(configuration.options.debug:maybe-enable-debugging PREFIX :stream STREAM)~ ::
+
+        To enable debug output to ~STREAM~ if the environment variable
+        =PREFIXCONFIG_DEBUG= is set
+
+   The intention is that a program using this system calls one of
+   these functions before configuration processing starts.
+
+   For example, using the schema defined [[*Specifying a Schema][above]]:
+
+   #+BEGIN_SRC lisp :exports both :results output
+     (setf (uiop:getenv "MY_PROGRAM_LOGGING_APPENDER") "file")
+
+     (configuration.options.debug:enable-debugging *standard-output*)
+
+     (let* ((schema        *my-schema*)
+            (configuration (configuration.options:make-configuration schema))
+            (synchronizer  (make-instance 'configuration.options:standard-synchronizer
+                                          :target configuration))
+            (source        (configuration.options.sources:make-source
+                            :common-cascade :basename "my-program" :syntax :ini)))
+       (configuration.options.sources:initialize source schema)
+       (configuration.options.sources:process source synchronizer))
+   #+END_SRC
+
+   #+RESULTS:
+   #+begin_example
+   Configuring COMMON-CASCADE-SOURCE with child sources (highest priority first)
+
+     1. Environment variables with prefix mapping
+        MY_PROGRAM_LOGGING_APPENDER=file (mapped to logging.appender) -> "file"
+
+     2. Configuring CONFIG-FILE-CASCADE-SOURCE with child sources (highest priority first)
+
+        1. Current directory file "my-program.conf" does not exist
+
+        2. User config file "/home/jmoringe/.config/my-program.conf" does not exist
+
+        3. System-wide config file "/etc/my-program.conf" does not exist
+
+#+end_example
+
 * STARTED Integration with the =architecture.service-provider= System
 
   The [[https://github.com/scymtym/architecture.service-provider][architecture.service-provider system]] allows defining services
