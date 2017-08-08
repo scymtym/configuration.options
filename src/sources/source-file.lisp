@@ -1,6 +1,6 @@
 ;;;; source-file.lisp --- Source for options from configuration files.
 ;;;;
-;;;; Copyright (C) 2011-2016 Jan Moringen
+;;;; Copyright (C) 2011-2017 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -24,7 +24,14 @@
                       :initform :error
                       :documentation
                       "Stores the behavior in case the specified file
-                       does not exist."))
+                       does not exist.")
+   (description       :initarg  :description
+                      :type     (or null string)
+                      :reader   source-description
+                      :initform nil
+                      :documentation
+                      "A description of the role the file source plays
+                       in the configuration scheme."))
   (:default-initargs
    :stream   (load-time-value (make-string-input-stream "") t)
    :pathname (missing-required-initarg 'file-source :pathname))

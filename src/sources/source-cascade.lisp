@@ -148,8 +148,11 @@
        (call-next-method
         instance slot-names
         :sources (mapcar (lambda (file)
-                           (let+ (((file &ign) (ensure-list file)))
-                             (list* :file :pathname file other-args)))
+                           (let+ (((file description) (ensure-list file)))
+                             (list* :file
+                                    :pathname    file
+                                    :description description
+                                    other-args)))
                          files))))))
 
 (defmethod print-items:print-items append ((object config-file-cascade-source))
