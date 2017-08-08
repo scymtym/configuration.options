@@ -94,10 +94,6 @@
      (1              (and real integer)         t)
      (0.5d0          (and real integer)         nil))))
 
-(defclass mock-type-based-merging-schema-item (mock-typed-schema-item
-                                               type-based-merging-mixin)
-  ())
-
 (test builtin-types.merge-values.smoke
   "Smoke test for methods on `merge-values' and
    `merge-values-using-type' for `type-based-merging-mixin'."
@@ -133,10 +129,6 @@
      (((1 :inherit) (2))           (list integer :inherit? t) ((1 2) t))
      (((1) (2  :inherit))          (list integer :inherit? t) ((1)   t))
      (((1 :inherit) (2  :inherit)) (list integer :inherit? t) ((1 2) t)))))
-
-(defclass mock-type-based-conversion-schema-item (mock-typed-schema-item
-                                                  type-based-conversion-mixin)
-  ())
 
 (test builtin-types.value<->string.smoke
   "Smoke test for methods on `value->string', `raw->value',
