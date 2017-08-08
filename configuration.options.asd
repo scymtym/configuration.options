@@ -9,7 +9,7 @@
   :maintainer     "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :version        (:read-file-form "version-string.sexp")
   :license        "LLGPLv3" ; see COPYING file for details.
-  :description    "A simple options system that supports multiple options sources."
+  :description    "An extensible configuration system that supports multiple option sources."
   :homepage       "https://github.com/scymtym/configuration.options"
   :bug-tracker    "https://github.com/scymtym/configuration.options/issues"
   :source-control (:git "https://github.com/scymtym/configuration.options.git")
