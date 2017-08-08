@@ -42,7 +42,10 @@
                                  (:file       "synchronizer")
 
                                  (:file       "macros")
-                                 (:file       "let-plus")))
+                                 (:file       "let-plus")
+
+                                 ;; Debugging
+                                 (:file       "debug")))
 
                    (:module     "sources"
                     :pathname   "src/sources"
@@ -93,7 +96,10 @@
                               (:file       "synchronizer")
 
                               (:file       "macros")
-                              (:file       "let-plus")))
+                              (:file       "let-plus")
+
+                              ;; Debugging
+                              (:file       "debug")))
 
                 (:module     "sources"
                  :pathname   "test/sources"
