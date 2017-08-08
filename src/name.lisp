@@ -1,6 +1,6 @@
 ;;;; name.lisp --- Option names.
 ;;;;
-;;;; Copyright (C) 2013, 2015, 2016 Jan Moringen
+;;;; Copyright (C) 2013, 2015, 2016, 2017 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -144,8 +144,8 @@
                          &key
                          start1 end1
                          start2 end2)
-  (let ((end1 (or end1 (length query)))
-        (end2 (or end2 (length name))))
+  (let ((end1 (or end1 (length (#+sbcl progn #-sbcl name-components query))))
+        (end2 (or end2 (length (#+sbcl progn #-sbcl name-components name)))))
     (map-query-alignments (lambda (total? end1 end2)
                             (declare (ignore end1 end2))
                             (when total? (return-from name-matches t)))

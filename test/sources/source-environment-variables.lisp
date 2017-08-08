@@ -23,7 +23,7 @@
     (let* ((prefix      (concatenate 'string prefix "_"))
            (name        (format nil "~A~A" prefix rest))
            (value       "value")
-           (entry       (format nil "~A=~A" name value))
+           #+sbcl (entry       (format nil "~A=~A" name value))
            #+sbcl (option-name (split-sequence:split-sequence
                                 #\_ (string-downcase rest))))
       (with-environment-variable (name value)
@@ -39,7 +39,7 @@
 
   (for-all ((name (gen-ascii-name)))
     (let* ((value "value")
-           (entry (format nil "~A=~A" name value)))
+           #+sbcl (entry (format nil "~A=~A" name value)))
       (with-environment-variable (name value)
         (with-source-and-sink ((:environment-variables
                                 :name-mapping (lambda (name1)

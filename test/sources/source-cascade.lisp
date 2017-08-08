@@ -21,7 +21,7 @@
            (config-file-2      (format nil "/tmp/~A.conf" file-name-2))
            (environment-prefix (concatenate 'string environment-prefix "_"))
            (environment-name   (format nil "~AA_B" environment-prefix))
-           (environment-entry  (format nil "~AA_B=1" environment-prefix)))
+           #+sbcl (environment-entry  (format nil "~AA_B=1" environment-prefix)))
       (with-environment-variable (environment-name "1")
         (with-files ((config-file-1 "a.b=2 b.c=3 d=4"))
           (with-source-and-sink
@@ -187,7 +187,7 @@
              (basename/safe      (substitute #\_ #\! basename))
              (environment-prefix (concatenate 'string basename/safe "_"))
              (environment-name   (format nil "~AB_C" environment-prefix))
-             (environment-entry  (format nil "~A=1" environment-name))
+             #+sbcl (environment-entry  (format nil "~A=1" environment-name))
              (offset             (if (service-provider:find-provider
                                       'configuration.options.sources::source :commandline
                                       :if-does-not-exist nil)
