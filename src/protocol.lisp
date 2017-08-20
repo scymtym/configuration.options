@@ -510,7 +510,8 @@
   (check-type interpret-wildcards? wildcard-interpretation)
   (map-options
    (named-lambda match (option &rest args &key (prefix '()) &allow-other-keys)
-     (let+ ((name (option-name option))
+     (let+ ((prefix-length (length prefix))
+            (name          (option-name option))
             ((&flet match-rest (offset)
                (when (case interpret-wildcards?
                        ((nil)      (name-equal query name :start1 offset))
@@ -523,23 +524,23 @@
           (match-rest 0))
          ((eq interpret-wildcards? nil)
           (match-rest (or (nth-value
-                           1 (name-equal query prefix :end1 (length prefix)))
-                          (length prefix))))
+                           1 (name-equal query prefix :end1 prefix-length))
+                          prefix-length)))
          ((eq interpret-wildcards? :query)
           (map-query-alignments
            (lambda (total? end1 end2)
              (declare (ignore total?))
-             (when (= end2 (length prefix))
+             (when (= end2 prefix-length)
                (match-rest end1)))
            (name-components query)  0 (length (#+sbcl progn #-sbcl name-components query))
-           (name-components prefix) 0 (length (#+sbcl progn #-sbcl name-components prefix))))
+           (name-components prefix) 0 prefix-length))
          (t ; implies (eq interpret-wildcards? :container)
           (map-query-alignments
            (lambda (total? end1 end2)
              (declare (ignore total?))
-             (when (= end1 (length prefix))
+             (when (= end1 prefix-length)
                (match-rest end2)))
-           (name-components prefix) 0 (length (#+sbcl progn #-sbcl name-components prefix))
+           (name-components prefix) 0 prefix-length
            (name-components query)  0 (length (#+sbcl progn #-sbcl name-components query)))))))
    container))
 
