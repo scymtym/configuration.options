@@ -30,7 +30,8 @@
   ("baz" ("foo" :type 'string))
   (:wild :type 'boolean)
   (("wild" :wild-inferiors) :type 'symbol)
-  ("sub" *simple-sub-schema*))
+  ("sub" *simple-sub-schema*)
+  ("sub" ("sub" *simple-sub-schema*)))
 
 (defun simple-schema-item (&key
                            (name    '("simple" "option"))

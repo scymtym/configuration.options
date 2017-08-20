@@ -523,9 +523,11 @@
          ((null prefix)
           (match-rest 0))
          ((eq interpret-wildcards? nil)
-          (match-rest (or (nth-value
-                           1 (name-equal query prefix :end1 prefix-length))
-                          prefix-length)))
+          (when (<= prefix-length
+                    (length (#+sbcl progn #-sbcl name-components query)))
+            (match-rest (or (nth-value
+                             1 (name-equal query prefix :end1 prefix-length))
+                            prefix-length))))
          ((eq interpret-wildcards? :query)
           (map-query-alignments
            (lambda (total? end1 end2)

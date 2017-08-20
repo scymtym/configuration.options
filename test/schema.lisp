@@ -33,7 +33,10 @@
                         (loop :for item :in (options sub-schema)
                            :collect (list item
                                           :container sub-schema
-                                          :prefix    '("sub"))))))
+                                          :prefix    '("sub"))
+                           :collect (list item
+                                          :container sub-schema
+                                          :prefix    '("sub" "sub"))))))
       (test-case schema expected))))
 
 (test standard-schema.find-options.smoke
@@ -222,9 +225,17 @@
                          │ ├─whoop~@
                          │ │   Type    STRING~@
                          │ │   Default <no default>~@
-                         │ └─*~@
-                         │     Type    INTEGER~@
-                         │     Default <no default>~@
+                         │ ├─*~@
+                         │ │   Type    INTEGER~@
+                         │ │   Default <no default>~@
+                         │ └─sub~@
+                         │   │ Simple schema for inclusion in a parent schema.~@
+                         │   ├─whoop~@
+                         │   │   Type    STRING~@
+                         │   │   Default <no default>~@
+                         │   └─*~@
+                         │       Type    INTEGER~@
+                         │       Default <no default>~@
                          └─wild~@
                          ~0@T  └─**~@
                          ~0@T      Type    SYMBOL~@

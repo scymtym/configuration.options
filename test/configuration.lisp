@@ -81,10 +81,15 @@
                          │     Default <no default>~@
                          │     Value   <no value>~@
                          └─sub~@
-                         ~0@T  └─whoop~@
-                         ~0@T      Type    STRING~@
-                         ~0@T      Default <no default>~@
-                         ~0@T      Value   <no value>")))))
+                         ~0@T  ├─whoop~@
+                         ~0@T  │   Type    STRING~@
+                         ~0@T  │   Default <no default>~@
+                         ~0@T  │   Value   <no value>~@
+                         ~0@T  └─sub~@
+                         ~0@T    └─whoop~@
+                         ~0@T        Type    STRING~@
+                         ~0@T        Default <no default>~@
+                         ~0@T        Value   <no value>")))))
 
 (def-suite standard-option
   :in options
