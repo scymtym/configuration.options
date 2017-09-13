@@ -19,8 +19,8 @@
                               ,(value->type (cdr value)))))))
     `(or ,@(mapcar #'value->type values))))
 
-(defun provider-designator/cons->value (designator)
-  (format nil "~{~A~^/~}" designator))
+(defun provider-designator/cons->string (designator)
+  (format nil "~(~{~A~^/~}~)" designator))
 
 (defmethod validate-value-using-type ((schema-item type-based-validation-mixin)
                                       (value       t)
@@ -38,8 +38,7 @@
                                      (value       cons)
                                      (type        (eql 'provider-designator-member))
                                      &key &allow-other-keys)
-  (let ((*print-case* :downcase))
-    (provider-designator/cons->value value)))
+  (provider-designator/cons->string value))
 
 (defmethod raw->value-using-type ((schema-item type-based-conversion-mixin)
                                   (raw         string)
@@ -47,7 +46,7 @@
                                   &key inner-type &allow-other-keys)
   (flet ((maybe-print (value)
            (etypecase value
-             (cons   (provider-designator/cons->value value))
-             (symbol value))))
-    (or (find raw inner-type :key #'maybe-print :test #'string-equal)
+             (cons   (provider-designator/cons->string value))
+             (symbol (string-downcase value)))))
+    (or (find raw inner-type :key #'maybe-print :test #'string=)
         (error "~@<~S does not designate a provider.~@:>" raw))))

@@ -35,7 +35,10 @@
   (mapc (lambda+ ((type-args string value))
           (check-value<->string
            `(provider-designator-member ,@type-args) string value))
-        '(((:foo (:baz :fez)) "foo"     :foo)
+        '(((:foo)             "foo"     :foo)
+          ((:foo)             "FOO"     option-syntax-error)
+
+          ((:foo (:baz :fez)) "foo"     :foo)
           ((:foo (:baz :fez)) "baz/fez" (:baz :fez))
           ((:foo (:baz :fez)) "bar"     option-syntax-error)
 
