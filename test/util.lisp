@@ -82,7 +82,9 @@
   ())
 
 (defun check-value<->string (type string value
-                             &key (value-test #'equal))
+                             &key
+                             (value-test #'equal)
+                             (string2    string))
   (let+ ((schema-item (make-instance
                        'mock-type-based-conversion-schema-item
                        :type type))
@@ -93,5 +95,5 @@
        (signals option-syntax-error
          (raw->value schema-item string)))
       (t
-       (is (equal  string (value->string schema-item value)))
-       (is (value= value  (raw->value schema-item string)))))))
+       (is (equal  string2 (value->string schema-item value)))
+       (is (value= value   (raw->value schema-item string)))))))

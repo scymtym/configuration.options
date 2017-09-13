@@ -98,13 +98,7 @@
   "Smoke test for methods on `merge-values' and
    `merge-values-using-type' for `type-based-merging-mixin'."
   (mapc
-   (lambda+ ((values type expected))
-     (let+ ((schema-item (make-instance
-                          'mock-type-based-merging-schema-item
-                          :type type)))
-       (is (equal expected
-                  (multiple-value-list
-                   (merge-values schema-item values))))))
+   (curry #'apply #'check-merge-values)
 
    '((()                           boolean                    (nil   nil))
      ((nil)                        boolean                    (nil   t))
@@ -136,16 +130,7 @@
    `type-based-conversion-mixin'."
   (mapc
    (lambda+ ((type string value &optional (string2 string)))
-     (let+ ((schema-item (make-instance
-                          'mock-type-based-conversion-schema-item
-                          :type type)))
-       (case value
-         (option-syntax-error
-          (signals option-syntax-error
-            (raw->value schema-item string)))
-         (t
-          (is (equal string2 (value->string schema-item value)))
-          (is (equal value   (raw->value schema-item string)))))))
+     (check-value<->string type string value :string2 string2))
 
    `((null                       ""                 option-syntax-error)
      (null                       "1"                option-syntax-error)
