@@ -41,9 +41,11 @@
   :depends-on  (:alexandria
                 (:version :let-plus                                 "0.2")
 
+                (:version :fiveam                                   "1.3")
+
                 (:version :configuration.options-source-commandline (:read-file-form "version-string.sexp"))
 
-                (:version :fiveam                                   "1.3"))
+                (:version :configuration.options/test               (:read-file-form "version-string.sexp")))
   :encoding    :utf-8
   :components  ((:module     "commandline"
                  :pathname   "test/sources/commandline"
