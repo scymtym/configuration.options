@@ -22,7 +22,11 @@
   (let ((symbol (typecase type-specifier
                   (symbol type-specifier)
                   (cons   (first type-specifier)))))
-    (if (eq (symbol-package symbol)
-            (load-time-value (find-package '#:common-lisp) t))
-        type-specifier
-        (typexpand-1 type-specifier))))
+    (cond
+      ((eq (symbol-package symbol)
+           (load-time-value (find-package '#:common-lisp) t))
+       type-specifier)
+      ((get symbol 'dont-expand)
+       type-specifier)
+      (t
+       (typexpand-1 type-specifier)))))
