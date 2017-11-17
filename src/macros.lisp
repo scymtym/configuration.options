@@ -109,7 +109,7 @@
    where SCHEMA-VALUE is evaluated and has to return a schema object.
 
    The arguments of the type and default keyword parameters are
-   evaluated.
+   evaluated in the null lexical environment.
 
    When DOCSTRING-AND-SPECS starts with a documentation string, it is
    used as the documentation string of the toplevel schema object.
