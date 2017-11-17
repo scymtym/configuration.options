@@ -982,8 +982,8 @@
 
 (defgeneric raw->value (schema-item raw)
   (:documentation
-   "Parse RAW and return a value object taking into properties of
-    SCHEMA-ITEM."))
+   "Parse RAW and return a value object taking into account properties
+    of SCHEMA-ITEM."))
 
 (defgeneric value->string-using-type (schema-item value type &key inner-type)
   (:documentation
