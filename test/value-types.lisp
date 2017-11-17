@@ -187,6 +187,7 @@
      ((or boolean integer)       "true"             t)
      ((or boolean integer)       "1"                1)
      ((or boolean integer)       "2"                2)
+     ((or integer pathname)      "/foo/bar"         #P"/foo/bar")
 
      ((and real integer)         ""                 option-syntax-error)
      ((and real integer)         "FOO"              option-syntax-error)

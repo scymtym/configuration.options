@@ -117,7 +117,7 @@
                                   (raw         string)
                                   (type        (eql 'pathname))
                                   &key &allow-other-keys)
-  (parse-namestring raw))
+  (values (parse-namestring raw)))
 
 ;;; type `list'
 
