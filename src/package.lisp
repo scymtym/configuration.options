@@ -189,9 +189,10 @@
    #:&options/synchronizer)
 
   (:documentation
-   "This package contains, options and option containers which are
-    either parts of a configuration or of a schema. Thus, the basic
-    structure is as follows:
+   "Options and option containers which are either parts of a
+    configuration or of a schema.
+
+    The basic structure is as follows:
 
     Concept           | Protocol                   | Class(es)                |
     ------------------+----------------------------+--------------------------+
