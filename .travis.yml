@@ -6,29 +6,25 @@ env: PREFIX="$(pwd)/sbcl"
      SBCL_OPTIONS="--noinform --no-userinit"
 
 install:
-  - curl -L sbcl.tar.bz2 "${SBCL_DOWNLOAD_URL}" | tar -xj
+  - curl -L "${SBCL_DOWNLOAD_URL}" | tar -xj
   - ( cd sbcl-* && INSTALL_ROOT="${PREFIX}" sh install.sh )
 
   - curl -o cl "${CL_LAUNCH_DOWNLOAD_URL}"
   - chmod +x cl
 
   - curl -o quicklisp.lisp "${QUICKLISP_DOWNLOAD_URL}"
-  - ./cl -L quicklisp.lisp '(quicklisp-quickstart:install :path "quicklisp/")'
-
-  - ( cd quicklisp/local-projects
-      && git clone http://github.com/scymtym/parser.ini )
+  - ./cl -L quicklisp.lisp '(quicklisp-quickstart:install)'
 
 script:
   - ./cl
       -S '(:source-registry (:directory "'$(pwd)'") :ignore-inherited-configuration)'
-      -e '(load "quicklisp/setup.lisp")'
-      -e '(ql:register-local-projects)'
-      -e '(ql:quickload (list :configuration.options/test
-                              :configuration.options-syntax-ini/test
-                              :configuration.options-syntax-xml/test
-                              :configuration.options-source-commandline/test
-                              :configuration.options-and-mop/test
-                              :configuration.options-and-service-provider/test))'
+      -Q
+      -s configuration.options/test
+      -s configuration.options-syntax-ini/test
+      -s configuration.options-syntax-xml/test
+      -s configuration.options-source-commandline/test
+      -s configuration.options-and-mop/test
+      -s configuration.options-and-service-provider/test
       '(or (every (function identity)
                   (mapcar (function funcall)
                           (quote (configuration.options.test:run-tests
