@@ -1,30 +1,31 @@
 ;;;; configuration.options.asd --- System definition for the configuration.options system.
 ;;;;
-;;;; Copyright (C) 2011-2017 Jan Moringen
+;;;; Copyright (C) 2011-2018 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
-(defsystem :configuration.options
+(defsystem "configuration.options"
+  :description    "An extensible configuration system that supports multiple option sources."
+  :license        "LLGPLv3" ; see COPYING file for details.
   :author         "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :maintainer     "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
-  :version        (:read-file-form "version-string.sexp")
-  :license        "LLGPLv3" ; see COPYING file for details.
-  :description    "An extensible configuration system that supports multiple option sources."
   :homepage       "https://github.com/scymtym/configuration.options"
   :bug-tracker    "https://github.com/scymtym/configuration.options/issues"
   :source-control (:git "https://github.com/scymtym/configuration.options.git")
-  :depends-on     (:alexandria
-                   :split-sequence
-                   (:version :let-plus                      "0.2")
-                   (:version :more-conditions               "0.3")
-                   (:version :utilities.print-items         "0.1")
-                   (:version :utilities.print-tree          "0.1")
-                   (:version :cl-hooks            "0.2") ; TODO
-                   (:version :architecture.service-provider "0.1")
-                   :log4cl
 
-                   (:version :esrap                         "0.9"))
-  :encoding       :utf-8
+  :version        (:read-file-form "version-string.sexp")
+  :depends-on     ("alexandria"
+                   "split-sequence"
+                   (:version "let-plus"                      "0.2")
+                   (:version "more-conditions"               "0.3")
+                   (:version "utilities.print-items"         "0.1")
+                   (:version "utilities.print-tree"          "0.1")
+                   (:version "cl-hooks"            "0.2") ; TODO
+                   (:version "architecture.service-provider" "0.1")
+                   "log4cl"
+
+                   (:version "esrap"                         "0.9"))
+
   :components     ((:module     "src"
                     :serial     t
                     :components ((:file       "package")
@@ -68,21 +69,22 @@
                                  (:file       "source-file")
                                  (:file       "source-cascade"))))
 
-  :in-order-to    ((test-op (test-op :configuration.options/test))))
+  :in-order-to    ((test-op (test-op "configuration.options/test"))))
 
-(defsystem :configuration.options/test
+(defsystem "configuration.options/test"
+  :description "Unit tests for the configuration.options system."
+  :license     "LLGPLv3" ; see COPYING file for details.
   :author      "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :maintainer  "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
+
   :version     (:read-file-form "version-string.sexp")
-  :license     "LLGPLv3" ; see COPYING file for details.
-  :description "Unit tests for the configuration.options system."
-  :depends-on  (:alexandria
-                (:version :let-plus              "0.2")
+  :depends-on  ("alexandria"
+                (:version "let-plus"              "0.2")
 
-                (:version :configuration.options (:read-file-form "version-string.sexp"))
+                (:version "configuration.options" (:read-file-form "version-string.sexp"))
 
-                (:version :fiveam                "1.3"))
-  :encoding    :utf-8
+                (:version "fiveam"                "1.3"))
+
   :components  ((:module     "test"
                  :serial     t
                  :components ((:file       "package")
@@ -119,8 +121,7 @@
                               (:file       "source-environment-variables")
                               (:file       "source-stream")
                               (:file       "source-file")
-                              (:file       "source-cascade")))))
+                              (:file       "source-cascade"))))
 
-(defmethod perform ((operation test-op)
-                    (component (eql (find-system :configuration.options/test))))
-  (uiop:symbol-call '#:configuration.options.test '#:run-tests))
+  :perform     (test-op (operation component)
+                 (uiop:symbol-call '#:configuration.options.test '#:run-tests)))
