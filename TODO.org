@@ -36,7 +36,11 @@
 
 * Features [1/4]
 
-** STARTED Syntax [2/5]
+** STARTED Syntax [2/6]
+
+*** TODO Better parse error reports
+
+    Maybe use text.source-location for all error reports?
 
 *** TODO Sexp Syntax
 
