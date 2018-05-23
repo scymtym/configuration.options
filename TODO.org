@@ -1,69 +1,103 @@
 #+SEQ_TODO: TODO STARTED | CANCELED DONE
 
 * Problems [0/2]
+
 ** TODO Environment Variable Source and Option Names
+
    Environment variables cannot have arbitrary names. In particular,
    the "?" and "-" characters are not allowed. How can we name an
    option/schema item with such a name in an environment variable?
+
 ** TODO Environment Variables and Information Separator
+
    Some shells (only fish?) treat list-valued environment variables
    unusually:
+
    #+BEGIN_SRC fish
      set -x FOO bar baz
    #+END_SRC
+
    results in an environment entry =FOO=bar\x1ebaz= where the =\x1e=
    character is apparent the "information separator".
+
 * TODO Design [0/3]
+
 ** TODO Escapes in name syntax
+
    Should we use =foo\.bar= or ="foo.bar"=?
+
 ** TODO ~option-class~ and ~option-cell-class~
+
    1. Think through
    2. Document
    3. Implement
+
 ** TODO Evaluate using trie data structure in option containers
+
 * Features [1/4]
+
 ** STARTED Syntax [2/5]
+
 *** TODO Sexp Syntax
+
     Something like
+
     #+BEGIN_SRC lisp
       ("foo"
        (("bar" "baz") 1)
        ("fez"         t))
     #+END_SRC
+
 *** TODO Lisp Syntax
+
     #+BEGIN_SRC lisp
       (if (string= (machine-type) "x86_64")
           (value  "foo.bar.dir" "foo/x86_64")
           (values "foo.baz.dir" "foo"))
     #+END_SRC
+
 *** TODO YAML Syntax
+
     #+BEGIN_SRC yaml
       - foo:
         - bar:
           - baz: 1
         - fez: true
     #+END_SRC
+
 *** DONE INI Syntax
+
     #+BEGIN_SRC conf
       [foo.bar]
       baz = 1
       [foo]
       fez = true
     #+END_SRC
+
 *** DONE XML Syntax
+
     #+BEGIN_SRC xml
       <configuration>
         <option name="foo.bar.baz">1</option>
         <option name="foo.fez">true</option>
       </configuration>
     #+END_SRC
+
 ** TODO Making options not have a value
+
    Do we have something along the lines of ~makunbound~? If not, add
    it.
+
 ** DONE Special-case empty configuration/schema in ~describe~
+
    Print something like =<empty>= to avoid confusing empty output.
+
 ** TODO Enforce non-wild option names in ~configuration~ container
+
 * TODO Refactoring [0/2]
+
 ** TODO Unify vocabulary
+
    + options vs. configurations in RSB scopes
+
 ** TODO Separate type and inheritance behavior for values
