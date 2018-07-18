@@ -1,6 +1,6 @@
 ;;;; package.lisp --- Package definition for cl-options system.
 ;;;;
-;;;; Copyright (C) 2011-2017 Jan Moringen
+;;;; Copyright (C) 2011-2018 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -142,6 +142,11 @@
    #:raw->value
    #:value->string-using-type
    #:raw->value-using-type)
+
+  ;; Value types
+  (:export
+   #:file-pathname
+   #:directory-pathname)
 
   ;; Option protocol
   (:export

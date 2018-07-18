@@ -1,6 +1,6 @@
 ;;;; value-types.lisp --- Conversion and validation methods for some value types.
 ;;;;
-;;;; Copyright (C) 2013, 2016, 2017 Jan Moringen
+;;;; Copyright (C) 2013-2018 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -118,6 +118,43 @@
                                   (type        (eql 'pathname))
                                   &key &allow-other-keys)
   (values (parse-namestring raw)))
+
+;;; type `file-pathname'
+
+(deftype file-pathname ()
+  `(and pathname (satisfies uiop:file-pathname-p)))
+
+(defmethod value->string-using-type ((schema-item type-based-conversion-mixin)
+                                     (value       pathname)
+                                     (type        (eql 'file-pathname))
+                                     &key &allow-other-keys)
+  (namestring value))
+
+(defmethod raw->value-using-type ((schema-item type-based-conversion-mixin)
+                                  (raw         string)
+                                  (type        (eql 'file-pathname))
+                                  &key &allow-other-keys)
+  (let ((pathname (parse-namestring raw)))
+    (unless (typep pathname 'file-pathname)
+      (error "~@<~S is not a file name.~@:>" raw))
+    pathname))
+
+;;; type `directory-pathname'
+
+(deftype directory-pathname ()
+  `(and pathname (satisfies uiop:directory-pathname-p)))
+
+(defmethod value->string-using-type ((schema-item type-based-conversion-mixin)
+                                     (value       pathname)
+                                     (type        (eql 'directory-pathname))
+                                     &key &allow-other-keys)
+  (namestring value))
+
+(defmethod raw->value-using-type ((schema-item type-based-conversion-mixin)
+                                  (raw         string)
+                                  (type        (eql 'directory-pathname))
+                                  &key &allow-other-keys)
+  (uiop:ensure-directory-pathname (parse-namestring raw)))
 
 ;;; type `list'
 

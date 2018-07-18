@@ -1,6 +1,6 @@
 ;;;; value-types.lisp --- Tests for validation and conversion of builtin types.
 ;;;;
-;;;; Copyright (C) 2013, 2016, 2017 Jan Moringen
+;;;; Copyright (C) 2013-2018 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -160,8 +160,19 @@
      ((member :|foo| :|bar|)     "BAR"              :|bar|)
 
      (pathname                   "a"                ,#P"a")
+     (pathname                   "a/"               ,#P"a/")
      (pathname                   "a.b"              ,#P"a.b")
      (pathname                   "a/b"              ,#P"a/b")
+
+     (file-pathname              "a"                ,#P"a")
+     (file-pathname              "a/"               option-syntax-error)
+     (file-pathname              "a.b"              ,#P"a.b")
+     (file-pathname              "a/b"              ,#P"a/b")
+
+     (directory-pathname         "a"                ,#P"a/"        "a/")
+     (directory-pathname         "a/"               ,#P"a/")
+     (directory-pathname         "a.b"              ,#P"a.b/"      "a.b/")
+     (directory-pathname         "a/b"              ,#P"a/b/"      "a/b/")
 
      ((list integer)             ""                 option-syntax-error)
      ((list integer)             "1"                (1))
