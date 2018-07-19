@@ -139,6 +139,57 @@
              Package/module/component log level.
    #+end_example
 
+*** STARTED Types
+
+    As demonstrated [[*Specifying a Schema][above]], each schema item has an associated type
+    that describes the allowed values of associated options, as types
+    tend to do. In addition to that, types are used to control the
+    parsing and unparsing of option values. For better or worse,
+    schema item types are specified using Common Lisp type specifiers
+    such as ~(member :info :warning :error)~ in the above example. The
+    validation, parsing and unparsing behavior for types is
+    implemented using an extensible protocol. This protocol is used
+    by, for example, the =configuration.options-and-puri= system to
+    add support for additional types.
+
+    The builtin types are:
+
+    #+BEGIN_SRC lisp :results value table :exports results
+      (sort
+       (remove-duplicates
+        (alexandria:mappend
+         (lambda (method)
+           (let ((specializer (third (c2mop:method-specializers method))))
+             (when (typep specializer 'c2mop:eql-specializer)
+               (let* ((type-specifier (c2mop:eql-specializer-object specializer))
+                      (documentation  (documentation type-specifier 'type))
+                      (description    (cond
+                                        ((eq (symbol-package type-specifier)
+                                             (find-package '#:common-lisp))
+                                         "«standard»")
+                                        (documentation
+                                         (first-line-or-less documentation))
+                                        (t
+                                         "«not documented»"))))
+                 (list (list type-specifier description))))))
+         (c2mop:generic-function-methods #'configuration.options:value->string-using-type))
+        :test #'eq :key #'first)
+       #'string-lessp :key #'first)
+    #+END_SRC
+
+    #+RESULTS:
+    | AND                                                               | «standard»                                                     |
+    | BOOLEAN                                                           | «standard»                                                     |
+    | CONFIGURATION.OPTIONS:DIRECTORY-PATHNAME                          | A pathname syntactically suitable for designating a directory. |
+    | CONFIGURATION.OPTIONS:FILE-PATHNAME                               | A pathname syntactically suitable for designating a file.      |
+    | INTEGER                                                           | «standard»                                                     |
+    | LIST                                                              | «standard»                                                     |
+    | MEMBER                                                            | «standard»                                                     |
+    | NULL                                                              | «standard»                                                     |
+    | OR                                                                | «standard»                                                     |
+    | PATHNAME                                                          | «standard»                                                     |
+    | STRING                                                            | «standard»                                                     |
+
 *** TODO Sub-schemata
 
 ** Constructing and Populating a Configuration
