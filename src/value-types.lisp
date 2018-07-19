@@ -122,6 +122,11 @@
 ;;; type `file-pathname'
 
 (deftype file-pathname ()
+  "A pathname syntactically suitable for designating a file.
+
+   For example, a pathname without a name component, commonly written
+   as \"foo/bar/\", i.e. with a trailing \"/\", cannot designate a
+   file."
   `(and pathname (satisfies uiop:file-pathname-p)))
 
 (defmethod value->string-using-type ((schema-item type-based-conversion-mixin)
@@ -142,6 +147,11 @@
 ;;; type `directory-pathname'
 
 (deftype directory-pathname ()
+  "A pathname syntactically suitable for designating a directory.
+
+   The pathname must have a directory but no name or type
+   component. Such pathnames are commonly written as \"foo/bar/\",
+   i.e. with a trailing \"/\"."
   `(and pathname (satisfies uiop:directory-pathname-p)))
 
 (defmethod value->string-using-type ((schema-item type-based-conversion-mixin)
