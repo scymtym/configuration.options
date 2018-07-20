@@ -129,6 +129,8 @@
    file."
   `(and pathname (satisfies uiop:file-pathname-p)))
 
+(setf (get 'file-pathname 'dont-expand) t)
+
 (defmethod value->string-using-type ((schema-item type-based-conversion-mixin)
                                      (value       pathname)
                                      (type        (eql 'file-pathname))
@@ -153,6 +155,8 @@
    component. Such pathnames are commonly written as \"foo/bar/\",
    i.e. with a trailing \"/\"."
   `(and pathname (satisfies uiop:directory-pathname-p)))
+
+(setf (get 'directory-pathname 'dont-expand) t)
 
 (defmethod value->string-using-type ((schema-item type-based-conversion-mixin)
                                      (value       pathname)
