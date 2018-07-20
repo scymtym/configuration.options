@@ -1,6 +1,6 @@
 ;;;; package.lisp --- Package definition for sources.commandline module.
 ;;;;
-;;;; Copyright (C) 2011-2016 Jan Moringen
+;;;; Copyright (C) 2011-2018 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -9,7 +9,6 @@
    #:cl
    #:alexandria
    #:split-sequence
-   #:iterate
    #:let-plus
    #:more-conditions
    #:print-items

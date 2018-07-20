@@ -1,6 +1,6 @@
 ;;;; syntax-xml.lisp --- Use XML documents as configuration sources.
 ;;;;
-;;;; Copyright (C) 2012, 2013, 2015, 2016 Jan Moringen
+;;;; Copyright (C) 2012-2018 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -84,19 +84,20 @@
     (xloc:with-locations-r/o (((:loc options) option-pattern
                                :if-multiple-matches :all))
         document
-      (iter (for option in options)
-            (restart-case
-                (xloc:with-locations-r/o ((name  name-pattern)
-                                          (value value-pattern))
-                    option
-                  (let+ ((name (parse-name name :wild-allowed nil))
-                         ((&flet notify (event &optional value)
-                            (notify sink event name value
-                                    :source (syntax-source syntax)))))
-                    (notify :added)
-                    (notify :new-value value)))
-              (continue (&optional condition)
-                :report (lambda (stream)
-                          (format stream "~@<Ignore option ~A.~@:>" option))
-                (declare (ignore condition)))))))
+      (map nil (lambda (option)
+                 (restart-case
+                     (xloc:with-locations-r/o ((name  name-pattern)
+                                               (value value-pattern))
+                       option
+                       (let+ ((name (parse-name name :wild-allowed nil))
+                              ((&flet notify (event &optional value)
+                                 (notify sink event name value
+                                         :source (syntax-source syntax)))))
+                         (notify :added)
+                         (notify :new-value value)))
+                   (continue (&optional condition)
+                     :report (lambda (stream)
+                               (format stream "~@<Ignore option ~A.~@:>" option))
+                     (declare (ignore condition)))))
+           options)))
   (values))

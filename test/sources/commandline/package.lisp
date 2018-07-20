@@ -1,6 +1,6 @@
 ;;;; package.lisp --- Package definition for unit tests of the sources.commandline module.
 ;;;;
-;;;; Copyright (C) 2013, 2016 Jan Moringen
+;;;; Copyright (C) 2013-2018 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -8,7 +8,6 @@
   (:use
    #:cl
    #:alexandria
-   #:iterate
    #:let-plus
 
    #:fiveam

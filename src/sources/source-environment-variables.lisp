@@ -1,6 +1,6 @@
 ;;;; source-environment-variables.lisp --- Options from environment variables.
 ;;;;
-;;;; Copyright (C) 2011-2017 Jan Moringen
+;;;; Copyright (C) 2011-2018 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -75,10 +75,11 @@
     (with-source-debug ("Environment variables~@[ ~/print-items:format-print-items/~]"
                         (remove :mapping (print-items:print-items source)
                                 :test-not #'eq :key #'first))
-      (iter (for entry in #+sbcl (sb-ext:posix-environ)
-                 #-sbcl '())
-            (with-simple-restart (continue "~@<Skip entry ~S.~@:>" entry)
-              (variable->option entry))))))
+      (map nil (lambda (entry)
+                 (with-simple-restart (continue "~@<Skip entry ~S.~@:>" entry)
+                   (variable->option entry)))
+           #+sbcl (sb-ext:posix-environ)
+           #-sbcl '()))))
 
 (defmethod print-items:print-items append ((object environment-variables-source))
   (let* ((mapping (source-name-mapping object))

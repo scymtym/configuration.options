@@ -1,6 +1,6 @@
 ;;;; package.lisp --- Package definition for unit tests of the sources module.
 ;;;;
-;;;; Copyright (C) 2013, 2016 Jan Moringen
+;;;; Copyright (C) 2013-2018 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -9,7 +9,6 @@
    #:cl
    #:alexandria
    #:split-sequence
-   #:iterate
    #:let-plus
    #:more-conditions
 
@@ -70,13 +69,14 @@
   (declare (ignore source)))
 
 (defmethod process-content ((syntax mock-syntax) (source stream) (sink t))
-  (iter (for statement in (split-sequence
-                           #\Space (read-stream-content-into-string source)
-                           :remove-empty-subseqs t))
-        (let+ (((name value) (split-sequence #\= statement))
-               (name (parse-name (string-trim '(#\Space) name))))
-          (notify sink :added     name nil)
-          (notify sink :new-value name value :raw? t))))
+  (map nil (lambda (statement)
+             (let+ (((name value) (split-sequence #\= statement))
+                    (name (parse-name (string-trim '(#\Space) name))))
+               (notify sink :added     name nil)
+               (notify sink :new-value name value :raw? t)))
+       (split-sequence
+        #\Space (read-stream-content-into-string source)
+        :remove-empty-subseqs t)))
 
 ;;; Test utilities and macros
 
@@ -204,9 +204,9 @@
 
 (defun are-expected-sink-calls (calls/expected calls/actual)
   (and (is (= (length calls/expected) (length calls/actual)))
-       (iter (for call/actual   in calls/actual)
-             (for call/expected in calls/expected)
-             (is (equal call/expected call/actual)))))
+       (loop :for call/actual   :in calls/actual
+             :for call/expected :in calls/expected
+             :do (is (equal call/expected call/actual)))))
 
 (defmacro expecting-sink-calls ((&optional sink-var) &body expected)
   "Check the calls information stored in the `mock-sink' object which

@@ -1,6 +1,6 @@
 ;;;; source.lisp --- Source for commandline options.
 ;;;;
-;;;; Copyright (C) 2011-2016 Jan Moringen
+;;;; Copyright (C) 2011-2018 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -185,53 +185,56 @@
                     :source source :option option :raw? raw?))))
     ;; Try to retrieve all options defined in the schema. For options
     ;; which are actually present, notify SINK.
-    (iter (for (option . name) in mapping)
-          (restart-case
-              (let+ (((&values value source)
-                      (net.didierverna.clon:getopt :option  option
-                                               :context context)))
-                (when (and source (not (eq source :default)))
-                  (log:info "~@<Identified commandline option ~
+    (loop :for (option . name) :in mapping
+          :do (restart-case
+                  (let+ (((&values value source)
+                          (net.didierverna.clon:getopt :option  option
+                                                       :context context)))
+                    (when (and source (not (eq source :default)))
+                      (log:info "~@<Identified commandline option ~
                              ~/configuration.options:print-name/ -> ~A ~
                              with value ~S.~@:>"
-                            name option value)
-                  (notify name value option)))
-            (continue (&optional condition)
-              :report (lambda (stream)
-                        (format stream "~@<Skip option ~A.~@:>" option))
-              (declare (ignore condition)))))
+                                name option value)
+                      (notify name value option)))
+                (continue (&optional condition)
+                  :report (lambda (stream)
+                            (format stream "~@<Skip option ~A.~@:>" option))
+                  (declare (ignore condition)))))
 
     ;; Analyze remainder to find commandline arguments corresponding
     ;; to wildcard commandline options.
-    (let* ((prefix/dashes (concatenate 'string "--" prefix))
-           (strip-start   (length prefix/dashes)))
-      (iter (generate option in           (net.didierverna.clon:remainder
-                                           :context context))
-            (for      name-and-value next (next option))
-            (restart-case
-                (let+ (
-                       (index)
-                       ((&values name value)
-                        (cond
-                          ((not (starts-with-subseq
-                                 prefix/dashes name-and-value))
-                           nil)
-                          ((setf index (position #\= name-and-value))
-                           (values (subseq name-and-value strip-start index)
-                                   (subseq name-and-value (1+ index))))
-                          (t
-                           (values (subseq name-and-value strip-start)
-                                   (next option)))))
-                       (name/parsed (when name
-                                      (make-name (split-sequence #\- name)))))
+    (let+ ((prefix/dashes (concatenate 'string "--" prefix))
+           (strip-start   (length prefix/dashes))
+           ((&flet next ()
+              (net.didierverna.clon:remainder
+               :context context))))
+      (loop :for name-and-value = (next)
+            :while name-and-value
+            :do (restart-case
+                    (let+ (
+                           (index)
+                           ((&values name value)
+                            (cond
+                              ((not (starts-with-subseq
+                                     prefix/dashes name-and-value))
+                               nil)
+                              ((setf index (position #\= name-and-value))
+                               (values (subseq name-and-value strip-start index)
+                                       (subseq name-and-value (1+ index))))
+                              (t
+                               (values (subseq name-and-value strip-start)
+                                       (setf name-and-value (next))))))
+                           (name/parsed (when name
+                                          (make-name (split-sequence #\- name)))))
 
-                  (when name/parsed
-                    (log:info "~@<Identified positional option ~
-                               ~/configuration.options:print-name/ -> ~
-                               ~A with value ~S.~@:>"
-                              name/parsed name value) ; TODO also report unrecognized options?
-                    (notify name/parsed value name :raw? t)))
-              (continue (&optional condition)
-                :report (lambda (stream)
-                          (format stream "~@<Skip positional option ~S.~@:>" name-and-value))
-                (declare (ignore condition))))))))
+                      (when name/parsed
+                        (log:info "~@<Identified positional option ~
+                                   ~/configuration.options:print-name/ ~
+                                   -> ~A with value ~S.~@:>"
+                                  name/parsed name value) ; TODO also report unrecognized options?
+                        (notify name/parsed value name :raw? t)))
+                  (continue (&optional condition)
+                    :report (lambda (stream)
+                              (format stream "~@<Skip positional option ~S.~@:>"
+                                      name-and-value))
+                    (declare (ignore condition))))))))

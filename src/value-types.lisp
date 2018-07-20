@@ -257,12 +257,13 @@
                (type        (eql ',type))
                &key
                inner-type)
-            (iter (for type1 in inner-type)
-                  (let+ (((&values value error?)
-                          (ignore-errors (value->string-using-type
-                                          schema-item value type1))))
-                    (when (not error?)
-                      (return-from value->string-using-type value))))
+            (map nil (lambda (type1)
+                       (let+ (((&values value error?)
+                               (ignore-errors (value->string-using-type
+                                               schema-item value type1))))
+                         (when (not error?)
+                           (return-from value->string-using-type value))))
+                 inner-type)
             (error "~@<Could not ~S ~A ~S ~S.~@:>"
                    'value->string schema-item value
                    (list* type inner-type)))
@@ -273,12 +274,13 @@
                (type        (eql ',type))
                &key
                inner-type)
-            (iter (for type1 in inner-type)
-                  (let+ (((&values value error?)
-                          (ignore-errors (raw->value-using-type
-                                          schema-item raw type1))))
-                    (when (not error?)
-                      (return-from raw->value-using-type value))))
+            (map nil (lambda (type1)
+                       (let+ (((&values value error?)
+                               (ignore-errors (raw->value-using-type
+                                               schema-item raw type1))))
+                         (when (not error?)
+                           (return-from raw->value-using-type value))))
+                 inner-type)
             (error "~@<~S is not valid for any of ~{~S~^, ~}.~@:>"
                    raw inner-type)))))
 

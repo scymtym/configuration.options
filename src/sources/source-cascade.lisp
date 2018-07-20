@@ -1,6 +1,6 @@
 ;;;; source-cascade.lisp --- Cascades of sources.
 ;;;;
-;;;; Copyright (C) 2011-2017 Jan Moringen
+;;;; Copyright (C) 2011-2018 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -71,14 +71,14 @@
                 (reduce #'+ sources :key (compose #'descendent-count
                                                   #'source-sources))
                 1))))
-      (iter (for child in (source-sources source))
-            (for i initially 0 then (+ i (descendent-count child)))
-            (for *debug-index* = (1+ i))
-            (with-simple-restart
-                (continue "~@<Ignore source ~A and continue with the ~
+      (loop :for i = 0 :then (+ i (descendent-count child))
+            :for child :in (source-sources source)
+            :for *debug-index* = (1+ i)
+            :do (with-simple-restart
+                    (continue "~@<Ignore source ~A and continue with the ~
                            next source.~@:>"
-                          child)
-              (process child (make-indexed-sink i sink)))))))
+                              child)
+                  (process child (make-indexed-sink i sink)))))))
 
 ;;; `config-file-cascade-source'
 
