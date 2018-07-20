@@ -74,10 +74,17 @@
 (defmethod process-content ((syntax xml-syntax)
                             (source stream)
                             (sink   t))
-  (let+ ((source (if (eq (stream-element-type source) '(unsigned-byte 8))
-                     source
-                     (sb-ext:string-to-octets
-                      (read-stream-content-into-string source))))
+  (let+ ((element-type (stream-element-type source))
+         (source       (cond
+                         ((subtypep element-type '(unsigned-byte 8))
+                          source)
+                         ((subtypep element-type 'character)
+                          (read-stream-content-into-string source))
+                         (t
+                          (error "~@<Cannot read XML configuration ~
+                                  from non-binary, non-character stream ~
+                                  ~S.~@:>"
+                                 source))))
          ((&structure-r/o syntax- option-pattern name-pattern value-pattern)
           syntax)
          (document (cxml:parse source (stp:make-builder))))
