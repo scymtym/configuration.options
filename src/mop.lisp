@@ -1,6 +1,6 @@
 ;;;; mop.lisp --- Integration with the metaobject protocol.
 ;;;;
-;;;; Copyright (C) 2013, 2014, 2016, 2017 Jan Moringen
+;;;; Copyright (C) 2013-2019 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -155,10 +155,10 @@
   (let ((schema          (make-instance 'standard-schema))
         (names-and-items (class-schema-items class)))
     (setf (option-documentation schema) documentation)
-    (loop :for (kind name item) :in names-and-items :do
-       (ecase kind
-         (:item
-          (setf (find-option name schema) item))))
+    (loop :for (kind name item) :in names-and-items
+          :do (ecase kind
+                (:item
+                 (setf (find-option name schema) item))))
     schema))
 
 (defmethod class-schema-items ((class class))
@@ -175,10 +175,9 @@
              (member name (%class-initargs class) :test #'string=)))))
 
 (defmethod class-schema-slots ((class class))
-  (unless (c2mop:class-finalized-p class)
-    (c2mop:finalize-inheritance class))
-  (remove-if-not (curry #'slot-suitable-for-schema? class)
-                 (c2mop:class-slots class)))
+  (let ((class (c2mop:ensure-finalized class)))
+    (remove-if-not (curry #'slot-suitable-for-schema? class)
+                   (c2mop:class-slots class))))
 
 (defmethod slot-schema-item ((class class)
                              (slot  c2mop:effective-slot-definition))
