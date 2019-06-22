@@ -1,6 +1,6 @@
 ;;;; service-provider.lisp --- Integration with the architecture.service-provider system.
 ;;;;
-;;;; Copyright (C) 2013, 2014, 2016, 2017 Jan Moringen
+;;;; Copyright (C) 2013-2019 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -68,7 +68,7 @@
      service provider/resolved configuration)))
 
 (defmethod make-provider-using-configuration ((service       t)
-                                              (provider      class-provider)
+                                              (provider      t)
                                               (configuration t))
   (let+ ((class    (provider-class provider))
          (initargs '())
