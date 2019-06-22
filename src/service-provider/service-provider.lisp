@@ -36,7 +36,7 @@
 
 ;;; Provider configuration protocol
 ;;;
-;;; This extended the provider instantiation protocol of the
+;;; This extends the provider instantiation protocol of the
 ;;; service-provider systems by
 ;;;
 ;;; 1. Defining a new generic function
