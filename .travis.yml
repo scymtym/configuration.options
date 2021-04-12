@@ -22,7 +22,6 @@ script:
       -s configuration.options/test
       -s configuration.options-syntax-ini/test
       -s configuration.options-syntax-xml/test
-      -s configuration.options-source-commandline/test
       -s configuration.options-and-mop/test
       -s configuration.options-and-service-provider/test
       '(or (every (function identity)
@@ -30,7 +29,6 @@ script:
                           (quote (configuration.options.test:run-tests
                                   configuration.options.sources.syntax-ini.test:run-tests
                                   configuration.options.sources.syntax-xml.test:run-tests
-                                  configuration.options.sources.commandline.test:run-tests
                                   configuration.options.mop.test:run-tests
                                   configuration.options.service-provider.test:run-tests))))
            (uiop:quit -1))'
